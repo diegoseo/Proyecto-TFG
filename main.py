@@ -39,3 +39,17 @@ print(asignacion_colores)
 
 
 #AHORA QUE YA TENGO ASIGNADO UN COLOR POR CADA TIPO TENGO QUE GRAFICAR LOS ESPECTROS#
+
+# Graficar los espectros
+plt.figure(figsize=(10, 6))
+
+# Iterar sobre cada columna de intensidad y graficar con el color correspondiente
+for col_idx, tipo in enumerate(tipos):
+    plt.plot(raman_shift, intensity.iloc[:, col_idx], label=tipo, color=asignacion_colores[tipo])
+
+# Personalizar la gráfica
+plt.xlabel('Raman Shift (cm⁻¹)')
+plt.ylabel('Intensity (a.u.)')
+plt.title('Espectros sin Normalizar')
+plt.legend(loc='upper right')
+plt.show()
