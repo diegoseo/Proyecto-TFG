@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-bd_name = 'paraibuace.csv' #Este archivo contiene los datos espectroscópicos que serán leídos
+bd_name = 'limpio.csv' #Este archivo contiene los datos espectroscópicos que serán leídos
 df = pd.read_csv(bd_name, delimiter = ',' , header=None)
 print(df)
 
@@ -36,12 +36,8 @@ print(tipos_nombres)
 
 
 
-colores_primarios = ['#FF0000', '#0000FF', '#FFFF00','#008000']  # Rojo, Azul, Amarillo,verde
-# Generar una paleta de colores con el número de colores igual a cant_tipos
-if (cant_tipos - len(colores_primarios)) > 0:
-    colores = plt.cm.get_cmap('hsv', cant_tipos - len(colores_primarios))
-else:
-    colores = plt.cm.get_cmap(colores_primarios, cant_tipos)
+
+colores = plt.cm.get_cmap('hsv', cant_tipos)
 
 # Crear el diccionario de asignación de colores
 asignacion_colores = {tipo: mcolors.to_hex(colores(i)) for i, tipo in enumerate(tipos_nombres)}
