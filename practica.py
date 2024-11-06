@@ -27,12 +27,17 @@ print(df)
 
 raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
 print(raman_shift)
+print(raman_shift.head(50))
 
 intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA FILA Y PRIMERA COLUMNA
 print(intensity)
 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 print(tipos)
+
+cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
+cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero
+print(cabecera)
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 print(cant_tipos)
@@ -58,14 +63,16 @@ print(diccionario)
 
 
 
-
+print('entro 10')
 
 plt.figure(figsize=(1,1))    
 for index, row in diccionario.iterrows():
+    print('entro 15')
     tipo = row[0]   # Nombre del tipo (por ejemplo, 'collagen')
     color = row[1]  # Color asociado (por ejemplo, '#ff0000')
     plt.plot([], [], color=color, label=tipo) 
 # Mostrar la leyenda y el gráfico
+print('entro 20')
 plt.legend(loc='center')
 plt.grid(False)
 plt.axis('off')
@@ -76,7 +83,7 @@ plt.show()
 # Graficar los espectros
 plt.figure(figsize=(10, 6))
 
-
+print('entro 11')
 '''
 ########## DESCOMENTAR ESTE PARA VER COMO MUESTRA LA LEYENDA Y VER LA FORMA DE PONER EN EL MISMO PLOT QUE EN LOS DEMAS GRAFICO
 for index, row in diccionario.iterrows():
@@ -108,7 +115,7 @@ print(df2)
 print(df2.shape)
 
 
-
+print('entro 12')
 #### GRAFICAMOS EL ESPECTRO SIN NORMALIZAR ##########
 
 leyendas_tipos = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
@@ -137,7 +144,7 @@ for col in df2.columns :
 
 
 #print(leyendas_tipos) 
-
+print('entro 13')
 # Etiquetas y título
 plt.xlabel('Longitud de onda / Frecuencia')
 plt.ylabel('Intensidad')
@@ -154,9 +161,65 @@ La normalización por la media es una técnica que ajusta los valores de una var
  para que tengan una media de 0 y una desviación estándar de 1.
 '''
 
+'''
+NORMALMENTE NO SE NORMALIZA EL RAMAN_SHIFT , TAMBIEN ATENDER QUE TIENE QUE SER TODO NUMERO PARA EL fit_transform()
+OSEA BORRAR CABECERA
+'''
+
+scaler = StandardScaler() 
+cal_nor = scaler.fit_transform(intensity) #calcula la media y desviación estándar
+dato_normalizado = pd.DataFrame(cal_nor, columns=intensity.columns) # lo convertimos de vuelta en un DataFrame
+
+print(dato_normalizado)
+
+df_concatenado = pd.concat([cabecera,dato_normalizado], axis=0, ignore_index=True)
+print(df_concatenado)
+
+
+# Paso 1: Convertir la primera fila en cabecera
+df_concatenado.columns = df_concatenado.iloc[0]  # Asigna la primera fila como nombres de columna
+
+# Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
+df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
+print(df_concatenado_cabecera_nueva.head(50))
 
 
 
+leyendas_tipos = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
+pos_y=0
+for col in df_concatenado_cabecera_nueva.columns :
+    for tipo in asignacion_colores:
+        if tipo == col :
+            color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
+            print(tipo,'==',col,'color=',color_actual) 
+            if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
+                print('RAMAN SHIFT')
+                print(raman_shift)
+                print('INTENSIDADES')
+                #print(df2.iloc[:,pos_y]) 
+                if tipo in leyendas_tipos:
+                    plt.plot(raman_shift , df_concatenado_cabecera_nueva[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
+                    '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
+                    print('entro4')
+                    print(pos_y)   
+                    break
+                else:
+                    plt.plot(raman_shift , df_concatenado_cabecera_nueva[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                    leyendas_tipos.add(tipo) 
+            pos_y+=1 
+
+
+
+#print(leyendas_tipos) 
+print('entro 13')
+# Etiquetas y título
+plt.xlabel('Longitud de onda / Frecuencia')
+plt.ylabel('Intensidad')
+plt.title(f'Espectros del archivo Normalizado por la media {bd_name}')
+
+
+
+##### VEMOS PARA  IMPLEMENTAR EL NORMALIZADO POR AREA
 
 
 
