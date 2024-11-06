@@ -11,6 +11,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA
+
+
+#nombre = input("Por favor, ingresa tu nombre: ")
+#print(f"Hola, {nombre}!")
+
 
 bd_name = 'limpio.csv' #Este archivo contiene los datos espectroscópicos que serán leídos
 df = pd.read_csv(bd_name, delimiter = ',' , header=None)
@@ -136,5 +142,27 @@ for col in df2.columns :
 plt.xlabel('Longitud de onda / Frecuencia')
 plt.ylabel('Intensidad')
 plt.title(f'Espectros del archivo {bd_name}')
+
+
+
+
+
+##### VEMOS PARA  IMPLEMENTAR EL NORMALIZADO POR LA MEDIA
+
+'''
+La normalización por la media es una técnica que ajusta los valores de una variable o conjunto de datos
+ para que tengan una media de 0 y una desviación estándar de 1.
+'''
+
+
+
+
+
+
+
+
+
+
+
 
 
