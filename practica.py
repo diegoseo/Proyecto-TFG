@@ -222,7 +222,7 @@ plt.title(f'Espectros del archivo Normalizado por la media {bd_name}')
 ##### VEMOS PARA  IMPLEMENTAR EL NORMALIZADO POR AREA
 
 
-
+#prueba git
 
 
 
