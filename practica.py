@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA Y PCA
+from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from sklearn.decomposition import PCA
 
 
@@ -49,9 +49,9 @@ intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA 
 #print(intensity)   
 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
-print(tipos)
+#print(tipos)
 types=tipos.tolist()
-print(types)
+#print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
 cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero
@@ -186,7 +186,9 @@ def mostrar_menu():
     print("7. SUAVIZADO POR MEDIA MOVIL")
     print("8. PRIMERA DERIVADA")
     print("9. SEGUNDA DERIVADA")
-    print("10. Salir")
+    print("10. CORRECCION LINEA BASE")
+    print("11. CORRECION SHIRLEY")
+    print("12. Salir")
 
 
 
@@ -202,6 +204,10 @@ def mostrar_menu():
       #      primera_derivada()
       # elif opcion == '9':
       #      segunda_derivada()
+      # elif opcion == '10':
+      #      correccion_lineaB()
+      # elif opcion == '11':
+      #      correcion_Shirley()
  
 
 def main():
@@ -226,7 +232,7 @@ def main():
             mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo)
         elif opcion == '4':
             mostrar_pca()
-        elif opcion == '10':
+        elif opcion == '12':
             print("Saliendo del programa...")
             break
         else:
@@ -267,7 +273,7 @@ def mostrar_espectros(datos,metodo):
                         leyendas_tipos.add(tipo) 
                 pos_y+=1 
     
-    #TODO ESTE CONDICIONAL ES SOLO PARA QUE EL TITULO DEL GRAFICO MUESTRE POR CUAL METODO SE NORMALIZO
+    # TODO ESTE CONDICIONAL ES SOLO PARA QUE EL TITULO DEL GRAFICO MUESTRE POR CUAL METODO SE NORMALIZO
     if metodo == 1:
         #print(leyendas_tipos) 
         #print('entro 13')
@@ -314,29 +320,59 @@ def  mostrar_pca():
         #print(normalizado_pca)
     elif opcion == '3' :
         normalizado_pca = df2
-        #print(normalizado_pca)
+        print(normalizado_pca)
     else:
         print("OPCION NO VALIDA")
         print("SAlir...")
         #mostrar_menu()
 
-'''
+    datos = pd.DataFrame(normalizado_pca)
+    #print(datos)
+    
+    datos_df = datos.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
+    #print('prueba')
+    #print(datos_df)
+    
+    datos_np = datos_df.to_numpy() # PASAMOS DE UN DATAFRAME PANDAS A UN ARRAY NUMPY
+    #print(datos_np)
+    
     pca = PCA(n_components=2)
-
     # Ajustar y transformar los datos
-    dato_pca = pca.fit_transform(normalizado_pca)
-
-    print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
+    dato_pca = pca.fit_transform(datos_np)
+    #print(dato_pca)
+    
+    
+    #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
     colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     plt.scatter(dato_pca[:, 0], dato_pca[:, 1], c=colores_pca_original, alpha=0.7)
-    plt.xlabel('Componente Principal 1')
-    plt.ylabel('Componente Principal 2')
+    plt.xlabel('Raman_shift')
+    plt.ylabel('Intensidad')
     plt.title('Proyección en las Primeras 2 Componentes Principales')
     plt.grid()
     plt.show()
 
+
+
+
+    '''
+    plt.figure(figsize=(10, 6))
+    plt.scatter(pca_resultado_original[:, 0], pca_resultado_original[:, 1], c=colors_pca_original, alpha=0.7)
+    plt.xlabel('Componente principal 1')
+    plt.ylabel('Componente principal 2')
+    plt.title('PCA del dataframe original')
+    
+    # Crear leyenda
+    handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markersize=10, markerfacecolor=v) for k, v in colors.items()]
+    plt.legend(handles=handles, loc='upper right')
+    plt.grid(True)
+    plt.show()
 '''
+
+
+
+
+
 
 
 
