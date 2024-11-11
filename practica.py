@@ -194,8 +194,7 @@ def mostrar_menu():
 
 
       # 
-      # elif opcion == '5':
-      #     suavizado_saviztky-golay()
+     
       # elif opcion == '6':
       #      suavizado_filtroGausiano()
       # elif opcion == '7':
@@ -231,7 +230,13 @@ def main():
             print("Por favor espere un momento")
             mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo)
         elif opcion == '4':
+            print("Procesando los datos")
+            print("Por favor espere un momento")
             mostrar_pca()
+        elif opcion == '5':
+            print("Procesando los datos")
+            print("Por favor espere un momento")
+            suavizado_saviztky_golay()
         elif opcion == '12':
             print("Saliendo del programa...")
             break
@@ -355,21 +360,12 @@ def  mostrar_pca():
 
 
 
-    '''
-    plt.figure(figsize=(10, 6))
-    plt.scatter(pca_resultado_original[:, 0], pca_resultado_original[:, 1], c=colors_pca_original, alpha=0.7)
-    plt.xlabel('Componente principal 1')
-    plt.ylabel('Componente principal 2')
-    plt.title('PCA del dataframe original')
+
+# SUAVIZADO POR SAVIZTKY-GOLAY
+
+def suavizado_saviztky_golay():  #acordarse que se puede suavizar por la media, area y directo
+    print()
     
-    # Crear leyenda
-    handles = [plt.Line2D([0], [0], marker='o', color='w', label=k, markersize=10, markerfacecolor=v) for k, v in colors.items()]
-    plt.legend(handles=handles, loc='upper right')
-    plt.grid(True)
-    plt.show()
-'''
-
-
 
 
 
