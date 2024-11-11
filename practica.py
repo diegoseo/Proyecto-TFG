@@ -14,7 +14,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from sklearn.decomposition import PCA
-
+from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
+from scipy.ndimage import gaussian_filter1d # PARA EL FILTRO GAUSSIANO
 
 def archivo_existe(ruta_archivo):
     return os.path.isfile(ruta_archivo)
@@ -146,7 +147,7 @@ df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index
 df_concatenado_area.columns = df_concatenado_area.iloc[0]  # Asigna la primera fila como nombres de columna
 # Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
 df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=True)
-#print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print('entro 10')
 
 
@@ -195,8 +196,7 @@ def mostrar_menu():
 
       # 
      
-      # elif opcion == '6':
-      #      suavizado_filtroGausiano()
+      # 
       # elif opcion == '7':
       #      suavizado_mediamovil()
       # elif opcion == '8':
@@ -237,6 +237,10 @@ def main():
             print("Procesando los datos")
             print("Por favor espere un momento")
             suavizado_saviztky_golay()
+        elif opcion == '6':
+            print("Procesando los datos")
+            print("Por favor espere un momento")
+            suavizado_filtroGausiano()
         elif opcion == '12':
             print("Saliendo del programa...")
             break
@@ -253,7 +257,6 @@ def mostrar_espectros(datos,metodo):
     # Graficar los espectros
     plt.figure(figsize=(10, 6))
   
-    
     leyendas_tipos = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
     pos_y=0
     for col in datos.columns :
@@ -294,6 +297,22 @@ def mostrar_espectros(datos,metodo):
         plt.xlabel('Longitud de onda / Frecuencia')
         plt.ylabel('Intensidad')
         plt.title(f'Espectros del archivo Normalizado por la Media {bd_name}')
+        plt.show()
+    elif metodo == 3:
+        #print(leyendas_tipos) 
+        #print('entro 13')
+        # Etiquetas y título
+        plt.xlabel('Longitud de onda / Frecuencia')
+        plt.ylabel('Intensidad')
+        plt.title(f'Espectros del archivo Suavizado por Saviztky_golay {bd_name}')
+        plt.show()
+    elif metodo == 4:
+        #print(leyendas_tipos) 
+        #print('entro 13')
+        # Etiquetas y título
+        plt.xlabel('Longitud de onda / Frecuencia')
+        plt.ylabel('Intensidad')
+        plt.title(f'Espectros del archivo Suavizado por Filtro Gaussiano {bd_name}')
         plt.show()
     else:
         #print(leyendas_tipos) 
@@ -364,10 +383,66 @@ def  mostrar_pca():
 # SUAVIZADO POR SAVIZTKY-GOLAY
 
 def suavizado_saviztky_golay():  #acordarse que se puede suavizar por la media, area y directo
-    print()
+    print("SUAVIZAR POR:")
+    print("1-MEDIA")
+    print("2-Area")
+    print("3-Sin normalizar")
+    opcion = input("Selecciona una opción: ")
+    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+    orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
     
+ 
+    if opcion == '1'  :
+        normalizado_pca = df_media_pca
+        #print(normalizado_pca)
+    elif opcion == '2' :
+        normalizado_pca = df_concatenado_cabecera_nueva_area
+        print(normalizado_pca)
+    elif opcion == '3' :
+        normalizado_pca = df2
+        #print(normalizado_pca)
+    else:
+        print("OPCION NO VALIDA")
+        print("SAlir...")
+        #mostrar_menu()
+    
+    dato = normalizado_pca.to_numpy() #PASAMOS LOS DATOS A NUMPY POR QUE SAVGOL_FILTER USA SOLO NUMPY COMO PARAMETRO (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
+
+    suavizado = savgol_filter(dato, window_length=ventana, polyorder=orden)
+    suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
+    suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
+    mostrar_espectros(suavizado_pd,3)
 
 
+
+
+def suavizado_filtroGausiano():  #acordarse que se puede suavizar por la media, area y directo
+    print("SUAVIZAR POR:")
+    print("1-MEDIA")
+    print("2-Area")
+    print("3-Sin normalizar")
+    opcion = input("Selecciona una opción: ")
+    sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
+    
+    
+ 
+    if opcion == '1'  :
+        normalizado = df_media_pca
+    elif opcion == '2' :
+        normalizado = df_concatenado_cabecera_nueva_area
+    elif opcion == '3' :
+        normalizado = df2
+    else:
+        print("OPCION NO VALIDA")
+        print("SAlir...")
+     
+    '''
+    normalizado = normalizado.apply(pd.to_numeric, errors='coerce')  # Reemplaza no numéricos por NaN
+    normalizado = normalizado.fillna(0)  # Reemplaza NaN con 0 (o usa dropna() para eliminarlos)
+    dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
+    suavizado_gaussiano = gaussian_filter1d(dato, sigma= sigma)
+    mostrar_espectros(suavizado_gaussiano,4)
+    '''
 
 
 
