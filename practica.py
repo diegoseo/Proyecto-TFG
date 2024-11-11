@@ -15,7 +15,7 @@ import matplotlib.colors as mcolors
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from sklearn.decomposition import PCA
 from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
-from scipy.ndimage import gaussian_filter1d # PARA EL FILTRO GAUSSIANO
+from scipy.ndimage import gaussian_filter # PARA EL FILTRO GAUSSIANO
 
 def archivo_existe(ruta_archivo):
     return os.path.isfile(ruta_archivo)
@@ -37,7 +37,7 @@ while existe == False:
     
 
 
-#print(df)
+print(df)
 
 
 #GRAFICAMOS LOS ESPECTROS SIN NORMALIZAR#
@@ -52,11 +52,11 @@ intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 #print(tipos)
 types=tipos.tolist()
-#print(types)
+print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
 cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero
-#print(cabecera)
+print(type(cabecera))
 
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
@@ -217,29 +217,29 @@ def main():
         if opcion == '1':
             metodo = 1
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             mostrar_espectros(df2,metodo)
         elif opcion == '2':
             metodo = 2
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             mostrar_espectros(df_media_pca,metodo)
         elif opcion == '3':
             metodo = 3
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo)
         elif opcion == '4':
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             mostrar_pca()
         elif opcion == '5':
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             suavizado_saviztky_golay()
         elif opcion == '6':
             print("Procesando los datos")
-            print("Por favor espere un momento")
+            print("Por favor espere un momento...")
             suavizado_filtroGausiano()
         elif opcion == '12':
             print("Saliendo del programa...")
@@ -434,16 +434,37 @@ def suavizado_filtroGausiano():  #acordarse que se puede suavizar por la media, 
         normalizado = df2
     else:
         print("OPCION NO VALIDA")
-        print("SAlir...")
+        print("Salir...")
      
-    '''
-    normalizado = normalizado.apply(pd.to_numeric, errors='coerce')  # Reemplaza no numéricos por NaN
-    normalizado = normalizado.fillna(0)  # Reemplaza NaN con 0 (o usa dropna() para eliminarlos)
+    print(type(normalizado))  
+    print(normalizado)
     dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
-    suavizado_gaussiano = gaussian_filter1d(dato, sigma= sigma)
-    mostrar_espectros(suavizado_gaussiano,4)
+    print(dato)
+    print(type(dato))
+    print(dato.dtype)  # me tira que es  Object, eso quiere decir que el array numpy contiene datos que no son de un tipo numerico uniforme
+    # por lo que tendremos que forza su conversion con astype(float)
+    dato = np.array(dato, dtype=float)
+    print(dato)
+    print(dato.dtype)
+    suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
+    print(suavizado_gaussiano)
+    suavizado_gaussiano_pd = pd.DataFrame(suavizado_gaussiano)
+    print(suavizado_gaussiano_pd)
     '''
-
+    # Supongamos que quieres que la primera fila de datos (fila 0) sea la nueva cabecera
+    normalizado.columns = normalizado.iloc[0]  # Asigna la primera fila como cabecera
+    normalizado = normalizado[1:].reset_index(drop=True)  # Elimina la primera fila (ahora duplicada en la cabecera) y resetea el índice
+    print(normalizado)
+    
+    #normalizado.row = normalizado['0'].reset_index(drop=True)  # Elimina la primera fila y resetea el índice
+    #print(normalizado)
+    normalizado = normalizado.apply(pd.to_numeric, errors='coerce')  # Reemplaza no numéricos por NaN
+    #normalizado = normalizado.fillna(0)  # Reemplaza NaN con 0 (o usa dropna() para eliminarlos)
+    
+    suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
+    mostrar_espectros(suavizado_gaussiano,4)
+    
+'''
 
 
 
