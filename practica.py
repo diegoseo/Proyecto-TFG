@@ -37,7 +37,7 @@ while existe == False:
     
 
 
-print(df)
+#print(df)
 
 
 #GRAFICAMOS LOS ESPECTROS SIN NORMALIZAR#
@@ -52,12 +52,12 @@ intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 #print(tipos)
 types=tipos.tolist()
-print(types)
+#print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
 cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero
-print(type(cabecera))
-
+#print(type(cabecera))
+#print(cabecera)
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 #print(cant_tipos)
@@ -147,7 +147,7 @@ df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index
 df_concatenado_area.columns = df_concatenado_area.iloc[0]  # Asigna la primera fila como nombres de columna
 # Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
 df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=True)
-print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+#print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print('entro 10')
 
 
@@ -218,29 +218,33 @@ def main():
             metodo = 1
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            mostrar_espectros(df2,metodo)
+            mostrar_espectros(df2,metodo,0)
         elif opcion == '2':
             metodo = 2
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            mostrar_espectros(df_media_pca,metodo)
+            mostrar_espectros(df_media_pca,metodo,0)
         elif opcion == '3':
             metodo = 3
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo)
+            mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo,0)
         elif opcion == '4':
             print("Procesando los datos")
             print("Por favor espere un momento...")
             mostrar_pca()
         elif opcion == '5':
-            print("Procesando los datos")
-            print("Por favor espere un momento...")
+           # print("Procesando los datos")
+           # print("Por favor espere un momento...")
             suavizado_saviztky_golay()
         elif opcion == '6':
-            print("Procesando los datos")
-            print("Por favor espere un momento...")
+           # print("Procesando los datos")
+           # print("Por favor espere un momento...")
             suavizado_filtroGausiano()
+        elif opcion == '7':
+           # print("Procesando los datos")
+           # print("Por favor espere un momento...")
+            suavizado_mediamovil()
         elif opcion == '12':
             print("Saliendo del programa...")
             break
@@ -251,7 +255,7 @@ def main():
 
 
 
-def mostrar_espectros(datos,metodo):
+def mostrar_espectros(datos,metodo,opcion):
     
     
     # Graficar los espectros
@@ -296,31 +300,73 @@ def mostrar_espectros(datos,metodo):
         # Etiquetas y título
         plt.xlabel('Longitud de onda / Frecuencia')
         plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo Normalizado por la Media {bd_name}')
+        plt.title(f'Espectros del archivo {bd_name} Normalizado por la Media')
         plt.show()
     elif metodo == 3:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
-        plt.xlabel('Longitud de onda / Frecuencia')
-        plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo Suavizado por Saviztky_golay {bd_name}')
-        plt.show()
+        if opcion == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media')
+            plt.show()   
+        elif opcion == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado Area')
+            plt.show() 
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar ')
+            plt.show() 
+            
     elif metodo == 4:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
-        plt.xlabel('Longitud de onda / Frecuencia')
-        plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo Suavizado por Filtro Gaussiano {bd_name}')
-        plt.show()
+        if opcion == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y Normalizado por la media')
+            plt.show()   
+        elif opcion == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y Normalizado Area')
+            plt.show() 
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y sin Normalizar ')
+            plt.show() 
+    elif metodo == 5:
+        #print(leyendas_tipos) 
+        #print('entro 13')
+        # Etiquetas y título
+        if opcion == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado por la media')
+            plt.show()   
+        elif opcion == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado Area')
+            plt.show() 
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
+            plt.show() 
     else:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
         plt.xlabel('Longitud de onda / Frecuencia')
         plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo Normalizado por Area {bd_name}')
+        plt.title(f'Espectros del archivo {bd_name} Normalizado por Area')
         plt.show()
 
 
@@ -344,7 +390,7 @@ def  mostrar_pca():
         #print(normalizado_pca)
     elif opcion == '3' :
         normalizado_pca = df2
-        print(normalizado_pca)
+        #print(normalizado_pca)
     else:
         print("OPCION NO VALIDA")
         print("SAlir...")
@@ -370,11 +416,25 @@ def  mostrar_pca():
     colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
     plt.figure(figsize=(10, 6))
     plt.scatter(dato_pca[:, 0], dato_pca[:, 1], c=colores_pca_original, alpha=0.7)
-    plt.xlabel('Raman_shift')
-    plt.ylabel('Intensidad')
-    plt.title('Proyección en las Primeras 2 Componentes Principales')
-    plt.grid()
-    plt.show()
+    
+    if opcion == '1':   
+        plt.xlabel('Raman_shift')
+        plt.ylabel('Intensidad')
+        plt.title('PCA NORMALIZADA POR LA MEDIA')
+        plt.grid()
+        plt.show()
+    elif opcion == '2':
+        plt.xlabel('Raman_shift')
+        plt.ylabel('Intensidad')
+        plt.title('PCA NORMALIZADA POR AREA')
+        plt.grid()
+        plt.show()
+    else:
+        plt.xlabel('Raman_shift')
+        plt.ylabel('Intensidad')
+        plt.title('PCA SIN NORMALIZAR')
+        plt.grid()
+        plt.show()        
 
 
 
@@ -390,7 +450,8 @@ def suavizado_saviztky_golay():  #acordarse que se puede suavizar por la media, 
     opcion = input("Selecciona una opción: ")
     ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
     orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
-    
+    print("Procesando los datos")
+    print("Por favor espere un momento...")
  
     if opcion == '1'  :
         normalizado_pca = df_media_pca
@@ -411,7 +472,7 @@ def suavizado_saviztky_golay():  #acordarse que se puede suavizar por la media, 
     suavizado = savgol_filter(dato, window_length=ventana, polyorder=orden)
     suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
     suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
-    mostrar_espectros(suavizado_pd,3)
+    mostrar_espectros(suavizado_pd,3,opcion)
 
 
 
@@ -423,7 +484,8 @@ def suavizado_filtroGausiano():  #acordarse que se puede suavizar por la media, 
     print("3-Sin normalizar")
     opcion = input("Selecciona una opción: ")
     sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
-    
+    print("Procesando los datos")
+    print("Por favor espere un momento...")
     
  
     if opcion == '1'  :
@@ -436,38 +498,73 @@ def suavizado_filtroGausiano():  #acordarse que se puede suavizar por la media, 
         print("OPCION NO VALIDA")
         print("Salir...")
      
-    print(type(normalizado))  
-    print(normalizado)
+    #print(type(normalizado))  
+    #print(normalizado)
     dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
-    print(dato)
-    print(type(dato))
-    print(dato.dtype)  # me tira que es  Object, eso quiere decir que el array numpy contiene datos que no son de un tipo numerico uniforme
+    #print(dato)
+    #print(type(dato))
+    #print(dato.dtype)  # me tira que es  Object, eso quiere decir que el array numpy contiene datos que no son de un tipo numerico uniforme
     # por lo que tendremos que forza su conversion con astype(float)
     dato = np.array(dato, dtype=float)
-    print(dato)
-    print(dato.dtype)
+    #print(dato)
+    #print(dato.dtype)
     suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
-    print(suavizado_gaussiano)
+    #print(suavizado_gaussiano)
     suavizado_gaussiano_pd = pd.DataFrame(suavizado_gaussiano)
-    print(suavizado_gaussiano_pd)
-    '''
-    # Supongamos que quieres que la primera fila de datos (fila 0) sea la nueva cabecera
-    normalizado.columns = normalizado.iloc[0]  # Asigna la primera fila como cabecera
-    normalizado = normalizado[1:].reset_index(drop=True)  # Elimina la primera fila (ahora duplicada en la cabecera) y resetea el índice
-    print(normalizado)
+    #print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
+    #print(suavizado_gaussiano_pd)
+     
+    suavizado_gaussiano_pd.columns = cabecera.iloc[0].values #agregamos la cabecera 
+    #print(suavizado_gaussiano_pd)
     
-    #normalizado.row = normalizado['0'].reset_index(drop=True)  # Elimina la primera fila y resetea el índice
-    #print(normalizado)
-    normalizado = normalizado.apply(pd.to_numeric, errors='coerce')  # Reemplaza no numéricos por NaN
-    #normalizado = normalizado.fillna(0)  # Reemplaza NaN con 0 (o usa dropna() para eliminarlos)
-    
-    suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
-    mostrar_espectros(suavizado_gaussiano,4)
-    
-'''
+    mostrar_espectros(suavizado_gaussiano_pd,4,opcion)
 
 
 
+def suavizado_mediamovil():
+    print("SUAVIZAR POR:")
+    print("1-MEDIA")
+    print("2-Area")
+    print("3-Sin normalizar")
+    opcion = input("Selecciona una opción: ")
+    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+    print("Procesando los datos")
+    print("Por favor espere un momento...")
+    
+ 
+    if opcion == '1'  :
+        normalizado = df_media_pca
+    elif opcion == '2' :
+        normalizado = df_concatenado_cabecera_nueva_area
+    elif opcion == '3' :
+        normalizado = df2
+    else:
+        print("OPCION NO VALIDA")
+        print("Salir...")
+        
+    suavizado_media_movil = pd.DataFrame()
+    
+    
+    suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean()
+    
+    mostrar_espectros(suavizado_media_movil,5,opcion)
+    
+    
+    
+    
+    
+    
+
+    
+    print(suavizado_media_movil)
+    
+    
+    
+        
+    
+    
+    
+    
 
 if __name__ == "__main__":
      main()
