@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 13 19:40:22 2024
+Created on Thu Nov 14 07:44:42 2024
 
 @author: diego
-"""
+"""#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 # main.py
@@ -232,9 +233,9 @@ def main():
              # print("Por favor espere un momento...")
              mostrar_pca()       
         elif opcion == '8':
-             primera_derivada()
-        # elif opcion == '9':
-        #     #segunda_derivada()
+             primera_derivada(0,0)
+        elif opcion == '9':
+             segunda_derivada()
         # elif opcion == '10':
         #     #correcion_LineaB()
         # elif opcion == '11':
@@ -541,13 +542,28 @@ def  mostrar_pca():
             metodo_suavizado = int(input("OPCION: "))
             if metodo_suavizado == 1:
                 normalizado_pca = suavizado_saviztky_golay(normalizado_pca,1)
-                print("volvio")
-                print(metodo_suavizado)
+                # print("volvio")
+                #print(metodo_suavizado)
             elif metodo_suavizado == 2:
                 normalizado_pca = suavizado_filtroGausiano(normalizado_pca,1)
             else:
-                normalizado_pca = suavizado_mediamovil(normalizado_pca,1)         
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,1) 
+            
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+            print("1- PRIMERA DERIVADA")
+            print("2- SEGUNDA DERIVADA")
+            op_der= int(input("OPCION: "))
+            if op_der == 1:
+                normalizado_pca = primera_derivada(normalizado_pca,1)
+            else:
+                normalizado_pca = segunda_derivada(normalizado_pca,1)
+        
     elif opcion == '2' :
+        print("entor op 2")
         normalizado_pca = df_concatenado_cabecera_nueva_area
         print("Deseas Suavizar?")
         print("1- SI")
@@ -560,11 +576,28 @@ def  mostrar_pca():
             print("3. SUAVIZADO POR MEDIA MOVIL")
             metodo_suavizado = int(input("OPCION: "))
             if metodo_suavizado == 1:
-                suavizado_saviztky_golay(normalizado_pca,1)
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,1)
             elif metodo_suavizado == 2:
-                suavizado_filtroGausiano(normalizado_pca,1)
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,1)
             else:
-                suavizado_mediamovil(normalizado_pca,1) 
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,1) 
+        print("no suavizar xdd")
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+           print("1- PRIMERA DERIVADA")
+           print("2- SEGUNDA DERIVADA")
+           op_der= int(input("OPCION: "))
+           if op_der == 1:
+               print("si quiero derivar")
+               #print(normalizado_pca)
+               normalizado_pca = primera_derivada(normalizado_pca,1)
+           else:
+               normalizado_pca = segunda_derivada(normalizado_pca,1)      
+
+
     elif opcion == '3' :
         normalizado_pca = df2
         print("Deseas Suavizar?")
@@ -578,11 +611,24 @@ def  mostrar_pca():
             print("3. SUAVIZADO POR MEDIA MOVIL")
             metodo_suavizado = int(input("OPCION: "))
             if metodo_suavizado == 1:
-                suavizado_saviztky_golay(normalizado_pca,1)
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,1)
             elif metodo_suavizado == 2:
-                suavizado_filtroGausiano(normalizado_pca,1)
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,1)
             else:
-                suavizado_mediamovil(normalizado_pca,1)      
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,1) 
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+            print("1- PRIMERA DERIVADA")
+            print("2- SEGUNDA DERIVADA")
+            op_der= int(input("OPCION: "))
+            if op_der == 1:
+                normalizado_pca = primera_derivada(normalizado_pca,1)
+            else:
+                normalizado_pca = segunda_derivada(normalizado_pca,1)      
+
     else:
         print("OPCION NO VALIDA")
         print("SAlir...")
@@ -631,52 +677,98 @@ def  mostrar_pca():
 
 
 
-def primera_derivada():
-    print("SUAVIZAR LA PRIMERA DERIVADA POR:")
-    print("1-SAVIZTKY-GOLAY")
-    print("2-FILTRO GAUSIANO")
-    print("3-MEDIA MOVIL")
-    print("4-SIN SUAVIZAR")
-    opcion = input("Selecciona una opción: ")
+def primera_derivada(normalizado, pca_op):
+        print("entro en la funcion")
+        
+        if pca_op == 0:
+             print("NORMALIZAR POR:")
+             print("1-Media")
+             print("2-Area")
+             print("3-Sin normalizar")
+             opcion = input("Selecciona una opción: ")
+             
+             if opcion == '1'  :
+                 normalizado = df_media_pca
+             elif opcion == '2' :
+                 normalizado = df_concatenado_cabecera_nueva_area
+             elif opcion == '3' :
+                 normalizado = df2
+             else:
+                 print("OPCION NO VALIDA")
+                 print("Salir...")
+             
+             print("DESEAS SUAVIZAR?")
+             print("1-SI")
+             print("2-NO")
+             opcion = int(input("OPCION: "))
+             if opcion == 1:
+                 print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
+                 print("3. SUAVIZADO POR MEDIA MOVIL")
+                 metodo_suavizado = int(input("OPCION: "))
+                 if metodo_suavizado == 1:
+                     normalizado = suavizado_saviztky_golay(normalizado,1)
+                 elif metodo_suavizado == 2:
+                     normalizado = suavizado_filtroGausiano(normalizado,1)
+                 else:
+                     normalizado = suavizado_mediamovil(normalizado,1) 
+             
+             # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
+             
+        # else:
+        #     #daba error por que no retornaba nada
+        #     normalizado_pca = normalizado_pca
+        #     print("entro en 1ra der")
+        #     return  normalizado_pca
+
+       # Crear un nuevo DataFrame para almacenar las derivadas
+        df_derivada = normalizado
+        #print("antes del for")
+        # Calcular la primera derivada para cada columna usando .diff()
+        # Verificar nombres de columna duplicados
+        # duplicated_columns = normalizado.columns[normalizado.columns.duplicated()] #solo para ver las columnas repetidas
+        # print(duplicated_columns)
+        # Asegurar nombres únicos en las columnas agregando un sufijo numérico
+        df_derivada.columns = range(len(df_derivada.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
+        #print(df_derivada.columns)
+        df_derivada = df_derivada.drop(0)
+        #print(df_derivada)
+        #print("xxxxxxxxxxxxxxxxxxx")
+        
+        for col in normalizado.columns:
+            df_derivada[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna
     
-  
-    '''
-    if opcion == '1'  :
-        normalizado = suavizado_saviztky_golay()
-    elif opcion == '2' :
-        normalizado = suavizado_filtroGausiano()
-    elif opcion == '3' :
-        normalizado = suavizado_mediamovil()
-    elif opcion == '4':
-        normalizado = df2
-    else:
-        print("OPCION NO VALIDA")
-        print("Salir...")
-   ''' 
- 
-    dato = intensity.copy
-   
-    print(dato)
+        #print(df_derivada)
+        
+    
+        # Mostrar el DataFrame de las primeras derivadas
+        #print("DataFrame de las primeras derivadas:")
+        print(df_derivada)
+        df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
+        print(df_derivada)
+      
+        
+     ################################################333 hay que grqficar en caso que se aprete opcion 8 directo
+        # if pca_op == 0 :
+        #     mostrar_espectros(datos, metodo, opcion)
+        
+        # return df_derivada
 
 
 
 
 
-
-
-
-
-
-
-
-
-
+def segunda_derivada():
+    print("entro sefunda dereivada")
 
 
 
 
 if __name__ == "__main__":
      main()
+
+
 
 
 
