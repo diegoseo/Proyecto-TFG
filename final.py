@@ -235,7 +235,7 @@ def main():
         elif opcion == '8':
              primera_derivada(0,0)
         elif opcion == '9':
-             segunda_derivada()
+             segunda_derivada(0,0)
         # elif opcion == '10':
         #     #correcion_LineaB()
         # elif opcion == '11':
@@ -348,6 +348,44 @@ def mostrar_espectros(datos,metodo,opcion):
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
+        if opcion == '1':
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado por la media')
+            plt.show()   
+        elif opcion == '2':
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado Area')
+            plt.show() 
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
+            plt.show() 
+    elif metodo == 7:
+            #print(leyendas_tipos) 
+            #print('entro 13')
+            # Etiquetas y título
+        if opcion == '1':
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado por la media')
+            plt.show()   
+        elif opcion == '2':
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado Area')
+            plt.show() 
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
+            plt.show() 
+    elif metodo == 8:
+            #print(leyendas_tipos) 
+            #print('entro 13')
+            # Etiquetas y título
         if opcion == '1':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
@@ -749,18 +787,87 @@ def primera_derivada(normalizado, pca_op):
         print(df_derivada)
       
         
-     ################################################333 hay que grqficar en caso que se aprete opcion 8 directo
-        # if pca_op == 0 :
-        #     mostrar_espectros(datos, metodo, opcion)
         
-        # return df_derivada
+        if pca_op == 0 :
+            mostrar_espectros(df_derivada, 7, 1)
+        else:
+            return df_derivada
+    
 
 
 
 
-
-def segunda_derivada():
+def segunda_derivada(normalizado, pca_op):
     print("entro sefunda dereivada")
+    print("entro en la funcion")
+        
+    if pca_op == 0:
+             print("NORMALIZAR POR:")
+             print("1-Media")
+             print("2-Area")
+             print("3-Sin normalizar")
+             opcion = input("Selecciona una opción: ")
+             
+             if opcion == '1'  :
+                 normalizado = df_media_pca
+             elif opcion == '2' :
+                 normalizado = df_concatenado_cabecera_nueva_area
+             elif opcion == '3' :
+                 normalizado = df2
+             else:
+                 print("OPCION NO VALIDA")
+                 print("Salir...")
+             
+             print("DESEAS SUAVIZAR?")
+             print("1-SI")
+             print("2-NO")
+             opcion = int(input("OPCION: "))
+             if opcion == 1:
+                 print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
+                 print("3. SUAVIZADO POR MEDIA MOVIL")
+                 metodo_suavizado = int(input("OPCION: "))
+                 if metodo_suavizado == 1:
+                     normalizado = suavizado_saviztky_golay(normalizado,1)
+                 elif metodo_suavizado == 2:
+                     normalizado = suavizado_filtroGausiano(normalizado,1)
+                 else:
+                     normalizado = suavizado_mediamovil(normalizado,1) 
+             
+             # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
+             
+    df_derivada2 = pd.DataFrame() #PARA ALMACENAR LOS DATOS DE LA SEGUNDA DERIVADA
+       # Crear un nuevo DataFrame para almacenar las derivadas
+    df_derivada = normalizado
+     
+        # Asegurar nombres únicos en las columnas agregando un sufijo numérico
+    df_derivada.columns = range(len(df_derivada.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
+        #print(df_derivada.columns)
+    df_derivada = df_derivada.drop(0)
+        #print(df_derivada)
+        #print("xxxxxxxxxxxxxxxxxxx")
+        
+    for col in normalizado.columns:
+        df_derivada[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna (PRIMERA DERIVADA)
+        df_derivada2[col] = df_derivada.diff()
+    
+    
+    
+    
+
+    print(df_derivada2)
+    df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
+    print(df_derivada2)
+    print(df_derivada)
+      
+        
+        
+    if pca_op == 0 :
+        mostrar_espectros(df_derivada, 7, 1)
+    else:
+        return df_derivada
+    
 
 
 
