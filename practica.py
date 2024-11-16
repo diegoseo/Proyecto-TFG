@@ -608,9 +608,24 @@ if __name__ == "__main__":
 
 
 
+global df_media_pca
+scaler = StandardScaler() 
+cal_nor = scaler.fit_transform(intensity) 
+dato_normalizado = pd.DataFrame(cal_nor, columns=intensity.columns)
+df_concatenado = pd.concat([cabecera,dato_normalizado], axis=0, ignore_index=True)
+df_concatenado.columns = df_concatenado.iloc[0]
+df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
+df_media_pca= pd.DataFrame(df_concatenado_cabecera_nueva)
 
 
 
+
+cal_nor = intensity.div(intensity.mean(axis=0), axis=1)  # Normalizar por la media
+dato_normalizado = pd.DataFrame(cal_nor, columns=intensity.columns)
+df_concatenado = pd.concat([cabecera, dato_normalizado], axis=0, ignore_index=True)
+df_concatenado.columns = df_concatenado.iloc[0]
+df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
+df_media_pca = pd.DataFrame(df_concatenado_cabecera_nueva)
 
 
 

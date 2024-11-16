@@ -51,11 +51,11 @@ intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA 
 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 #print(tipos)
-types=tipos.tolist()
-#print(types)
+types=tipos.tolist() #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
+print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
-cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero
+cabecera.drop( 0 ,axis=1, inplace=True) #eliminamos la primera columna no me sirve el indice cero #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
 #print(type(cabecera))
 #print(cabecera)
 
@@ -96,13 +96,16 @@ df2 = df2.drop(0).reset_index(drop=True) #eliminamos la primera fila
 df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del rama_shift
 #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
-#print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
+print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
 
 
 """
 VARIABLES DE NORMALIZAR POR LA MEDIA
 """
+
+
 global df_media_pca
 scaler = StandardScaler() 
 cal_nor = scaler.fit_transform(intensity) #calcula la media y desviación estándar
@@ -117,10 +120,9 @@ df_concatenado.columns = df_concatenado.iloc[0]  # Asigna la primera fila como n
 df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
 #print(df_concatenado_cabecera_nueva.head(50))
 df_media_pca= pd.DataFrame(df_concatenado_cabecera_nueva)
-#print(df_media_pca) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print("EL ESPECTRO NORMALIZADO POR LA MEDIA ES")
+print(df_media_pca) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print('normalizacion media')
-
-
 
 """
 VARIABLES DE NORMALIZAR POR AREA
@@ -140,7 +142,7 @@ df3_normalizado = df3.copy()
 for col in df3.columns:
     #print(df3[col])
     #print(df3_normalizado[col])
-    area = (np.trapz(df3[col], np_array))*-1  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
+    area = (np.trapz(df3[col], np_array))  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
     if area != 0:
         df3_normalizado[col] = df3[col] / area
     else:
@@ -152,7 +154,8 @@ df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index
 df_concatenado_area.columns = df_concatenado_area.iloc[0]  # Asigna la primera fila como nombres de columna
 # Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
 df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=True)
-#print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print("ESPECTRO NORMALIZADO POR EL AREA")
+print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print('entro 10')
 
 
@@ -363,25 +366,28 @@ def mostrar_espectros(datos,metodo,opcion):
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
             plt.show() 
-    elif metodo == 7:
+   
+        ''' elif metodo == 7:
             #print(leyendas_tipos) 
             #print('entro 13')
             # Etiquetas y título
-        if opcion == '1':
-            plt.xlabel('Longitud de onda / Frecuencia')
-            plt.ylabel('Intensidad')
-            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado por la media')
-            plt.show()   
-        elif opcion == '2':
-            plt.xlabel('Longitud de onda / Frecuencia')
-            plt.ylabel('Intensidad')
-            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado Area')
-            plt.show() 
-        else:
-            plt.xlabel('Longitud de onda / Frecuencia')
-            plt.ylabel('Intensidad')
-            plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
-            plt.show() 
+            if pca_op == 1 :
+                    if opcion == '1':
+                        plt.xlabel('Longitud de onda / Frecuencia')
+                        plt.ylabel('Intensidad')
+                        plt.title(f'PCA del archivo {bd_name} Normalizado por la  Media')
+                        plt.show()   
+                    elif opcion == '2':
+                        plt.xlabel('Longitud de onda / Frecuencia')
+                        plt.ylabel('Intensidad')
+                        plt.title(f'PCA del archivo {bd_name} Normalizado por Area')
+                        plt.show() 
+                    else:
+                        plt.xlabel('Longitud de onda / Frecuencia')
+                        plt.ylabel('Intensidad')
+                        plt.title(f'PCA del archivo {bd_name} Sin Normalizar ')
+                        plt.show() 
+
     elif metodo == 8:
             #print(leyendas_tipos) 
             #print('entro 13')
@@ -400,7 +406,7 @@ def mostrar_espectros(datos,metodo,opcion):
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
-            plt.show() 
+            plt.show() '''
     else:
         print("NO HAY GRAFICA DISPONIBLE PARA ESTA OPCION")
 
@@ -449,9 +455,12 @@ def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede 
     suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
     
     if pca_op == 0:
+        print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
+        print(suavizado_pd) 
         mostrar_espectros(suavizado_pd,4,opcion)
     else:
-        print("entro en retorna")
+        print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
+        print(suavizado_pd)  
         return suavizado_pd
     
     
@@ -504,8 +513,12 @@ def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede 
     #print(suavizado_gaussiano_pd)
     
     if pca_op == 0:
+        print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
+        print(suavizado_gaussiano_pd)
         mostrar_espectros(suavizado_gaussiano_pd,5,opcion)
     else:
+        print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
+        print(suavizado_gaussiano_pd)
         return suavizado_gaussiano_pd
 
 
@@ -545,9 +558,13 @@ def suavizado_mediamovil(normalizado_pca, pca_op):
     suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean() # mean() es para hallar el promedio
     
     if pca_op == 0:
+        print("ESPECTRO SUAVIZADO POR MEDIA MOVIL")
+        print(suavizado_media_movil)
         mostrar_espectros(suavizado_media_movil,6,opcion)
     else:
-        return mostrar_espectros
+        print("ESPECTRO SUAVIZADO POR MEDIA MOVIL")
+        print(suavizado_media_movil)
+        return suavizado_media_movil
     
     
    # print(suavizado_media_movil)
@@ -782,15 +799,19 @@ def primera_derivada(normalizado, pca_op):
     
         # Mostrar el DataFrame de las primeras derivadas
         #print("DataFrame de las primeras derivadas:")
-        print(df_derivada)
+        #print(df_derivada)
         df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
-        print(df_derivada)
+        #print(df_derivada)
       
         
         
         if pca_op == 0 :
+            print("LA PRIMERA DERIVADA ES:")
+            print(df_derivada)
             mostrar_espectros(df_derivada, 7, 1)
         else:
+            print("LA PRIMERA DERIVADA ES:")
+            print(df_derivada)
             return df_derivada
     
 
@@ -839,34 +860,38 @@ def segunda_derivada(normalizado, pca_op):
              
     df_derivada2 = pd.DataFrame() #PARA ALMACENAR LOS DATOS DE LA SEGUNDA DERIVADA
        # Crear un nuevo DataFrame para almacenar las derivadas
-    df_derivada = normalizado
+    df_derivada2 = normalizado
      
         # Asegurar nombres únicos en las columnas agregando un sufijo numérico
-    df_derivada.columns = range(len(df_derivada.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
+    df_derivada2.columns = range(len(df_derivada2.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
         #print(df_derivada.columns)
-    df_derivada = df_derivada.drop(0)
+    df_derivada2 = df_derivada2.drop(0)
         #print(df_derivada)
         #print("xxxxxxxxxxxxxxxxxxx")
         
     for col in normalizado.columns:
-        df_derivada[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna (PRIMERA DERIVADA)
-        df_derivada2[col] = df_derivada.diff()
+        df_derivada2[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna (PRIMERA DERIVADA)
+        df_derivada2[col] = df_derivada2.diff()
     
     
     
     
 
-    print(df_derivada2)
-    df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
-    print(df_derivada2)
-    print(df_derivada)
+    #print(df_derivada2)
+    df_derivada2.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
+    #print(df_derivada2)
+    #print(df_derivada)
       
         
         
     if pca_op == 0 :
-        mostrar_espectros(df_derivada, 7, 1)
+        print("LA SEGUNDA DERIVADA ES:")
+        print(df_derivada2)
+        mostrar_espectros(df_derivada2, 7, 1)
     else:
-        return df_derivada
+        print("LA SEGUNDA DERIVADA ES:")
+        print(df_derivada2)
+        return df_derivada2
     
 
 
