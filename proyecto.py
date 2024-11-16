@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 31 11:42:51 2024
+Created on Wed Nov 13 19:40:22 2024
 
 @author: diego
 """
+
 
 # main.py
 import os
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from sklearn.decomposition import PCA
 from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
 from scipy.ndimage import gaussian_filter # PARA EL FILTRO GAUSSIANO
+
 
 def archivo_existe(ruta_archivo):
     return os.path.isfile(ruta_archivo)
@@ -35,10 +38,6 @@ while existe == False:
         print("El archivo no existe.")
         archivo_nombre = input("Ingrese el nombre del archivo: ")
     
-
-
-print(df)
-
 
 #GRAFICAMOS LOS ESPECTROS SIN NORMALIZAR#
 
@@ -65,21 +64,25 @@ cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA V
 tipos_nombres = df.iloc[0, 1:].unique() # OBTENEMOS LOS NOMBRES DE LOS TIPOS
 #print(tipos_nombres)
 
+# Obtenemos el colormap sin especificar el número de colores
+cmap = plt.colormaps['hsv']  # Usamos solo el nombre del colormap
 
-
-
-colores = plt.cm.get_cmap('hsv', cant_tipos)
+# Nos aseguramos de que `colores` es una lista
+colores = [cmap(i) for i in np.linspace(0, 1, len(tipos_nombres))]  # Genera una lista de colores
 
 # Crear el diccionario de asignación de colores
-asignacion_colores = {tipo: mcolors.to_hex(colores(i)) for i, tipo in enumerate(tipos_nombres)}
+asignacion_colores = {tipo: mcolors.to_hex(colores[i]) for i, tipo in enumerate(tipos_nombres)}
+
 
 # Mostrar el diccionario de colores
 #print("Diccionario de asignación de colores:")
-print(asignacion_colores)
+#print(asignacion_colores)
 
 diccionario=pd.DataFrame(asignacion_colores.items())
 #print(diccionario)
+
 #AHORA QUE YA TENGO ASIGNADO UN COLOR POR CADA TIPO TENGO QUE GRAFICAR LOS ESPECTROS#
+
 
 
 """
@@ -94,6 +97,7 @@ df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del ram
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
 #print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
+
 
 """
 VARIABLES DE NORMALIZAR POR LA MEDIA
@@ -152,7 +156,7 @@ df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=Tr
 
 
 
-
+# MOSTRAMOS LA LEYENDA PARA CADA TIPO
 plt.figure(figsize=(2,2))    
 for index, row in diccionario.iterrows():
     #print('entro 15')
@@ -170,8 +174,6 @@ plt.show()
 
 
 
-
-
 '''
     PREPARAMOS EL SIGUIENTE MENU
 '''
@@ -181,28 +183,19 @@ def mostrar_menu():
     print("1. MOSTRAR ESPECTROS")
     print("2. NORMALIZAR POR MEDIA")
     print("3. NORMALIZAR POR AREA")
-    print("4. PCA")
-    print("5. SUAVIZADO POR SAVIZTKY-GOLAY")
-    print("6. SUAVIZADO POR FILTRO GAUSIANO")
-    print("7. SUAVIZADO POR MEDIA MOVIL")
+    print("4. SUAVIZADO POR SAVIZTKY-GOLAY")
+    print("5. SUAVIZADO POR FILTRO GAUSIANO")
+    print("6. SUAVIZADO POR MEDIA MOVIL")
+    print("7. PCA")
     print("8. PRIMERA DERIVADA")
     print("9. SEGUNDA DERIVADA")
     print("10. CORRECCION LINEA BASE")
     print("11. CORRECION SHIRLEY")
-    print("12. Salir")
+    print("12. ESPECTRO ESCALADO")
+    print("13. ESPECTRO ACOTADO")
+    print("14. Salir")
 
 
-
-
-      # elif opcion == '8':
-      #      primera_derivada()
-      # elif opcion == '9':
-      #      segunda_derivada()
-      # elif opcion == '10':
-      #      correccion_lineaB()
-      # elif opcion == '11':
-      #      correcion_Shirley()
- 
 
 def main():
     while True:
@@ -225,29 +218,36 @@ def main():
             print("Por favor espere un momento...")
             mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo,0)
         elif opcion == '4':
-            print("Procesando los datos")
-            print("Por favor espere un momento...")
-            mostrar_pca()
+            suavizado_saviztky_golay(0,0)          
         elif opcion == '5':
-           # print("Procesando los datos")
-           # print("Por favor espere un momento...")
-            suavizado_saviztky_golay()
+             suavizado_filtroGausiano(0,0)
+             # print("Procesando los datos")
+             # print("Por favor espere un momento...")        
         elif opcion == '6':
-           # print("Procesando los datos")
-           # print("Por favor espere un momento...")
-            suavizado_filtroGausiano()
+             suavizado_mediamovil(0,0)
+             # print("Procesando los datos")
+             # print("Por favor espere un momento...")     
         elif opcion == '7':
-           # print("Procesando los datos")
-           # print("Por favor espere un momento...")
-            suavizado_mediamovil()
+             # print("Procesando los datos")
+             # print("Por favor espere un momento...")
+             mostrar_pca()       
         elif opcion == '8':
-            primera_derivada()
-        elif opcion == '12':
+             primera_derivada()
+        # elif opcion == '9':
+        #     #segunda_derivada()
+        # elif opcion == '10':
+        #     #correcion_LineaB()
+        # elif opcion == '11':
+        #     #correcion_shirley()
+        # elif opcion == '12':
+        #     #espectro_escalado()
+        # elif opcion == '13':
+        #     #espectro_acotado()
+        elif opcion == '14':
             print("Saliendo del programa...")
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
-
 
 
 
@@ -300,15 +300,20 @@ def mostrar_espectros(datos,metodo,opcion):
         plt.title(f'Espectros del archivo {bd_name} Normalizado por la Media')
         plt.show()
     elif metodo == 3:
+        plt.xlabel('Longitud de onda / Frecuencia')
+        plt.ylabel('Intensidad')
+        plt.title(f'Espectros del archivo {bd_name} Normalizado por Area')
+        plt.show()
+    elif metodo == 4:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
-        if opcion == 1:
+        if opcion == '1':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media')
             plt.show()   
-        elif opcion == 2:
+        elif opcion == '2':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado Area')
@@ -319,16 +324,16 @@ def mostrar_espectros(datos,metodo,opcion):
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar ')
             plt.show() 
             
-    elif metodo == 4:
+    elif metodo == 5:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
-        if opcion == 1:
+        if opcion == '1':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y Normalizado por la media')
             plt.show()   
-        elif opcion == 2:
+        elif opcion == '2':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y Normalizado Area')
@@ -338,16 +343,16 @@ def mostrar_espectros(datos,metodo,opcion):
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Filtro Gaussiano y sin Normalizar ')
             plt.show() 
-    elif metodo == 5:
+    elif metodo == 6:
         #print(leyendas_tipos) 
         #print('entro 13')
         # Etiquetas y título
-        if opcion == 1:
+        if opcion == '1':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado por la media')
             plt.show()   
-        elif opcion == 2:
+        elif opcion == '2':
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y Normalizado Area')
@@ -358,13 +363,155 @@ def mostrar_espectros(datos,metodo,opcion):
             plt.title(f'Espectros del archivo {bd_name} Suavizado por Media Movil y sin Normalizar ')
             plt.show() 
     else:
-        #print(leyendas_tipos) 
-        #print('entro 13')
-        # Etiquetas y título
-        plt.xlabel('Longitud de onda / Frecuencia')
-        plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo {bd_name} Normalizado por Area')
-        plt.show()
+        print("NO HAY GRAFICA DISPONIBLE PARA ESTA OPCION")
+
+
+
+
+# SUAVIZADO POR SAVIZTKY-GOLAY
+
+def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede suavizar por la media, area y directo
+    if pca_op == 0:
+        print("NORMALIZAR POR:")
+        print("1-MEDIA")
+        print("2-AREA")
+        print("3-SIN NORMALIZAR")
+        opcion = input("Selecciona una opción: ")
+        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+        orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+     
+        if opcion == '1'  :
+            normalizado_pca = df_media_pca
+            #print(normalizado_pca)
+        elif opcion == '2' :
+            normalizado_pca = df_concatenado_cabecera_nueva_area
+            #print(normalizado_pca)
+        elif opcion == '3' :
+            normalizado_pca = df2
+            #print(normalizado_pca)
+        else:
+            print("OPCION NO VALIDA")
+            print("SALIR...")
+            #mostrar_menu()
+    else:
+        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+        orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+     
+      
+    
+    dato = normalizado_pca.to_numpy() #PASAMOS LOS DATOS A NUMPY POR QUE SAVGOL_FILTER USA SOLO NUMPY COMO PARAMETRO (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
+
+    suavizado = savgol_filter(dato, window_length=ventana, polyorder=orden)
+    suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
+    suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
+    
+    if pca_op == 0:
+        mostrar_espectros(suavizado_pd,4,opcion)
+    else:
+        print("entro en retorna")
+        return suavizado_pd
+    
+    
+# SUAVIZADO POR FILTRO GAUSIANO
+
+def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede suavizar por la media, area y directo
+    if pca_op == 0:
+        print("NORMALIZAR POR:")
+        print("1-MEDIA")
+        print("2-Area")
+        print("3-Sin normalizar")
+        opcion = input("Selecciona una opción: ")
+        sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+        
+     
+        if opcion == '1'  :
+            normalizado = df_media_pca
+        elif opcion == '2' :
+            normalizado = df_concatenado_cabecera_nueva_area
+        elif opcion == '3' :
+            normalizado = df2
+        else:
+            print("OPCION NO VALIDA")
+            print("Salir...")
+    else:
+        sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
+        normalizado = normalizado_pca
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+         
+    #print(type(normalizado))  
+    #print(normalizado)
+    dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
+    #print(dato)
+    #print(type(dato))
+    #print(dato.dtype)  # me tira que es  Object, eso quiere decir que el array numpy contiene datos que no son de un tipo numerico uniforme
+    # por lo que tendremos que forza su conversion con astype(float)
+    dato = np.array(dato, dtype=float)
+    #print(dato)
+    #print(dato.dtype)
+    suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
+    #print(suavizado_gaussiano)
+    suavizado_gaussiano_pd = pd.DataFrame(suavizado_gaussiano)
+    #print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
+    #print(suavizado_gaussiano_pd)
+     
+    suavizado_gaussiano_pd.columns = cabecera.iloc[0].values #agregamos la cabecera 
+    #print(suavizado_gaussiano_pd)
+    
+    if pca_op == 0:
+        mostrar_espectros(suavizado_gaussiano_pd,5,opcion)
+    else:
+        return suavizado_gaussiano_pd
+
+
+
+
+
+def suavizado_mediamovil(normalizado_pca, pca_op):
+    if pca_op == 0:
+        print("NORMALIZAR POR:")
+        print("1-Media")
+        print("2-Area")
+        print("3-Sin normalizar")
+        opcion = input("Selecciona una opción: ")
+        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+        
+     
+        if opcion == '1'  :
+            normalizado = df_media_pca
+        elif opcion == '2' :
+            normalizado = df_concatenado_cabecera_nueva_area
+        elif opcion == '3' :
+            normalizado = df2
+        else:
+            print("OPCION NO VALIDA")
+            print("Salir...")
+    else:
+        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+        normalizado = normalizado_pca
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+      
+    suavizado_media_movil = pd.DataFrame()
+    
+    
+    suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean() # mean() es para hallar el promedio
+    
+    if pca_op == 0:
+        mostrar_espectros(suavizado_media_movil,6,opcion)
+    else:
+        return mostrar_espectros
+    
+    
+   # print(suavizado_media_movil)
 
 
 
@@ -374,36 +521,68 @@ def mostrar_espectros(datos,metodo,opcion):
 def  mostrar_pca():
     print("NORMALIZAR POR:")
     print("1-MEDIA")
-    print("2-Area")
-    print("3-Sin normalizar")
+    print("2-AREA")
+    print("3-SIN NORMALIZAR")
     
     opcion = input("Selecciona una opción: ")
     
  
     if opcion == '1'  :
         normalizado_pca = df_media_pca
-        # print("Deseas derivar primeramente?")
-        # print("1- Si, por la primera derivada")
-        # print("2- Si, por la segunda derivada")
-        # print("3- No")
-        # derivar = input("Selecciona una opción: ")
-        #print(normalizado_pca)
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,1)
+                print("volvio")
+                print(metodo_suavizado)
+            elif metodo_suavizado == 2:
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,1)
+            else:
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,1)         
     elif opcion == '2' :
         normalizado_pca = df_concatenado_cabecera_nueva_area
-        # print("Deseas derivar primeramente?")
-        # print("1- Si, por la primera derivada")
-        # print("2- Si, por la segunda derivada")
-        # print("3- No")
-        # derivar = input("Selecciona una opción: ")
-        #print(normalizado_pca)
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                suavizado_saviztky_golay(normalizado_pca,1)
+            elif metodo_suavizado == 2:
+                suavizado_filtroGausiano(normalizado_pca,1)
+            else:
+                suavizado_mediamovil(normalizado_pca,1) 
     elif opcion == '3' :
         normalizado_pca = df2
-        # print("Deseas derivar primeramente?")
-        # print("1- Si, por la primera derivada")
-        # print("2- Si, por la segunda derivada")
-        # print("3- No")
-        # derivar = input("Selecciona una opción: ")
-        #print(normalizado_pca)
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                suavizado_saviztky_golay(normalizado_pca,1)
+            elif metodo_suavizado == 2:
+                suavizado_filtroGausiano(normalizado_pca,1)
+            else:
+                suavizado_mediamovil(normalizado_pca,1)      
     else:
         print("OPCION NO VALIDA")
         print("SAlir...")
@@ -452,121 +631,6 @@ def  mostrar_pca():
 
 
 
-
-# SUAVIZADO POR SAVIZTKY-GOLAY
-
-def suavizado_saviztky_golay():  #acordarse que se puede suavizar por la media, area y directo
-    print("NORMALIZAR POR:")
-    print("1-MEDIA")
-    print("2-Area")
-    print("3-Sin normalizar")
-    opcion = input("Selecciona una opción: ")
-    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
-    orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
-    print("Procesando los datos")
-    print("Por favor espere un momento...")
- 
-    if opcion == '1'  :
-        normalizado_pca = df_media_pca
-        #print(normalizado_pca)
-    elif opcion == '2' :
-        normalizado_pca = df_concatenado_cabecera_nueva_area
-        print(normalizado_pca)
-    elif opcion == '3' :
-        normalizado_pca = df2
-        #print(normalizado_pca)
-    else:
-        print("OPCION NO VALIDA")
-        print("SAlir...")
-        #mostrar_menu()
-    
-    dato = normalizado_pca.to_numpy() #PASAMOS LOS DATOS A NUMPY POR QUE SAVGOL_FILTER USA SOLO NUMPY COMO PARAMETRO (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
-
-    suavizado = savgol_filter(dato, window_length=ventana, polyorder=orden)
-    suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
-    suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
-    mostrar_espectros(suavizado_pd,3,opcion)
-
-
-
-
-def suavizado_filtroGausiano():  #acordarse que se puede suavizar por la media, area y directo
-    print("NORMALIZAR POR:")
-    print("1-MEDIA")
-    print("2-Area")
-    print("3-Sin normalizar")
-    opcion = input("Selecciona una opción: ")
-    sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
-    print("Procesando los datos")
-    print("Por favor espere un momento...")
-    
- 
-    if opcion == '1'  :
-        normalizado = df_media_pca
-    elif opcion == '2' :
-        normalizado = df_concatenado_cabecera_nueva_area
-    elif opcion == '3' :
-        normalizado = df2
-    else:
-        print("OPCION NO VALIDA")
-        print("Salir...")
-     
-    #print(type(normalizado))  
-    #print(normalizado)
-    dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
-    #print(dato)
-    #print(type(dato))
-    #print(dato.dtype)  # me tira que es  Object, eso quiere decir que el array numpy contiene datos que no son de un tipo numerico uniforme
-    # por lo que tendremos que forza su conversion con astype(float)
-    dato = np.array(dato, dtype=float)
-    #print(dato)
-    #print(dato.dtype)
-    suavizado_gaussiano = gaussian_filter(dato,sigma=sigma)
-    #print(suavizado_gaussiano)
-    suavizado_gaussiano_pd = pd.DataFrame(suavizado_gaussiano)
-    #print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-    #print(suavizado_gaussiano_pd)
-     
-    suavizado_gaussiano_pd.columns = cabecera.iloc[0].values #agregamos la cabecera 
-    #print(suavizado_gaussiano_pd)
-    
-    mostrar_espectros(suavizado_gaussiano_pd,4,opcion)
-
-
-
-def suavizado_mediamovil():
-    print("NORMALIZAR POR:")
-    print("1-Media")
-    print("2-Area")
-    print("3-Sin normalizar")
-    opcion = input("Selecciona una opción: ")
-    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
-    print("Procesando los datos")
-    print("Por favor espere un momento...")
-    
- 
-    if opcion == '1'  :
-        normalizado = df_media_pca
-    elif opcion == '2' :
-        normalizado = df_concatenado_cabecera_nueva_area
-    elif opcion == '3' :
-        normalizado = df2
-    else:
-        print("OPCION NO VALIDA")
-        print("Salir...")
-        
-    suavizado_media_movil = pd.DataFrame()
-    
-    
-    suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean() # mean() es para hallar el promedio
-    
-    mostrar_espectros(suavizado_media_movil,5,opcion)
-    
-   # print(suavizado_media_movil)
-    
-    
-    
-        
 def primera_derivada():
     print("SUAVIZAR LA PRIMERA DERIVADA POR:")
     print("1-SAVIZTKY-GOLAY")
@@ -598,39 +662,21 @@ def primera_derivada():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
      main()
-
-
-
-
-
-
-
-
-global df_media_pca
-scaler = StandardScaler() 
-cal_nor = scaler.fit_transform(intensity) 
-dato_normalizado = pd.DataFrame(cal_nor, columns=intensity.columns)
-df_concatenado = pd.concat([cabecera,dato_normalizado], axis=0, ignore_index=True)
-df_concatenado.columns = df_concatenado.iloc[0]
-df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
-df_media_pca= pd.DataFrame(df_concatenado_cabecera_nueva)
-
-
-
-
-cal_nor = intensity.div(intensity.mean(axis=0), axis=1)  # Normalizar por la media
-dato_normalizado = pd.DataFrame(cal_nor, columns=intensity.columns)
-df_concatenado = pd.concat([cabecera, dato_normalizado], axis=0, ignore_index=True)
-df_concatenado.columns = df_concatenado.iloc[0]
-df_concatenado_cabecera_nueva = df_concatenado[1:].reset_index(drop=True)
-df_media_pca = pd.DataFrame(df_concatenado_cabecera_nueva)
-
-
-
-
-
 
 
 
