@@ -136,6 +136,7 @@ df3_normalizado = df3.copy()
 #print(df3)
 # Cálculo del área bajo la curva para cada columna
 #print("\nÁreas bajo la curva para cada columna:")
+"""
 for col in df3.columns:
     #print(df3[col])
     #print(df3_normalizado[col])
@@ -145,6 +146,7 @@ for col in df3.columns:
     else:
         print(f"Advertencia: El área de la columna {col} es cero y no se puede normalizar.") #seguro contra errores de división por cero 
 #print(df3_normalizado)
+"""
 df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index=True)
 #print(df_concatenado_area)
 # Paso 1: Convertir la primera fila en cabecera
