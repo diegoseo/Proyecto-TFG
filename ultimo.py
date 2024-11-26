@@ -1052,7 +1052,12 @@ def  mostrar_pca():
         #mostrar_menu()
 
     datos = pd.DataFrame(normalizado_pca)
-    #print(datos)
+    
+    print("DATOS:")
+    print(datos)
+    datos = datos.dropna()
+    print("DATOS sin NaN:")
+    print(datos)
     
     datos_df = datos.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
     #print('prueba')
