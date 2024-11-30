@@ -104,7 +104,7 @@ def mostrar_menu():
       print("7. PCA")
       print("8. PRIMERA DERIVADA")
       print("9. SEGUNDA DERIVADA")
-      print("10. CORRECCION LINEA BASE")
+      print("10. CORRECCION BASE LINEAL")
       print("11. CORRECION SHIRLEY")
       print("12. ESPECTRO ESCALADO")
       print("13. ESPECTRO ACOTADO")
@@ -116,7 +116,8 @@ def mostrar_menu():
 #GRAFICAMOS LOS ESPECTROS SIN NORMALIZAR#
 
 raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
-#print(raman_shift)
+print("gbdgb")
+print(raman_shift)
 
 intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA FILA Y PRIMERA COLUMNA
 #print(intensity)   
@@ -1165,7 +1166,7 @@ def correcion_LineaB(normalizado, pca_op):
         #print(np_corregido)
         #print("DF_CORREGIDO")
         df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
-        #print(df_corregido)
+        print(df_corregido)
         
         
       
@@ -1175,7 +1176,7 @@ def correcion_LineaB(normalizado, pca_op):
 
         pos = 0  
         # Asignar la primera columna como Raman shift
-        raman_shift = df_corregido.iloc[:, 0]  # Primera columna
+        #raman_shift = df_corregido.iloc[:, 0]  # Primera columna
         #print("Raman shift")
         #print(raman_shift)
         #print("Cant filas = ", len(raman_shift))
@@ -1183,19 +1184,16 @@ def correcion_LineaB(normalizado, pca_op):
         #y_ajustados = pd.DataFrame(raman_shift)
         #print(y_ajustados)
 
-        raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
-        
+        #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
+        print("RAMAN SHIFT")
+        print(raman_shift)
         
         # Iterar sobre las demás columnas
-        for col in df_corregido.columns[1:]:
+        for col in df_corregido.columns:
             intensidades = df_corregido[col]  # Extraer la columna actual
-
-            intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS
-            
-            # print(intensidades)
-            # print(cont)
-            
-            
+            intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
+            #print(intensidades)
+            # print(cont)                        
             # Calcularmos la pendiente 
             coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
             # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
@@ -1206,22 +1204,68 @@ def correcion_LineaB(normalizado, pca_op):
             intersecciones[col] = interseccion
             #print(raman_shift[pos])
             #print("xD")
-            y_ajustado = pendiente * raman_shift[pos] + interseccion          
-            y_ajustados[col] = y_ajustado
-            
+            y_ajustado = []
+            for pos, intensidad in enumerate(intensidades):
+                y = pendiente * raman_shift[pos] + interseccion  
+                print()
+                print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
+                y_ajustado.append(y)
+            y_ajustados[col] =  y_ajustado
             #print("XD")
             if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
                 pos = 0
                 #print("entro")
+                
+  
             else:
                 pos += 1 
                 #print("emtro2")
             
-      
+            
+        # y_ajustado = np.array(list(y_ajustados.values()))
+        # fila=0
+        # columna=1
+        # num_filas = len(raman_shift)
+        # print("num_filas =", num_filas)
 
+        # num_columnas = len(y_ajustados) + 1
+        # print("num_columnas", num_columnas)
+        
+        # df_resultados = pd.DataFrame(index=range(num_filas), columns=range(num_columnas))
+       
+        # # Crear un DataFrame inicial con Raman Shift como la primera columna
+        # #df_resultados = pd.DataFrame({"Raman Shift": raman_shift})
+        # #print("df_resultados", raman_shift)
+        
+        # # Insertar los valores en el DataFrame
+        # for valor in y_ajustado:
+        #     df_resultados.iloc[fila, columna] = valor
+        #     fila += 1  # Avanzar a la siguiente fila
+        
+        #     # Si se llenan todas las filas, pasar a la siguiente columna y reiniciar el índice de fila
+        #     if fila >= num_filas-1:
+        #         fila = 0
+        #         columna += 1
+        
+        # # Mostrar el DataFrame resultante
+        # print(df_resultados)
+     
+              # Iterar sobre el diccionario y agregar cada columna al DataFrame
+              # for clave, valores in y_ajustados.items():
+              #     # Convertir cada par clave-valor en una columna
+              #     df_resultados[clave] = valores
+                      
+              # # Mostrar el DataFrame final
+              # #print(df_resultados)
+        print()
         print("LA PENDIENTE SON:", pendientes)
+        # print(type(pendientes))
+        print()
         print("LA INTERSECCIONES SON:", intersecciones)
+        # print(type(intersecciones))
+        print()
         print("Y AJUSTADO =", y_ajustados)
+        # print(type(y_ajustados))
         
         #   CORROBORAR LOS RESULTADOS 
         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
@@ -1234,8 +1278,5 @@ if __name__ == "__main__":
 
 
        
-    
-    
-    
     
     
