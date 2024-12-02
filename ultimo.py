@@ -81,12 +81,12 @@ def main():
               segunda_derivada(0,0)
         elif opcion == '10':
              correcion_LineaB(0,0)
-        # # elif opcion == '11':
-        # #     #correcion_shirley()
-        # # elif opcion == '12':
-        # #     #espectro_escalado()
-        # # elif opcion == '13':
-        # #     #espectro_acotado()
+        elif opcion == '11':
+             correcion_shirley(0,0)
+        # elif opcion == '12':
+        #      espectro_escalado(0,0)
+        elif opcion == '13':
+             espectro_acotado(0,0)
         elif opcion == '14':
             print("Saliendo del programa...")
             break
@@ -106,7 +106,7 @@ def mostrar_menu():
       print("9. SEGUNDA DERIVADA")
       print("10. CORRECCION BASE LINEAL")
       print("11. CORRECION SHIRLEY")
-      print("12. ESPECTRO ESCALADO")
+      #print("12. ESPECTRO ESCALADO")
       print("13. ESPECTRO ACOTADO")
       print("14. Salir")
       
@@ -128,7 +128,7 @@ types=tipos.tolist() #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
 #print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
-#print(cabecera)
+print(cabecera)
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 #print(cant_tipos)
@@ -253,8 +253,8 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
     
     
     
-    #print("ENTRO EN MOSTRAR ESPECTROS")
-    #print(datos)
+    print("ENTRO EN MOSTRAR ESPECTROS")
+    print(datos)
     
     # Graficar los espectros
     plt.figure(figsize=(10, 6))
@@ -372,9 +372,77 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
             plt.show() 
     elif metodo == 7:
             print("hola PCA")
-    elif metodo == 8:
-            print("entro en opcion 8")
-  
+    elif metodo == 10:
+            if opcion == '1':
+                if m_suavi == 1:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Normalizado por la media')
+                    plt.show()
+                elif m_suavi == 2:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por la media')
+                    plt.show()
+                elif m_suavi == 3:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por la media')
+                    plt.show()
+                else:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} sin suavizar y Normalizado por la media')
+                    plt.show()
+            elif opcion == '2':
+                if m_suavi == 1:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Normalizado por Area')
+                    plt.show()
+                elif m_suavi == 2:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por Area')
+                    plt.show()
+                elif m_suavi == 3:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por Area')
+                    plt.show()
+                else:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} sin Suavizar y Normalizado por Area')
+                    plt.show()
+            else:
+                if m_suavi == 1:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Sin Normalizar')
+                    plt.show()
+                elif m_suavi == 2:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Sin Normalizar')
+                    plt.show()
+                elif m_suavi == 3:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Sin Normalizar')
+                    plt.show()
+                else:
+                    plt.xlabel('Longitud de onda / Frecuencia')
+                    plt.ylabel('Intensidad')
+                    plt.title(f'Espectros del archivo {bd_name} sin Suavizar y Sin Normalizar')
+                    plt.show()
+    # elif metodo == 11:
+    # elif metodo == 12:
+    elif metodo == 13:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectros del archivo {bd_name} Acotado ')
+            plt.show() 
     else:
         print("NO HAY GRAFICA DISPONIBLE PARA ESTA OPCION")
 
@@ -1102,13 +1170,13 @@ def correcion_LineaB(normalizado, pca_op):
             print("1-Media")
             print("2-Area")
             print("3-Sin normalizar")
-            opcion = input("Selecciona una opción: ")
+            opcion = int(input("Selecciona una opción: "))
                
-            if opcion == '1'  :
+            if opcion == 1  :
                 normalizado = df_media_pca
-            elif opcion == '2' :
+            elif opcion == 2 :
                 normalizado = df_concatenado_cabecera_nueva_area
-            elif opcion == '3' :
+            elif opcion == 3 :
                 normalizado = df2
             else:
                 print("OPCION NO VALIDA")
@@ -1125,22 +1193,22 @@ def correcion_LineaB(normalizado, pca_op):
                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
                 print("3. SUAVIZADO POR MEDIA MOVIL")
-                metodo_suavizado = input("OPCION: ")
-                if metodo_suavizado == '1':
+                metodo_suavizado = int(input("OPCION: "))
+                if metodo_suavizado == 1:
                     aux = suavizado_saviztky_golay(normalizado,1)
                     #print("EL aux.SHAPE antes ES:", aux.shape)
                     #normalizado = suavizado_saviztky_golay(normalizado,1)
-                elif metodo_suavizado == '2':
+                elif metodo_suavizado == 2:
                     #print("normalizado shape por FG = ", normalizado.shape)
                     #normalizado = suavizado_filtroGausiano(normalizado,1)
                     aux = suavizado_filtroGausiano(normalizado,1)
                     #print("normalizado shape despues por FG = ", normalizado.shape)
-                elif metodo_suavizado == '3':
+                elif metodo_suavizado == 3:
                     #normalizado = suavizado_mediamovil(normalizado,1) 
                     aux = suavizado_mediamovil(normalizado,1) 
             else:
-                    metodo_suavizado = '4'         
-                    print("No se va a normalizar, directamente la correccion")
+                    metodo_suavizado = 4         
+                    print("No se va a suavizar, directamente la correccion")
                      
                       # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
                
@@ -1161,6 +1229,9 @@ def correcion_LineaB(normalizado, pca_op):
         
         #print("NORMALIZADO-F")
         #print(normalizado_f)
+        cabecera_aux = normalizado_f.columns
+        print("XDDDDDDDDDD")
+        print(cabecera_aux)
         np_corregido = normalizado_f.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
         #print("DF_CORREGIDO")
         #print(np_corregido)
@@ -1186,7 +1257,7 @@ def correcion_LineaB(normalizado, pca_op):
 
         #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
         print("RAMAN SHIFT")
-        print(raman_shift)
+        #print(raman_shift)
         
         # Iterar sobre las demás columnas
         for col in df_corregido.columns:
@@ -1207,68 +1278,103 @@ def correcion_LineaB(normalizado, pca_op):
             y_ajustado = []
             for pos, intensidad in enumerate(intensidades):
                 y = pendiente * raman_shift[pos] + interseccion  
-                print()
-                print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
+                #print()
+                #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
                 y_ajustado.append(y)
             y_ajustados[col] =  y_ajustado
             #print("XD")
-            if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
-                pos = 0
-                #print("entro")
+            # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
+            #     pos = 0
+            #     #print("entro")
                 
   
-            else:
-                pos += 1 
-                #print("emtro2")
-            
-            
-        # y_ajustado = np.array(list(y_ajustados.values()))
-        # fila=0
-        # columna=1
-        # num_filas = len(raman_shift)
-        # print("num_filas =", num_filas)
-
-        # num_columnas = len(y_ajustados) + 1
-        # print("num_columnas", num_columnas)
+            # else:
+            #     pos += 1 
+            #     #print("emtro2")
+                
+                
+        df_y_ajustados = pd.DataFrame(y_ajustados)
+        #df_y_ajustados.index.name = "Raman Shift"  
+        print(len(df_y_ajustados.columns))
+        print(len(cabecera))
+        df_y_ajustados.columns = cabecera_aux
+        print(df_y_ajustados)    
         
-        # df_resultados = pd.DataFrame(index=range(num_filas), columns=range(num_columnas))
-       
-        # # Crear un DataFrame inicial con Raman Shift como la primera columna
-        # #df_resultados = pd.DataFrame({"Raman Shift": raman_shift})
-        # #print("df_resultados", raman_shift)
-        
-        # # Insertar los valores en el DataFrame
-        # for valor in y_ajustado:
-        #     df_resultados.iloc[fila, columna] = valor
-        #     fila += 1  # Avanzar a la siguiente fila
-        
-        #     # Si se llenan todas las filas, pasar a la siguiente columna y reiniciar el índice de fila
-        #     if fila >= num_filas-1:
-        #         fila = 0
-        #         columna += 1
-        
-        # # Mostrar el DataFrame resultante
-        # print(df_resultados)
-     
-              # Iterar sobre el diccionario y agregar cada columna al DataFrame
-              # for clave, valores in y_ajustados.items():
-              #     # Convertir cada par clave-valor en una columna
-              #     df_resultados[clave] = valores
-                      
-              # # Mostrar el DataFrame final
-              # #print(df_resultados)
-        print()
-        print("LA PENDIENTE SON:", pendientes)
+        #print()
+        #print("LA PENDIENTE SON:", pendientes)
         # print(type(pendientes))
-        print()
-        print("LA INTERSECCIONES SON:", intersecciones)
+        #print()
+        #print("LA INTERSECCIONES SON:", intersecciones)
         # print(type(intersecciones))
-        print()
-        print("Y AJUSTADO =", y_ajustados)
+        #print()
+        #print("Y AJUSTADO =", y_ajustados)
         # print(type(y_ajustados))
         
         #   CORROBORAR LOS RESULTADOS 
         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
+        if pca_op == 0:
+            if opcion_s == 1:
+                mostrar_espectros(df_y_ajustados, 10, opcion, metodo_suavizado)
+            else:
+                mostrar_espectros(df_y_ajustados, 10, opcion,4)
+        else:
+            return df_y_ajustados   #FALTA HACER QUE LA FUNCION PCA LLAME A ESTA FUNCION
+
+
+
+def correcion_shirley(normalizado, pca_op) :
+    print("FALTA IMPLEMENTEAR")
+    
+    
+
+
+
+def espectro_acotado(datos, pca_op):
+    if pca_op == 0:
+        df_aux = df.copy()
+        # Reemplazar la cabecera con la primera fila
+        df_aux.columns = df.iloc[0].astype(str)   # Asignar la fila 0 como cabecera
+        df_aux = df_aux[1:]  # Eliminar la fila 0, ya que ahora es la cabecera
+        
+        # Resetear el índice si es necesario
+        df_aux.reset_index(drop=True, inplace=True)
+
+        df_filtrado = df_aux
+        print(df_filtrado)
+    else:
+        df_filtrado = datos
+        
+    
+    
+    
+    x = df_filtrado.iloc[:, 0].astype(float)  # Convertir a float si es necesario
+    # GRAFICAR LOS ESPECTROS DENTRO DE UN RANGO EN ESPECIFICO
+    
+    # Filtrado del rango de las intensidades
+    min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
+    max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
+    
+    # Filtrar los datos para que solo incluyan las filas dentro de este rango
+    df_filtrado = df_filtrado[(x >= min_rango) & (x <= max_rango)] #filtra las filas donde los valores de la primera columna están dentro del rango definido.
+
+    #print(df_filtrado)
+    
+    if pca_op == 0:
+        mostrar_espectros(df_filtrado, 13, 0, 0)
+    else:
+        return(df_filtrado)
+    
+
+
+        ##### YA FILTRA PERO NO GRAFICA
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -1277,6 +1383,28 @@ if __name__ == "__main__":
 
 
 
-       
+       # VER COMO ES EL FORMATO QUE TIENE QUE RECIBIR MOSTRAR_ESPECTROS 
     
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
