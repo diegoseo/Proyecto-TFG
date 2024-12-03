@@ -161,8 +161,8 @@ df2 = df2.drop(0).reset_index(drop=True) #eliminamos la primera fila
 df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del rama_shift
 #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
-#print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
-#print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
+print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
 
 
@@ -552,8 +552,8 @@ def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede 
     #print(suavizado_gaussiano_pd)
     #print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRrr")
     if pca_op == 0:
-        #print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
-        #print(suavizado_gaussiano_pd)
+        print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
+        print(suavizado_gaussiano_pd)
         mostrar_espectros(suavizado_gaussiano_pd,5,opcion,0)
     else:
         #print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
@@ -1329,50 +1329,193 @@ def correcion_shirley(normalizado, pca_op) :
 
 
 
+# def espectro_acotado(datos, pca_op):
+#     if pca_op == 0:
+#         df_aux = df.copy()
+#         #df_aux = df_aux.to_numpy()
+#         print("df_aux")
+#         print(df_aux)
+#         # Reemplazar la cabecera con la primera fila
+#         df_aux.columns = df.iloc[0].astype(str)   # Asignar la fila 0 como cabecera
+#         print("df_aux.columns")
+#         print(df_aux)        
+#         df_aux = df_aux[1:]  # Eliminar la fila 0, ya que ahora es la cabecera
+#         print("df_aux eliminar fila cero")
+#         print(df_aux)
+#         # Resetear el índice si es necesario
+#         df_aux.reset_index(drop=True, inplace=True)
+#         print("df_aux")
+#         print(df_aux)
+#         df_filtrado = df_aux
+#         print("df_filtrado")
+#         print(df_filtrado)
+#     else:
+#         df_filtrado = datos
+    
+    
+#     df3 = df.copy()
+#     df3.columns = df3.iloc[0]
+#     #print(df2)
+#     df3 = df3.drop(0).reset_index(drop=True) #eliminamos la primera fila
+#     df3 = df3.drop(df3.columns[0], axis=1) #eliminamos la primera columna el del rama_shift
+#     #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
+#     df3 = df3.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
+#     print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
+#     print(df3) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+#     #print(df2.shape)
+
+    
+#     x = df_filtrado.iloc[:, 0].astype(float)  # Convertir a float si es necesario
+#     # GRAFICAR LOS ESPECTROS DENTRO DE UN RANGO EN ESPECIFICO
+    
+#     # Filtrado del rango de las intensidades
+#     min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
+#     max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
+    
+#     # Filtrar los datos para que solo incluyan las filas dentro de este rango
+#     df_filtrado = df_filtrado[(x >= min_rango) & (x <= max_rango)] #filtra las filas donde los valores de la primera columna están dentro del rango definido.
+#     raman = df_filtrado.iloc[:, 0].squeeze() 
+    
+#     # Graficar los espectros
+#     plt.figure(figsize=(10, 6))
+
+
+#     #DESCOMENTAR EL CODIGO DE ABAJO ESE ES MIO, EL DE ARRIBA ES CHATGPT  
+     
+#     leyendas = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
+#     pos_y=0
+#     for col in df_filtrado.columns :
+#             #print('entro normal')
+#           for tipo in asignacion_colores:
+
+#                 if tipo == col :
+#                   color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
+
+#                   if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
+
+#                         if tipo in leyendas:
+                            
+#                             print("error 1")
+#                             plt.plot(raman , df_filtrado[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
+#                             '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
+  
+#                             break
+#                         else:
+#                             print("error 2")
+#                             plt.plot(raman , df_filtrado[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+#                             leyendas.add(tipo) 
+#                   pos_y+=1 
+       
+
+
+
+#           plt.xlabel('Longitud de onda / Frecuencia')
+#           plt.ylabel('Intensidad')
+#           plt.title(f'Espectros del archivo {bd_name}')
+#           plt.show()
+
+
+
+
 def espectro_acotado(datos, pca_op):
     if pca_op == 0:
-        df_aux = df.copy()
-        # Reemplazar la cabecera con la primera fila
-        df_aux.columns = df.iloc[0].astype(str)   # Asignar la fila 0 como cabecera
-        df_aux = df_aux[1:]  # Eliminar la fila 0, ya que ahora es la cabecera
-        
-        # Resetear el índice si es necesario
-        df_aux.reset_index(drop=True, inplace=True)
-
-        df_filtrado = df_aux
-        print(df_filtrado)
+        df_aux = df.to_numpy()
+        print("df_aux")
+        print(df_aux)
+        # # Reemplazar la cabecera con la primera fila
+        # df_aux.columns = df.iloc[0].astype(str)   # Asignar la fila 0 como cabecera
+        # print("df_aux.columns")
+        # print(df_aux)        
+        # df_aux = df_aux[1:]  # Eliminar la fila 0, ya que ahora es la cabecera
+        # print("df_aux eliminar fila cero")
+        # print(df_aux)
+        # # Resetear el índice si es necesario
+        # df_aux.reset_index(drop=True, inplace=True)
+        # print("df_aux")
+        # print(df_aux)
+        # df_filtrado = df_aux
+        # print("df_filtrado")
+        # print(df_filtrado)
     else:
-        df_filtrado = datos
+        df_aux = datos.to_numpy()
         
+        
+    cabecera_np = df_aux[0,:]   # la primera fila contiene los encabezados
+    intensidades_np = df_aux[1: , :] # apartamos las intensidades
     
-    
-    
-    x = df_filtrado.iloc[:, 0].astype(float)  # Convertir a float si es necesario
-    # GRAFICAR LOS ESPECTROS DENTRO DE UN RANGO EN ESPECIFICO
-    
+    raman =  intensidades_np[:, 0].astype(float)  # Primera columna (Raman Shift)
+    intensidades =  intensidades_np[:, 1:].astype(float)  # Columnas restantes (intensidades)
+   
     # Filtrado del rango de las intensidades
     min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
     max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
     
-    # Filtrar los datos para que solo incluyan las filas dentro de este rango
-    df_filtrado = df_filtrado[(x >= min_rango) & (x <= max_rango)] #filtra las filas donde los valores de la primera columna están dentro del rango definido.
-
-    #print(df_filtrado)
     
-    if pca_op == 0:
-        mostrar_espectros(df_filtrado, 13, 0, 0)
-    else:
-        return(df_filtrado)
+    indices_acotados = (raman >= min_rango) & (raman <= max_rango)
     
+    raman_acotado = raman[indices_acotados]
+    intensidades_acotadas = intensidades[indices_acotados,:]
 
+    
+        
+    # Imprimir resultados
+    print("Raman Shift Acotado:")
+    print(raman_acotado)
+    print("\nIntensidades Acotadas:")
+    print(intensidades_acotadas)
+        
+    
+    # Crear un DataFrame a partir de las dos variables
+    df_acotado = pd.DataFrame(
+    data=np.column_stack([raman_acotado, intensidades_acotadas]),
+    columns=["Raman Shift"] + list(cabecera_np[1:])  # Encabezados para el DataFrame
+    )
 
-        ##### YA FILTRA PERO NO GRAFICA
-
-
-
-
-
-
+    # Mostrar el DataFrame resultante
+    print(df_acotado)
+    
+    if pca_op == 0:  
+   
+        # Graficar los espectros
+        plt.figure(figsize=(10, 6))
+    
+    
+        #DESCOMENTAR EL CODIGO DE ABAJO ESE ES MIO, EL DE ARRIBA ES CHATGPT  
+         
+        leyendas = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
+        pos_y=0
+        for col in df_acotado.columns :
+                #print('entro normal')
+              for tipo in asignacion_colores:
+    
+                    if tipo == col :
+                      color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
+    
+                      if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
+    
+                            if tipo in leyendas:
+                                
+                                print("error 1")
+                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
+                                '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
+      
+                                break
+                            else:
+                                print("error 2")
+                                print(raman)
+                                print(df_acotado[col])
+                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                                leyendas.add(tipo) 
+                      pos_y+=1 
+           
+    
+        
+        plt.xlabel('Longitud de onda / Frecuencia')
+        plt.ylabel('Intensidad')
+        plt.title(f'Espectros del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
+        plt.show()
+    else: 
+        return(df_acotado)
 
 
 
@@ -1386,8 +1529,6 @@ if __name__ == "__main__":
        # VER COMO ES EL FORMATO QUE TIENE QUE RECIBIR MOSTRAR_ESPECTROS 
     
     
-
-
 
 
 
