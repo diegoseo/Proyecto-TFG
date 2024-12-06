@@ -1226,90 +1226,40 @@ def correcion_LineaB(normalizado, pca_op):
         else:
             normalizado_f = normalizado_correccion #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
             #print("aca va lo del PCA")
-        
-        #print("NORMALIZADO-F")
-        #print(normalizado_f)
+        #Aseguramos que las columnas tengan encabezados válidos
         cabecera_aux = normalizado_f.columns
-        print("XDDDDDDDDDD")
-        print(cabecera_aux)
-        np_corregido = normalizado_f.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
-        #print("DF_CORREGIDO")
-        #print(np_corregido)
-        #print("DF_CORREGIDO")
-        df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
-        print(df_corregido)
         
+        # Convertimos el DataFrame a numpy para trabajar con los datos
+        np_corregido = normalizado_f.to_numpy()
         
-      
-        pendientes = {}   # Crear un diccionario para almacenar las pendientes
+        # Creamos un nuevo DataFrame sin la cabecera original
+        df_corregido = pd.DataFrame(np_corregido)
+        
+        # Diccionarios para almacenar resultados
+        pendientes = {}   
         intersecciones = {}
         y_ajustados = {}
-
-        pos = 0  
-        # Asignar la primera columna como Raman shift
-        #raman_shift = df_corregido.iloc[:, 0]  # Primera columna
-        #print("Raman shift")
-        #print(raman_shift)
-        #print("Cant filas = ", len(raman_shift))
-
-        #y_ajustados = pd.DataFrame(raman_shift)
-        #print(y_ajustados)
-
-        #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
-        print("RAMAN SHIFT")
-        #print(raman_shift)
         
-        # Iterar sobre las demás columnas
+        # Iteramos sobre las columnas para ajustar la línea base
         for col in df_corregido.columns:
-            intensidades = df_corregido[col]  # Extraer la columna actual
-            intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
-            #print(intensidades)
-            # print(cont)                        
-            # Calcularmos la pendiente 
-            coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
-            # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
-            pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
-            interseccion = coef[1] # La interseccion (b) esta en el indice 1 
-            # Guardamos la pendiente y intersecciones en el diccionario
+            # Extraemos la columna actual y aseguramos que los valores sean numéricos
+            intensidades = pd.to_numeric(df_corregido[col], errors='coerce')
+            
+            # Ajuste lineal (Y = mx + b)
+            coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1: línea recta
+            pendiente, interseccion = coef  # Asignamos directamente los coeficientes
+            
+            # Guardamos las pendientes e intersecciones
             pendientes[col] = pendiente
             intersecciones[col] = interseccion
-            #print(raman_shift[pos])
-            #print("xD")
-            y_ajustado = []
-            for pos, intensidad in enumerate(intensidades):
-                y = pendiente * raman_shift[pos] + interseccion  
-                #print()
-                #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
-                y_ajustado.append(y)
-            y_ajustados[col] =  y_ajustado
-            #print("XD")
-            # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
-            #     pos = 0
-            #     #print("entro")
-                
-  
-            # else:
-            #     pos += 1 
-            #     #print("emtro2")
-                
-                
+            
+            # Calculamos los valores ajustados (y = mx + b)
+            y_ajustado = pendiente * np.array(raman_shift) + interseccion
+            y_ajustados[col] = y_ajustado
+        
+        # Convertimos los datos ajustados a DataFrame con las cabeceras originales
         df_y_ajustados = pd.DataFrame(y_ajustados)
-        #df_y_ajustados.index.name = "Raman Shift"  
-        print(len(df_y_ajustados.columns))
-        print(len(cabecera))
         df_y_ajustados.columns = cabecera_aux
-        print(df_y_ajustados)    
-        
-        #print()
-        #print("LA PENDIENTE SON:", pendientes)
-        # print(type(pendientes))
-        #print()
-        #print("LA INTERSECCIONES SON:", intersecciones)
-        # print(type(intersecciones))
-        #print()
-        #print("Y AJUSTADO =", y_ajustados)
-        # print(type(y_ajustados))
-        
         #   CORROBORAR LOS RESULTADOS 
         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
         if pca_op == 0:
@@ -1441,6 +1391,37 @@ if __name__ == "__main__":
        # VER COMO ES EL FORMATO QUE TIENE QUE RECIBIR MOSTRAR_ESPECTROS 
     
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
