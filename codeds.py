@@ -215,7 +215,7 @@ def main():
             metodo = 2
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            mostrar_espectros(df_media_pca,metodo,0)
+            mostrar_espectros(df_media_pca,metodo,0) ## aca pio porque no envias la opcion nomas en vez de una variable metodo XD
         # elif opcion == '3':
         #     metodo = 3
         #     print("Procesando los datos")
