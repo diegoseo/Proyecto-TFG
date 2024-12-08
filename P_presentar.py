@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Dec  3 09:15:28 2024
@@ -114,7 +114,7 @@ def main():
             if metodo_grafico == 1:
                 suavizado_saviztky_golay(0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(suavizado_saviztky_golay(0,1), 0,4)
+                espectro_acotado(suavizado_saviztky_golay(0,1), 2,4)
             elif metodo_grafico == 3:
                 print("NORMALIZAR POR:")
                 print("1-Media")
@@ -140,7 +140,7 @@ def main():
             if metodo_grafico == 1:
                 suavizado_filtroGausiano(0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(suavizado_filtroGausiano(0,1),4,5)
+                espectro_acotado(suavizado_filtroGausiano(0,1),2,5)
             elif metodo_grafico == 3: 
                  print("NORMALIZAR POR:")
                  print("1-Media")
@@ -166,7 +166,7 @@ def main():
             if metodo_grafico == 1:
                 suavizado_mediamovil(0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(suavizado_mediamovil(0,1), 0,6)
+                espectro_acotado(suavizado_mediamovil(0,1), 2,6)
             elif metodo_grafico == 3:
                  print("NORMALIZAR POR:")
                  print("1-Media")
@@ -196,9 +196,19 @@ def main():
             if metodo_grafico == 1:
                 primera_derivada(0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(primera_derivada(0,3), 0,7)
-            # elif metodo_grafico == 3:
-            #     #grafico_tipo()
+                espectro_acotado(primera_derivada(0,3), 2,7)
+            elif metodo_grafico == 3:
+                print("NORMALIZAR POR:")
+                print("1-Media")
+                print("2-Area")
+                print("3-Sin normalizar")
+                opcion = int(input("Selecciona una opción: "))
+                if opcion == 1:
+                    grafico_tipo(primera_derivada(df2,4),raman_shift,8,'1',0)
+                elif opcion == 2:
+                    grafico_tipo(primera_derivada(df_media_pca,4),raman_shift,8,'2',0)
+                else: 
+                    grafico_tipo(primera_derivada(df_concatenado_cabecera_nueva_area,4),raman_shift,8,'3',0)   
             # else
             #     #grafico_tipo_acotado()  
                
@@ -213,9 +223,19 @@ def main():
             if metodo_grafico == 1:
                 segunda_derivada(0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(segunda_derivada(0,3), 0,7)
-            # elif metodo_grafico == 3:
-            #     #grafico_tipo()
+                espectro_acotado(segunda_derivada(0,3), 2,9)
+            elif metodo_grafico == 3:
+                print("NORMALIZAR POR:")
+                print("1-Media")
+                print("2-Area")
+                print("3-Sin normalizar")
+                opcion = int(input("Selecciona una opción: "))
+                if opcion == 1:
+                    grafico_tipo(primera_derivada(df2,4),raman_shift,9,'1',0)
+                elif opcion == 2:
+                    grafico_tipo(primera_derivada(df_media_pca,4),raman_shift,9,'2',0)
+                else: 
+                    grafico_tipo(primera_derivada(df_concatenado_cabecera_nueva_area,4),raman_shift,9,'3',0)   
             # else
             #     #grafico_tipo_acotado()              
         elif opcion == '10':
@@ -641,7 +661,7 @@ def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede 
 def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede suavizar por la media, area y directo
     if pca_op == 0 or pca_op == 1:
         print("NORMALIZAR POR:")
-        print("1-MEDIA")
+        print("1-Media")
         print("2-Area")
         print("3-Sin normalizar")
         opcion = input("Selecciona una opción: ")
@@ -666,14 +686,18 @@ def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede 
         print("Procesando los datos")
         print("Por favor espere un momento...")
         if pca_op == 2:
+            print("entro en pca_op = 2")
             normalizado = df_media_pca
         elif pca_op == 3:
+            print("entro en pca_op = 3")
             normalizado = df_concatenado_cabecera_nueva_area
         else:
+            print("entro en pca_op = 4")
             normalizado = df2
      
         
     print("avanzo")
+    print(pca_op)
     #print(type(normalizado))  
     #print(normalizado)
     dato = normalizado.to_numpy() #PASAMOS LOS DATOS A NUMPY (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
@@ -699,7 +723,7 @@ def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede 
             print(suavizado_gaussiano_pd)
             mostrar_espectros(suavizado_gaussiano_pd,raman_shift,5,opcion,0)
         else:
-            print("risas")
+            print("risas58")
             print(suavizado_gaussiano_pd)
             return suavizado_gaussiano_pd
     else:
@@ -784,27 +808,51 @@ def suavizado_mediamovil(normalizado_pca, pca_op):
 def espectro_acotado(datos, pca_op,nor_op):
     
     print("ENTRO EN EL ESPECTRO ACOTADO")
+    print(datos)
     
     if pca_op == 0:
-        df_aux = df.to_numpy()
+        df_aux = df.iloc[1:,1:].to_numpy()
         print("df_aux")
         print(df_aux)
     else:
+        print("entro en el else")
         df_aux = datos.to_numpy()
         
-        
-    cabecera_np = df_aux[0,:]   # la primera fila contiene los encabezados
-    intensidades_np = df_aux[1: , :] # apartamos las intensidades
+    print("ENTRO EN EL ESPECTRO ACOTADO222")
+    print(df_aux)
+    print(df_aux.shape)
     
-    raman =  intensidades_np[:, 0].astype(float)  # Primera columna (Raman Shift)
+    cabecera_np = df.iloc[0,:].to_numpy()   # la primera fila contiene los encabezados
+    cabecera_np = cabecera_np[1:]
+    print("la cabeceras son:")
+    print(cabecera_np)
+    print(cabecera_np.shape)
+    
+    
+    intensidades_np = df_aux[: , :] # apartamos las intensidades
+    print("intensidades_np son:")
+    print(intensidades_np)
+    print(intensidades_np.shape)
+    
+    
+    raman =  df.iloc[:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
+    raman = raman[1:]
     intensidades =  intensidades_np[:, 1:].astype(float)  # Columnas restantes (intensidades)
-   
+    print("RAMAN:")
+    print(raman)
+    print(raman.shape)
+    print("INTENSIDADES:")
+    print(intensidades)
+    print(intensidades.shape)
     # Filtrado del rango de las intensidades
     min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
     max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
     
     
     indices_acotados = (raman >= min_rango) & (raman <= max_rango)
+    print("Indices acotados")
+    print(indices_acotados)
+    print(indices_acotados.shape)
     
     raman_acotado = raman[indices_acotados]
     intensidades_acotadas = intensidades[indices_acotados,:]
@@ -826,13 +874,14 @@ def espectro_acotado(datos, pca_op,nor_op):
 
     # Mostrar el DataFrame resultante
     print(df_acotado)
-    
-    if pca_op == 0:  
+    # df_acotado = pd.DataFrame(df_acotado)
+    # print(df_acotado)
+    if pca_op == 0 or pca_op == 2:
    
         # Graficar los espectros
         plt.figure(figsize=(10, 6))
     
-    
+        print("entro en el graficador")
         #DESCOMENTAR EL CODIGO DE ABAJO ESE ES MIO, EL DE ARRIBA ES CHATGPT  
          
         leyendas = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
@@ -892,15 +941,15 @@ def espectro_acotado(datos, pca_op,nor_op):
             plt.ylabel('Intensidad')
             plt.title(f'Espectros del archivo {bd_name}  SUAVIZADO POR MEDIA MOVIL en el rango de {min_rango} a {max_rango}')
             plt.show()
-        elif nor_op == 7:
-            plt.xlabel('Longitud de onda / Frecuencia')
-            plt.ylabel('Intensidad')
-            plt.title(f'Primera derivada del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
-            plt.show()
         elif nor_op == 8:
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Primera derivada del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
+            plt.show()
+        elif nor_op == 9:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Segunda derivada del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
             plt.show()
     else: 
         return df_acotado , raman_acotado # creo que no hace falta retornarn nada ya que si una funcion le llama seria solamente para graficarla y retorna tiene quw retornar tambien su raman_shift acotado
@@ -1720,6 +1769,16 @@ def grafico_tipo(datos,raman_shift,metodo,opcion,m_suavi):
             plt.show() 
     elif metodo == 7:
             print("hola PCA")
+    elif metodo == 8:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectro del tipo: {mostrar_tipo}  por la primera derivada ')
+            plt.show() 
+    elif metodo == 9:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Espectro del tipo: {mostrar_tipo}  por la primera derivada ')
+            plt.show() 
     elif metodo == 10:
             if opcion == '1':
                 if m_suavi == 1:
