@@ -1234,7 +1234,8 @@ def correcion_LineaB(normalizado, pca_op):
         
         # Creamos un nuevo DataFrame sin la cabecera original
         df_corregido = pd.DataFrame(np_corregido)
-        
+        print("DF_CORREGIDO")
+        print(df_corregido)
         # Diccionarios para almacenar resultados
         pendientes = {}   
         intersecciones = {}
@@ -1242,20 +1243,22 @@ def correcion_LineaB(normalizado, pca_op):
         
         # Iteramos sobre las columnas para ajustar la línea base
         for col in df_corregido.columns:
+            #print(col)
+            #print("xd")
             # Extraemos la columna actual y aseguramos que los valores sean numéricos
             intensidades = pd.to_numeric(df_corregido[col], errors='coerce')
-            
+            print(intensidades)
             # Ajuste lineal (Y = mx + b)
             coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1: línea recta
             pendiente, interseccion = coef  # Asignamos directamente los coeficientes
-            
+            print(pendiente," , ", interseccion)
             # Guardamos las pendientes e intersecciones
             pendientes[col] = pendiente
             intersecciones[col] = interseccion
             
             # Calculamos los valores ajustados (y = mx + b)
             y_ajustado = pendiente * np.array(raman_shift) + interseccion
-            y_ajustados[col] = y_ajustado
+            y_ajustados[col] = intensidades - y_ajustado # RESTAMOS DE LA LINEA BASE BASE AJUSTADA A CADA INTENSIDAD
         
         # Convertimos los datos ajustados a DataFrame con las cabeceras originales
         df_y_ajustados = pd.DataFrame(y_ajustados)

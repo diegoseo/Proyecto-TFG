@@ -38,6 +38,20 @@ while existe == False:
         print("El archivo no existe.")
         archivo_nombre = input("Ingrese el nombre del archivo: ")
 
+print("DF ANTES DEL CORTE")
+print(df)
+print(df.shape)
+
+menor_cant_filas = df.dropna().shape[0] # Buscamos la columna con menor cantidad de intensidades
+print("menor cantidad de filas:", menor_cant_filas)
+
+df_truncado = df.iloc[:menor_cant_filas] # Hacemos los cortes para igualar las columnas
+
+df = df_truncado
+
+print("DF DESPUES DEL CORTE")
+print(df)
+print(df.shape)
 
 '''
     PREPARAMOS EL SIGUIENTE MENU
@@ -239,7 +253,32 @@ def main():
             # else
             #     #grafico_tipo_acotado()              
         elif opcion == '10':
-             correcion_LineaB(0,0)
+            metodo = 8
+            print("Como deseas ver el espectro")
+            print("1-Grafico completo")
+            print("2-Grafico acotado")
+            print("3-Grafico por tipo")
+            print("4-Grafico acotado por tipo")
+            metodo_grafico = int(input("Opcion: "))
+            if metodo_grafico == 1:
+                correcion_LineaB(0,0)
+            elif metodo_grafico == 2:
+                espectro_acotado(correcion_LineaB(0,5), 2,9)
+            elif metodo_grafico == 3:
+                print("NORMALIZAR POR:")
+                print("1-Media")
+                print("2-Area")
+                print("3-Sin normalizar")
+                opcion = int(input("Selecciona una opción: "))
+                if opcion == 1:
+                    grafico_tipo(correcion_LineaB(df2,4),raman_shift,9,'1',0)
+                elif opcion == 2:
+                    grafico_tipo(correcion_LineaB(df_media_pca,4),raman_shift,9,'2',0)
+                else: 
+                    grafico_tipo(correcion_LineaB(df_concatenado_cabecera_nueva_area,4),raman_shift,9,'3',0)   
+            # else
+            #     #grafico_tipo_acotado()              
+             
         elif opcion == '11':
               correcion_shirley(0,0)
         # # elif opcion == '12':
@@ -1344,7 +1383,7 @@ def segunda_derivada(normalizado, pca_op):
 
 # POR EL METODO DE REGRESION LINEAL
 def correcion_LineaB(normalizado, pca_op):
-        if pca_op == 0:
+        if pca_op == 0 or pca_op == 5:
             print("NORMALIZAR POR:")
             print("1-Media")
             print("2-Area")
@@ -1393,14 +1432,15 @@ def correcion_LineaB(normalizado, pca_op):
                
         else:
            #daba error por que no retornaba nada
+           print("entro en el else de correccion base")
            normalizado_correccion = normalizado
         
-        if (pca_op == 0 or pca_op == 3) and opcion_s == 1:
+        if (pca_op == 0 or pca_op == 3 or pca_op == 5) and opcion_s == 1:
             #print("entro aca")
             normalizado_f = aux
             print("EL DF NORMALIZADO_F ES:")
             print(normalizado_f)
-        elif (pca_op == 0 or pca_op == 3) and opcion_s == 2:
+        elif (pca_op == 0 or pca_op == 3 or pca_op == 5) and opcion_s == 2:
             normalizado_f = normalizado
         else:
             normalizado_f = normalizado_correccion #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
@@ -1409,20 +1449,21 @@ def correcion_LineaB(normalizado, pca_op):
         #print("NORMALIZADO-F")
         #print(normalizado_f)
         cabecera_aux = normalizado_f.columns
-        print("XDDDDDDDDDD")
-        print(cabecera_aux)
+        #print("XDDDDDDDDDD")
+        #print(cabecera_aux)
         np_corregido = normalizado_f.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
         #print("DF_CORREGIDO")
         #print(np_corregido)
         #print("DF_CORREGIDO")
         df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
-        print(df_corregido)
+        #print(df_corregido)
         
         
       
         pendientes = {}   # Crear un diccionario para almacenar las pendientes
         intersecciones = {}
         y_ajustados = {}
+        #dic_prueba = {}
 
         pos = 0  
         # Asignar la primera columna como Raman shift
@@ -1435,8 +1476,8 @@ def correcion_LineaB(normalizado, pca_op):
         #print(y_ajustados)
 
         #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
-        print("RAMAN SHIFT")
-        print(raman_shift)
+        #print("RAMAN SHIFT")
+        #print(raman_shift)
         
         # Iterar sobre las demás columnas
         for col in df_corregido.columns:
@@ -1460,8 +1501,12 @@ def correcion_LineaB(normalizado, pca_op):
                 #print()
                 #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
                 y_ajustado.append(y)
-            y_ajustados[col] =  y_ajustado
-            #print("XD")
+                #dic_prueba.append(y)
+            y_ajustados[col] = intensidades - y_ajustado
+            #dic_prueba[col] = y_ajustado
+            #print(intensidades, "-", dic_prueba[col] , "=", y_ajustados[col])
+            #print("XDDDDDDDDDDDD")
+            #print(y_ajustado)
             # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
             #     pos = 0
             #     #print("entro")
@@ -1474,10 +1519,10 @@ def correcion_LineaB(normalizado, pca_op):
                 
         df_y_ajustados = pd.DataFrame(y_ajustados)
         #df_y_ajustados.index.name = "Raman Shift"  
-        print(len(df_y_ajustados.columns))
-        print(len(cabecera))
+        #print(len(df_y_ajustados.columns))
+        #print(len(cabecera))
         df_y_ajustados.columns = cabecera_aux
-        print(df_y_ajustados)    
+        #print(df_y_ajustados)    
         
         #print()
         #print("LA PENDIENTE SON:", pendientes)
@@ -1491,12 +1536,13 @@ def correcion_LineaB(normalizado, pca_op):
         
         #   CORROBORAR LOS RESULTADOS 
         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
-        if pca_op == 0:
+        if pca_op == 0 and pca_op != 5:
             if opcion_s == 1:
                 mostrar_espectros(df_y_ajustados,raman_shift, 10, opcion, metodo_suavizado)
             else:
                 mostrar_espectros(df_y_ajustados,raman_shift, 10, opcion,4)
         else:
+            print("entro en el else para retornar el df")
             return df_y_ajustados   #FALTA HACER QUE LA FUNCION PCA LLAME A ESTA FUNCION
 
 
