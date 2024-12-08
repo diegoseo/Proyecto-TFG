@@ -124,39 +124,39 @@ print("EL ESPECTRO NORMALIZADO POR LA MEDIA ES")
 print(df_media_pca) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print('normalizacion media')
 
-"""
-VARIABLES DE NORMALIZAR POR AREA
-"""
-global df_concatenado_cabecera_nueva_area
-df3 = pd.DataFrame(intensity)
-#print("DataFrame de Intensidades:")
-#print(df3)
-df3 = df3.apply(pd.to_numeric, errors='coerce')  # Convierte a numérico, colocando NaN donde haya problemas
-#print(df3)
-np_array = raman_shift.to_numpy() #CONVERTIMOS INTENSITY AL TIPO NUMPY POR QUE POR QUE NP.TRAPZ UTILIZA ESE TIPO DE DATOS
-#print(np_array)
-df3_normalizado = df3.copy()
-#print(df3)
-# Cálculo del área bajo la curva para cada columna
-#print("\nÁreas bajo la curva para cada columna:")
-for col in df3.columns:
-    #print(df3[col])
-    #print(df3_normalizado[col])
-    area = (np.trapz(df3[col], np_array))  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
-    if area != 0:
-        df3_normalizado[col] = df3[col] / area
-    else:
-        print(f"Advertencia: El área de la columna {col} es cero y no se puede normalizar.") #seguro contra errores de división por cero 
-#print(df3_normalizado)
-df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index=True)
-#print(df_concatenado_area)
-# Paso 1: Convertir la primera fila en cabecera
-df_concatenado_area.columns = df_concatenado_area.iloc[0]  # Asigna la primera fila como nombres de columna
-# Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
-df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=True)
-print("ESPECTRO NORMALIZADO POR EL AREA")
-print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
-#print('entro 10')
+# """
+# VARIABLES DE NORMALIZAR POR AREA
+# """
+# global df_concatenado_cabecera_nueva_area
+# df3 = pd.DataFrame(intensity)
+# #print("DataFrame de Intensidades:")
+# #print(df3)
+# df3 = df3.apply(pd.to_numeric, errors='coerce')  # Convierte a numérico, colocando NaN donde haya problemas
+# #print(df3)
+# np_array = raman_shift.to_numpy() #CONVERTIMOS INTENSITY AL TIPO NUMPY POR QUE POR QUE NP.TRAPZ UTILIZA ESE TIPO DE DATOS
+# #print(np_array)
+# df3_normalizado = df3.copy()
+# #print(df3)
+# # Cálculo del área bajo la curva para cada columna
+# #print("\nÁreas bajo la curva para cada columna:")
+# for col in df3.columns:
+#     #print(df3[col])
+#     #print(df3_normalizado[col])
+#     area = (np.trapz(df3[col], np_array))  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
+#     if area != 0:
+#         df3_normalizado[col] = df3[col] / area
+#     else:
+#         print(f"Advertencia: El área de la columna {col} es cero y no se puede normalizar.") #seguro contra errores de división por cero 
+# #print(df3_normalizado)
+# df_concatenado_area = pd.concat([cabecera,df3_normalizado], axis=0, ignore_index=True)
+# #print(df_concatenado_area)
+# # Paso 1: Convertir la primera fila en cabecera
+# df_concatenado_area.columns = df_concatenado_area.iloc[0]  # Asigna la primera fila como nombres de columna
+# # Paso 2: Eliminar la primera fila (ahora es la cabecera) y resetear el índice
+# df_concatenado_cabecera_nueva_area = df_concatenado_area[1:].reset_index(drop=True)
+# print("ESPECTRO NORMALIZADO POR EL AREA")
+# print(df_concatenado_cabecera_nueva_area) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+# #print('entro 10')
 
 
 
@@ -216,11 +216,11 @@ def main():
             print("Procesando los datos")
             print("Por favor espere un momento...")
             mostrar_espectros(df_media_pca,metodo,0)
-        elif opcion == '3':
-            metodo = 3
-            print("Procesando los datos")
-            print("Por favor espere un momento...")
-            mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo,0)
+        # elif opcion == '3':
+        #     metodo = 3
+        #     print("Procesando los datos")
+        #     print("Por favor espere un momento...")
+        #     mostrar_espectros(df_concatenado_cabecera_nueva_area,metodo,0)
         elif opcion == '4':
             suavizado_saviztky_golay(0,0)          
         elif opcion == '5':
@@ -235,10 +235,10 @@ def main():
              # print("Procesando los datos")
              # print("Por favor espere un momento...")
              mostrar_pca()       
-        elif opcion == '8':
-             primera_derivada(0,0)
-        elif opcion == '9':
-             segunda_derivada(0,0)
+        # elif opcion == '8':
+        #      primera_derivada(0,0)
+        # elif opcion == '9':
+        #      segunda_derivada(0,0)
         # elif opcion == '10':
         #     #correcion_LineaB()
         # elif opcion == '11':
@@ -612,10 +612,10 @@ def  mostrar_pca():
             print("1- PRIMERA DERIVADA")
             print("2- SEGUNDA DERIVADA")
             op_der= int(input("OPCION: "))
-            if op_der == 1:
-                normalizado_pca = primera_derivada(normalizado_pca,1)
-            else:
-                normalizado_pca = segunda_derivada(normalizado_pca,1)
+            # if op_der == 1:
+            #     normalizado_pca = primera_derivada(normalizado_pca,1)
+            # else:
+            #     normalizado_pca = segunda_derivada(normalizado_pca,1)
         
     elif opcion == '2' :
         print("entor op 2")
@@ -645,12 +645,12 @@ def  mostrar_pca():
            print("1- PRIMERA DERIVADA")
            print("2- SEGUNDA DERIVADA")
            op_der= int(input("OPCION: "))
-           if op_der == 1:
-               print("si quiero derivar")
-               #print(normalizado_pca)
-               normalizado_pca = primera_derivada(normalizado_pca,1)
-           else:
-               normalizado_pca = segunda_derivada(normalizado_pca,1)      
+           # if op_der == 1:
+           #     print("si quiero derivar")
+           #     #print(normalizado_pca)
+           #     normalizado_pca = primera_derivada(normalizado_pca,1)
+           # else:
+           #     normalizado_pca = segunda_derivada(normalizado_pca,1)      
 
 
     elif opcion == '3' :
@@ -679,10 +679,10 @@ def  mostrar_pca():
             print("1- PRIMERA DERIVADA")
             print("2- SEGUNDA DERIVADA")
             op_der= int(input("OPCION: "))
-            if op_der == 1:
-                normalizado_pca = primera_derivada(normalizado_pca,1)
-            else:
-                normalizado_pca = segunda_derivada(normalizado_pca,1)      
+            #if op_der == 1:
+                #normalizado_pca = primera_derivada(normalizado_pca,1)
+            #else:
+               # normalizado_pca = segunda_derivada(normalizado_pca,1)      
 
     else:
         print("OPCION NO VALIDA")
@@ -732,166 +732,166 @@ def  mostrar_pca():
 
 
 
-def primera_derivada(normalizado, pca_op):
-        print("entro en la funcion")
+# def primera_derivada(normalizado, pca_op):
+#         print("entro en la funcion")
         
-        if pca_op == 0:
-             print("NORMALIZAR POR:")
-             print("1-Media")
-             print("2-Area")
-             print("3-Sin normalizar")
-             opcion = input("Selecciona una opción: ")
+#         if pca_op == 0:
+#              print("NORMALIZAR POR:")
+#              print("1-Media")
+#              print("2-Area")
+#              print("3-Sin normalizar")
+#              opcion = input("Selecciona una opción: ")
              
-             if opcion == '1'  :
-                 normalizado = df_media_pca
-             elif opcion == '2' :
-                 normalizado = df_concatenado_cabecera_nueva_area
-             elif opcion == '3' :
-                 normalizado = df2
-             else:
-                 print("OPCION NO VALIDA")
-                 print("Salir...")
+#              if opcion == '1'  :
+#                  normalizado = df_media_pca
+#              elif opcion == '2' :
+#                  normalizado = df_concatenado_cabecera_nueva_area
+#              elif opcion == '3' :
+#                  normalizado = df2
+#              else:
+#                  print("OPCION NO VALIDA")
+#                  print("Salir...")
              
-             print("DESEAS SUAVIZAR?")
-             print("1-SI")
-             print("2-NO")
-             opcion = int(input("OPCION: "))
-             if opcion == 1:
-                 print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
-                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
-                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
-                 print("3. SUAVIZADO POR MEDIA MOVIL")
-                 metodo_suavizado = int(input("OPCION: "))
-                 if metodo_suavizado == 1:
-                     normalizado = suavizado_saviztky_golay(normalizado,1)
-                 elif metodo_suavizado == 2:
-                     normalizado = suavizado_filtroGausiano(normalizado,1)
-                 else:
-                     normalizado = suavizado_mediamovil(normalizado,1) 
+#              print("DESEAS SUAVIZAR?")
+#              print("1-SI")
+#              print("2-NO")
+#              opcion = int(input("OPCION: "))
+#              if opcion == 1:
+#                  print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+#                  print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+#                  print("2. SUAVIZADO POR FILTRO GAUSIANO")
+#                  print("3. SUAVIZADO POR MEDIA MOVIL")
+#                  metodo_suavizado = int(input("OPCION: "))
+#                  if metodo_suavizado == 1:
+#                      normalizado = suavizado_saviztky_golay(normalizado,1)
+#                  elif metodo_suavizado == 2:
+#                      normalizado = suavizado_filtroGausiano(normalizado,1)
+#                  else:
+#                      normalizado = suavizado_mediamovil(normalizado,1) 
              
-             # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
+#              # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
              
-        # else:
-        #     #daba error por que no retornaba nada
-        #     normalizado_pca = normalizado_pca
-        #     print("entro en 1ra der")
-        #     return  normalizado_pca
+#         # else:
+#         #     #daba error por que no retornaba nada
+#         #     normalizado_pca = normalizado_pca
+#         #     print("entro en 1ra der")
+#         #     return  normalizado_pca
 
-       # Crear un nuevo DataFrame para almacenar las derivadas
-        df_derivada = normalizado
-        #print("antes del for")
-        # Calcular la primera derivada para cada columna usando .diff()
-        # Verificar nombres de columna duplicados
-        # duplicated_columns = normalizado.columns[normalizado.columns.duplicated()] #solo para ver las columnas repetidas
-        # print(duplicated_columns)
-        # Asegurar nombres únicos en las columnas agregando un sufijo numérico
-        df_derivada.columns = range(len(df_derivada.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
-        #print(df_derivada.columns)
-        df_derivada = df_derivada.drop(0)
-        #print(df_derivada)
-        #print("xxxxxxxxxxxxxxxxxxx")
+#        # Crear un nuevo DataFrame para almacenar las derivadas
+#         df_derivada = normalizado
+#         #print("antes del for")
+#         # Calcular la primera derivada para cada columna usando .diff()
+#         # Verificar nombres de columna duplicados
+#         # duplicated_columns = normalizado.columns[normalizado.columns.duplicated()] #solo para ver las columnas repetidas
+#         # print(duplicated_columns)
+#         # Asegurar nombres únicos en las columnas agregando un sufijo numérico
+#         df_derivada.columns = range(len(df_derivada.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
+#         #print(df_derivada.columns)
+#         df_derivada = df_derivada.drop(0)
+#         #print(df_derivada)
+#         #print("xxxxxxxxxxxxxxxxxxx")
         
-        for col in normalizado.columns:
-            df_derivada[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna
+#         for col in normalizado.columns:
+#             df_derivada[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna
     
-        #print(df_derivada)
+#         #print(df_derivada)
         
     
-        # Mostrar el DataFrame de las primeras derivadas
-        #print("DataFrame de las primeras derivadas:")
-        #print(df_derivada)
-        df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
-        #print(df_derivada)
+#         # Mostrar el DataFrame de las primeras derivadas
+#         #print("DataFrame de las primeras derivadas:")
+#         #print(df_derivada)
+#         df_derivada.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
+#         #print(df_derivada)
       
         
         
-        if pca_op == 0 :
-            print("LA PRIMERA DERIVADA ES:")
-            print(df_derivada)
-            mostrar_espectros(df_derivada, 7, 1)
-        else:
-            print("LA PRIMERA DERIVADA ES:")
-            print(df_derivada)
-            return df_derivada
+#         if pca_op == 0 :
+#             print("LA PRIMERA DERIVADA ES:")
+#             print(df_derivada)
+#             mostrar_espectros(df_derivada, 7, 1)
+#         else:
+#             print("LA PRIMERA DERIVADA ES:")
+#             print(df_derivada)
+#             return df_derivada
     
 
 
 
 
-def segunda_derivada(normalizado, pca_op):
-    print("entro sefunda dereivada")
-    print("entro en la funcion")
+# def segunda_derivada(normalizado, pca_op):
+#     print("entro sefunda dereivada")
+#     print("entro en la funcion")
         
-    if pca_op == 0:
-             print("NORMALIZAR POR:")
-             print("1-Media")
-             print("2-Area")
-             print("3-Sin normalizar")
-             opcion = input("Selecciona una opción: ")
+#     if pca_op == 0:
+#              print("NORMALIZAR POR:")
+#              print("1-Media")
+#              print("2-Area")
+#              print("3-Sin normalizar")
+#              opcion = input("Selecciona una opción: ")
              
-             if opcion == '1'  :
-                 normalizado = df_media_pca
-             elif opcion == '2' :
-                 normalizado = df_concatenado_cabecera_nueva_area
-             elif opcion == '3' :
-                 normalizado = df2
-             else:
-                 print("OPCION NO VALIDA")
-                 print("Salir...")
+#              if opcion == '1'  :
+#                  normalizado = df_media_pca
+#              elif opcion == '2' :
+#                  normalizado = df_concatenado_cabecera_nueva_area
+#              elif opcion == '3' :
+#                  normalizado = df2
+#              else:
+#                  print("OPCION NO VALIDA")
+#                  print("Salir...")
              
-             print("DESEAS SUAVIZAR?")
-             print("1-SI")
-             print("2-NO")
-             opcion = int(input("OPCION: "))
-             if opcion == 1:
-                 print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
-                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
-                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
-                 print("3. SUAVIZADO POR MEDIA MOVIL")
-                 metodo_suavizado = int(input("OPCION: "))
-                 if metodo_suavizado == 1:
-                     normalizado = suavizado_saviztky_golay(normalizado,1)
-                 elif metodo_suavizado == 2:
-                     normalizado = suavizado_filtroGausiano(normalizado,1)
-                 else:
-                     normalizado = suavizado_mediamovil(normalizado,1) 
+#              print("DESEAS SUAVIZAR?")
+#              print("1-SI")
+#              print("2-NO")
+#              opcion = int(input("OPCION: "))
+#              if opcion == 1:
+#                  print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+#                  print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+#                  print("2. SUAVIZADO POR FILTRO GAUSIANO")
+#                  print("3. SUAVIZADO POR MEDIA MOVIL")
+#                  metodo_suavizado = int(input("OPCION: "))
+#                  if metodo_suavizado == 1:
+#                      normalizado = suavizado_saviztky_golay(normalizado,1)
+#                  elif metodo_suavizado == 2:
+#                      normalizado = suavizado_filtroGausiano(normalizado,1)
+#                  else:
+#                      normalizado = suavizado_mediamovil(normalizado,1) 
              
-             # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
+#              # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
              
-    df_derivada2 = pd.DataFrame() #PARA ALMACENAR LOS DATOS DE LA SEGUNDA DERIVADA
-       # Crear un nuevo DataFrame para almacenar las derivadas
-    df_derivada2 = normalizado
+#     df_derivada2 = pd.DataFrame() #PARA ALMACENAR LOS DATOS DE LA SEGUNDA DERIVADA
+#        # Crear un nuevo DataFrame para almacenar las derivadas
+#     df_derivada2 = normalizado
      
-        # Asegurar nombres únicos en las columnas agregando un sufijo numérico
-    df_derivada2.columns = range(len(df_derivada2.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
-        #print(df_derivada.columns)
-    df_derivada2 = df_derivada2.drop(0)
-        #print(df_derivada)
-        #print("xxxxxxxxxxxxxxxxxxx")
+#         # Asegurar nombres únicos en las columnas agregando un sufijo numérico
+#     df_derivada2.columns = range(len(df_derivada2.columns)) #pasamos todo a nuemrico la cabecera para evitar el conflicto de cabecera repetidas
+#         #print(df_derivada.columns)
+#     df_derivada2 = df_derivada2.drop(0)
+#         #print(df_derivada)
+#         #print("xxxxxxxxxxxxxxxxxxx")
         
-    for col in normalizado.columns:
-        df_derivada2[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna (PRIMERA DERIVADA)
-        df_derivada2[col] = df_derivada2.diff()
+#     for col in normalizado.columns:
+#         df_derivada2[col] = normalizado[col].diff()  # Calcula la diferencia entre valores consecutivos en cada columna (PRIMERA DERIVADA)
+#         df_derivada2[col] = df_derivada2.diff()
     
     
     
     
 
-    #print(df_derivada2)
-    df_derivada2.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
-    #print(df_derivada2)
-    #print(df_derivada)
+#     #print(df_derivada2)
+#     df_derivada2.columns = df2.columns  #volvemosa agrega la cabecera despues de haber eliminado para agregar los indices numericos sin repetirse
+#     #print(df_derivada2)
+#     #print(df_derivada)
       
         
         
-    if pca_op == 0 :
-        print("LA SEGUNDA DERIVADA ES:")
-        print(df_derivada2)
-        mostrar_espectros(df_derivada2, 7, 1)
-    else:
-        print("LA SEGUNDA DERIVADA ES:")
-        print(df_derivada2)
-        return df_derivada2
+#     if pca_op == 0 :
+#         print("LA SEGUNDA DERIVADA ES:")
+#         print(df_derivada2)
+#         mostrar_espectros(df_derivada2, 7, 1)
+#     else:
+#         print("LA SEGUNDA DERIVADA ES:")
+#         print(df_derivada2)
+#         return df_derivada2
     
 
 

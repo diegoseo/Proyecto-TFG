@@ -68,9 +68,13 @@ def main():
         elif opcion == '4':
             suavizado_saviztky_golay(0,0)          
         elif opcion == '5':
-            suavizado_filtroGausiano(0,0)      
+            suavizado_filtroGausiano(0,0)
+            print("Procesando los datos")
+            print("Por favor espere un momento...")        
         elif opcion == '6':
-              suavizado_mediamovil(0,0)   
+              suavizado_mediamovil(0,0)
+              print("Procesando los datos")
+              print("Por favor espere un momento...")     
         elif opcion == '7':
               print("Procesando los datos")
               print("Por favor espere un momento...")
@@ -79,14 +83,14 @@ def main():
               primera_derivada(0,0)
         elif opcion == '9':
               segunda_derivada(0,0)
-        elif opcion == '10':
-             correcion_LineaB(0,0)
-        elif opcion == '11':
-             correcion_shirley(0,0)
-        # elif opcion == '12':
-        #      espectro_escalado(0,0)
-        elif opcion == '13':
-             espectro_acotado(0,0)
+        # # elif opcion == '10':
+        # #     #correcion_LineaB()
+        # # elif opcion == '11':
+        # #     #correcion_shirley()
+        # # elif opcion == '12':
+        # #     #espectro_escalado()
+        # # elif opcion == '13':
+        # #     #espectro_acotado()
         elif opcion == '14':
             print("Saliendo del programa...")
             break
@@ -104,9 +108,9 @@ def mostrar_menu():
       print("7. PCA")
       print("8. PRIMERA DERIVADA")
       print("9. SEGUNDA DERIVADA")
-      print("10. CORRECCION BASE LINEAL")
+      print("10. CORRECCION LINEA BASE")
       print("11. CORRECION SHIRLEY")
-      #print("12. ESPECTRO ESCALADO")
+      print("12. ESPECTRO ESCALADO")
       print("13. ESPECTRO ACOTADO")
       print("14. Salir")
       
@@ -116,7 +120,6 @@ def mostrar_menu():
 #GRAFICAMOS LOS ESPECTROS SIN NORMALIZAR#
 
 raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
-print("gbdgb")
 print(raman_shift)
 
 intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA FILA Y PRIMERA COLUMNA
@@ -125,10 +128,10 @@ intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 #print(tipos)
 types=tipos.tolist() #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
-#print(types)
+print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
-print(cabecera)
+#print(cabecera)
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 #print(cant_tipos)
@@ -136,17 +139,18 @@ cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA V
 tipos_nombres = df.iloc[0, 1:].unique() # OBTENEMOS LOS NOMBRES DE LOS TIPOS
 #print(tipos_nombres)
 
-cmap = plt.colormaps['hsv']  # Usamos solo el nombre del colormap, Obtenemos el colormap sin especificar el número de colores
+# Obtenemos el colormap sin especificar el número de colores
+cmap = plt.colormaps['hsv']  # Usamos solo el nombre del colormap
 
 # Nos aseguramos de que `colores` es una lista
 colores = [cmap(i) for i in np.linspace(0, 1, len(tipos_nombres))]  # Genera una lista de colores
 
 # Crear el diccionario de asignación de colores
 asignacion_colores = {tipo: mcolors.to_hex(colores[i]) for i, tipo in enumerate(tipos_nombres)}
-#print(asignacion_colores)
+print(asignacion_colores)
 
 diccionario=pd.DataFrame(asignacion_colores.items())
-#print(diccionario)
+print(diccionario)
 
 #AHORA QUE YA TENGO ASIGNADO UN COLOR POR CADA TIPO TENGO QUE GRAFICAR LOS ESPECTROS#
 
@@ -161,8 +165,8 @@ df2 = df2.drop(0).reset_index(drop=True) #eliminamos la primera fila
 df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del rama_shift
 #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
-print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
-print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+#print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
+#print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
 
 
@@ -255,7 +259,6 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
     
     print("ENTRO EN MOSTRAR ESPECTROS")
     print(datos)
-    
     # Graficar los espectros
     plt.figure(figsize=(10, 6))
     
@@ -277,7 +280,7 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
                     #print(raman_shift)
                     #print('INTENSIDADES')
                     #print(df2.iloc[:,pos_y]) 
-                    #print(col)
+                    print(col)
                     #print("xdxdxdxdxdxd")
                     if tipo in leyendas_tipos:
                         plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
@@ -285,8 +288,8 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
                         #print('entro4')
                         #print(pos_y)   
                         break
-                    else:  # OJO CAMBIE A  datos[col] , ANTES ERA df2
-                        plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                    else:
+                        plt.plot(raman_shift , df2[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
                         leyendas_tipos.add(tipo) 
                 pos_y+=1 
     
@@ -372,77 +375,9 @@ def mostrar_espectros(datos,metodo,opcion,m_suavi):
             plt.show() 
     elif metodo == 7:
             print("hola PCA")
-    elif metodo == 10:
-            if opcion == '1':
-                if m_suavi == 1:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Normalizado por la media')
-                    plt.show()
-                elif m_suavi == 2:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por la media')
-                    plt.show()
-                elif m_suavi == 3:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por la media')
-                    plt.show()
-                else:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} sin suavizar y Normalizado por la media')
-                    plt.show()
-            elif opcion == '2':
-                if m_suavi == 1:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Normalizado por Area')
-                    plt.show()
-                elif m_suavi == 2:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por Area')
-                    plt.show()
-                elif m_suavi == 3:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por Area')
-                    plt.show()
-                else:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} sin Suavizar y Normalizado por Area')
-                    plt.show()
-            else:
-                if m_suavi == 1:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por SAVIZTKY-GOLAY y Sin Normalizar')
-                    plt.show()
-                elif m_suavi == 2:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Sin Normalizar')
-                    plt.show()
-                elif m_suavi == 3:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} Suavizado por MEDIA MOVIL y Sin Normalizar')
-                    plt.show()
-                else:
-                    plt.xlabel('Longitud de onda / Frecuencia')
-                    plt.ylabel('Intensidad')
-                    plt.title(f'Espectros del archivo {bd_name} sin Suavizar y Sin Normalizar')
-                    plt.show()
-    # elif metodo == 11:
-    # elif metodo == 12:
-    elif metodo == 13:
-            plt.xlabel('Longitud de onda / Frecuencia')
-            plt.ylabel('Intensidad')
-            plt.title(f'Espectros del archivo {bd_name} Acotado ')
-            plt.show() 
+    elif metodo == 8:
+            print("entro en opcion 8")
+  
     else:
         print("NO HAY GRAFICA DISPONIBLE PARA ESTA OPCION")
 
@@ -490,13 +425,13 @@ def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede 
     suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
     
     if pca_op == 0:
-        #print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
-        #print(suavizado_pd) 
+        print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
+        print(suavizado_pd) 
         mostrar_espectros(suavizado_pd,4,opcion,0)
     else:
-        #print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
-        #print("suavizado savitkz golay:",suavizado_pd.shape) 
-        #print(suavizado_pd)
+        print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
+        print("suavizado savitkz golay:",suavizado_pd.shape) 
+        print(suavizado_pd)
         return suavizado_pd
     
 
@@ -552,8 +487,8 @@ def suavizado_filtroGausiano(normalizado_pca, pca_op):  #acordarse que se puede 
     #print(suavizado_gaussiano_pd)
     #print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRrr")
     if pca_op == 0:
-        print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
-        print(suavizado_gaussiano_pd)
+        #print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
+        #print(suavizado_gaussiano_pd)
         mostrar_espectros(suavizado_gaussiano_pd,5,opcion,0)
     else:
         #print("ESPECTRO SUAVIZADO POR FILTRO GAUSSIANO")
@@ -614,7 +549,7 @@ def suavizado_mediamovil(normalizado_pca, pca_op):
 
 def primera_derivada(normalizado, pca_op):
             
-    #print("entro en la funcion")
+    print("entro en la funcion")
             
     if pca_op == 0:
         print("NORMALIZAR POR:")
@@ -633,7 +568,7 @@ def primera_derivada(normalizado, pca_op):
             print("OPCION NO VALIDA")
             print("Salir...")
        
-        #print("EL normalizado.SHAPE antes ES:", normalizado.shape)
+        print("EL normalizado.SHAPE antes ES:", normalizado.shape)
         
         print("DESEA SUAVIZAR")
         print("1. SI")
@@ -647,19 +582,19 @@ def primera_derivada(normalizado, pca_op):
             metodo_suavizado = input("OPCION: ")
             if metodo_suavizado == '1':
                 aux = suavizado_saviztky_golay(normalizado,1)
-                #print("EL aux.SHAPE antes ES:", aux.shape)
+                print("EL aux.SHAPE antes ES:", aux.shape)
                 #normalizado = suavizado_saviztky_golay(normalizado,1)
             elif metodo_suavizado == '2':
-                #print("normalizado shape por FG = ", normalizado.shape)
+                print("normalizado shape por FG = ", normalizado.shape)
                 #normalizado = suavizado_filtroGausiano(normalizado,1)
                 aux = suavizado_filtroGausiano(normalizado,1)
-                #print("normalizado shape despues por FG = ", normalizado.shape)
+                print("normalizado shape despues por FG = ", normalizado.shape)
             elif metodo_suavizado == '3':
                 #normalizado = suavizado_mediamovil(normalizado,1) 
                 aux = suavizado_mediamovil(normalizado,1) 
         else:
                 metodo_suavizado = '4'         
-                #print("No se va a normalizar, directamente la derivada")
+                print("No se va a normalizar, directamente la derivada")
                  
                   # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
            
@@ -670,33 +605,33 @@ def primera_derivada(normalizado, pca_op):
     if pca_op == 0 and opcion_s == 1:
         #print("entro aca")
         normalizado_f = aux
-        #print("EL DF NORMALIZADO_F ES:")
-        #print(normalizado_f)
+        print("EL DF NORMALIZADO_F ES:")
+        print(normalizado_f)
     elif pca_op == 0 and opcion_s == 2:
         normalizado_f = normalizado
     else:
         normalizado_f = normalizado_pca #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
-        #print("aca va lo del PCA")
+        print("aca va lo del PCA")
     
     
     df_derivada = normalizado_f.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
-    #print("xXXXXXXXxxXXXX")
-    #print(df_derivada)
+    print("xXXXXXXXxxXXXX")
+    print(df_derivada)
     
     # Calcular la primera derivada
     df_derivada_diff = df_derivada.diff()
     
     # Imprimir la primera derivada
-    #print("Primera Derivada:")
-    #print(df_derivada_diff)
+    print("Primera Derivada:")
+    print(df_derivada_diff)
     
     
     plt.figure(figsize=(10, 6))
     
 
     if pca_op == 0 :
-        #print("LA PRIMERA DERIVADA ES:")
-        #print(df_derivada_diff.shape)
+        print("LA PRIMERA DERIVADA ES:")
+        print(df_derivada_diff.shape)
         #mostrar_espectros(df_derivada_diff, 8,opcion,metodo_suavizado)
         leyendas_tipos = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
         pos_y=0
@@ -718,14 +653,14 @@ def primera_derivada(normalizado, pca_op):
                         if tipo in leyendas_tipos:
                             plt.plot(raman_shift , df_derivada_diff[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
                             '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
-                            #print('entro4')
+                            print('entro4')
                             #print(pos_y)   
                             break
                         else:
-                            plt.plot(raman_shift , df_derivada_diff[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                            plt.plot(raman_shift , df2[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
                             leyendas_tipos.add(tipo)
-                            #print(leyendas_tipos)
-                            #print("entro 5")
+                            print(leyendas_tipos)
+                            print("entro 5")
                     pos_y+=1 
                         
         if opcion == '1':
@@ -793,8 +728,8 @@ def primera_derivada(normalizado, pca_op):
                 plt.show()
                 
     else:
-        #print("LA PRIMERA DERIVADA ES:")
-        #print(df_derivada_diff)
+        print("LA PRIMERA DERIVADA ES:")
+        print(df_derivada_diff)
         return df_derivada_diff
         #para la llamada del PCA
 
@@ -806,7 +741,7 @@ def primera_derivada(normalizado, pca_op):
  
 def segunda_derivada(normalizado, pca_op):
             
-    #print("entro en la funcion")
+    print("entro en la funcion")
             
     if pca_op == 0:
         print("NORMALIZAR POR:")
@@ -825,7 +760,7 @@ def segunda_derivada(normalizado, pca_op):
             print("OPCION NO VALIDA")
             print("Salir...")
        
-        #print("EL normalizado.SHAPE antes ES:", normalizado.shape)
+        print("EL normalizado.SHAPE antes ES:", normalizado.shape)
         
         print("DESEA SUAVIZAR")
         print("1. SI")
@@ -839,13 +774,13 @@ def segunda_derivada(normalizado, pca_op):
             metodo_suavizado = input("OPCION: ")
             if metodo_suavizado == '1':
                 aux = suavizado_saviztky_golay(normalizado,1)
-                #print("EL aux.SHAPE antes ES:", aux.shape)
+                print("EL aux.SHAPE antes ES:", aux.shape)
                 #normalizado = suavizado_saviztky_golay(normalizado,1)
             elif metodo_suavizado == '2':
-                #print("normalizado shape por FG = ", normalizado.shape)
+                print("normalizado shape por FG = ", normalizado.shape)
                 #normalizado = suavizado_filtroGausiano(normalizado,1)
                 aux = suavizado_filtroGausiano(normalizado,1)
-                #print("normalizado shape despues por FG = ", normalizado.shape)
+                print("normalizado shape despues por FG = ", normalizado.shape)
             elif metodo_suavizado == '3':
                 #normalizado = suavizado_mediamovil(normalizado,1) 
                 aux = suavizado_mediamovil(normalizado,1) 
@@ -858,42 +793,42 @@ def segunda_derivada(normalizado, pca_op):
     else:
        #daba error por que no retornaba nada
        normalizado_pca = normalizado
-    
+
     if pca_op == 0 and opcion_s == 1:
         #print("entro aca")
         normalizado_f = aux
-        #print("EL DF NORMALIZADO_F ES:")
-        #print(normalizado_f)
+        print("EL DF NORMALIZADO_F ES:")
+        print(normalizado_f)
     elif pca_op == 0 and opcion_s == 2:
         normalizado_f = normalizado
     else:
         normalizado_f = normalizado_pca #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
-        #print("aca va lo del PCA")
+        print("aca va lo del PCA")
     
     
     df_derivada = normalizado_f.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
-    #print("xXXXXXXXxxXXXX")
-    #print(df_derivada)
+    print("xXXXXXXXxxXXXX")
+    print(df_derivada)
     
     # Calcular la primera derivada
     df_derivada_diff = df_derivada.diff()
-    #print("primera derivada")
-    #print(df_derivada_diff)
+    print("primera derivada")
+    print(df_derivada_diff)
     # Calculamos la segunda derivada
     df_derivada_diff = df_derivada_diff.diff()
-    #print("segunda derivada")
-    #print(df_derivada_diff)
+    print("segunda derivada")
+    print(df_derivada_diff)
     # Imprimir la primera derivada
-    #print("Primera Derivada:")
-    #print(df_derivada_diff)
+    print("Primera Derivada:")
+    print(df_derivada_diff)
     
     
     plt.figure(figsize=(10, 6))
     
 
     if pca_op == 0 :
-        #print("LA PRIMERA DERIVADA ES:")
-        #print(df_derivada_diff.shape)
+        print("LA PRIMERA DERIVADA ES:")
+        print(df_derivada_diff.shape)
         #mostrar_espectros(df_derivada_diff, 8,opcion,metodo_suavizado)
         leyendas_tipos = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
         pos_y=0
@@ -915,14 +850,14 @@ def segunda_derivada(normalizado, pca_op):
                         if tipo in leyendas_tipos:
                             plt.plot(raman_shift , df_derivada_diff[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
                             '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
-                            #print('entro4')
+                            print('entro4')
                             #print(pos_y)   
                             break
                         else:
                             plt.plot(raman_shift , df2[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
                             leyendas_tipos.add(tipo)
-                            #print(leyendas_tipos)
-                            #print("entro 5")
+                            print(leyendas_tipos)
+                            print("entro 5")
                     pos_y+=1 
                         
         if opcion == '1':
@@ -990,8 +925,8 @@ def segunda_derivada(normalizado, pca_op):
                 plt.show()
                 
     else:
-        #print("LA PRIMERA DERIVADA ES:")
-        #print(df_derivada_diff)
+        print("LA PRIMERA DERIVADA ES:")
+        print(df_derivada_diff)
         return df_derivada_diff
         #para la llamada del PCA
    
@@ -1045,7 +980,7 @@ def  mostrar_pca():
                  normalizado_pca = segunda_derivada(normalizado_pca,1)
         
     elif opcion == '2' :
-        #print("entor op 2")
+        print("entor op 2")
         normalizado_pca = df_concatenado_cabecera_nueva_area
         print("Deseas Suavizar?")
         print("1- SI")
@@ -1063,7 +998,7 @@ def  mostrar_pca():
                 normalizado_pca = suavizado_filtroGausiano(normalizado_pca,1)
             else:
                 normalizado_pca = suavizado_mediamovil(normalizado_pca,1) 
-        #print("no suavizar xdd")
+        print("no suavizar xdd")
         print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
         print("1- SI")
         print("2- NO")
@@ -1117,12 +1052,7 @@ def  mostrar_pca():
         #mostrar_menu()
 
     datos = pd.DataFrame(normalizado_pca)
-    
-    # print("DATOS:")
-    # print(datos)
-    datos = datos.dropna() #eliminamos las filas con valores NAN
-    # print("DATOS sin NaN:")
-    # print(datos)
+    #print(datos)
     
     datos_df = datos.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
     #print('prueba')
@@ -1163,224 +1093,10 @@ def  mostrar_pca():
 
 
 
-# POR EL METODO DE REGRESION LINEAL
-def correcion_LineaB(normalizado, pca_op):
-        if pca_op == 0:
-            print("NORMALIZAR POR:")
-            print("1-Media")
-            print("2-Area")
-            print("3-Sin normalizar")
-            opcion = int(input("Selecciona una opción: "))
-               
-            if opcion == 1  :
-                normalizado = df_media_pca
-            elif opcion == 2 :
-                normalizado = df_concatenado_cabecera_nueva_area
-            elif opcion == 3 :
-                normalizado = df2
-            else:
-                print("OPCION NO VALIDA")
-                print("Salir...")
-           
-            #print("EL normalizado.SHAPE antes ES:", normalizado.shape)
-            
-            print("DESEA SUAVIZAR")
-            print("1. SI")
-            print("2. NO")
-            opcion_s =  int(input("OPCION: "))
-            if opcion_s == 1:
-                print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
-                print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
-                print("2. SUAVIZADO POR FILTRO GAUSIANO")
-                print("3. SUAVIZADO POR MEDIA MOVIL")
-                metodo_suavizado = int(input("OPCION: "))
-                if metodo_suavizado == 1:
-                    aux = suavizado_saviztky_golay(normalizado,1)
-                    #print("EL aux.SHAPE antes ES:", aux.shape)
-                    #normalizado = suavizado_saviztky_golay(normalizado,1)
-                elif metodo_suavizado == 2:
-                    #print("normalizado shape por FG = ", normalizado.shape)
-                    #normalizado = suavizado_filtroGausiano(normalizado,1)
-                    aux = suavizado_filtroGausiano(normalizado,1)
-                    #print("normalizado shape despues por FG = ", normalizado.shape)
-                elif metodo_suavizado == 3:
-                    #normalizado = suavizado_mediamovil(normalizado,1) 
-                    aux = suavizado_mediamovil(normalizado,1) 
-            else:
-                    metodo_suavizado = 4         
-                    print("No se va a suavizar, directamente la correccion")
-                     
-                      # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
-               
-        else:
-           #daba error por que no retornaba nada
-           normalizado_correccion = normalizado
-        
-        if pca_op == 0 and opcion_s == 1:
-            #print("entro aca")
-            normalizado_f = aux
-            #print("EL DF NORMALIZADO_F ES:")
-            #print(normalizado_f)
-        elif pca_op == 0 and opcion_s == 2:
-            normalizado_f = normalizado
-        else:
-            normalizado_f = normalizado_correccion #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
-            #print("aca va lo del PCA")
-        #Aseguramos que las columnas tengan encabezados válidos
-        cabecera_aux = normalizado_f.columns
-        
-        # Convertimos el DataFrame a numpy para trabajar con los datos
-        np_corregido = normalizado_f.to_numpy()
-        
-        # Creamos un nuevo DataFrame sin la cabecera original
-        df_corregido = pd.DataFrame(np_corregido)
-        print("DF_CORREGIDO")
-        print(df_corregido)
-        # Diccionarios para almacenar resultados
-        pendientes = {}   
-        intersecciones = {}
-        y_ajustados = {}
-        
-        # Iteramos sobre las columnas para ajustar la línea base
-        for col in df_corregido.columns:
-            #print(col)
-            #print("xd")
-            # Extraemos la columna actual y aseguramos que los valores sean numéricos
-            intensidades = pd.to_numeric(df_corregido[col], errors='coerce')
-            print(intensidades)
-            # Ajuste lineal (Y = mx + b)
-            coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1: línea recta
-            pendiente, interseccion = coef  # Asignamos directamente los coeficientes
-            print(pendiente," , ", interseccion)
-            # Guardamos las pendientes e intersecciones
-            pendientes[col] = pendiente
-            intersecciones[col] = interseccion
-            
-            # Calculamos los valores ajustados (y = mx + b)
-            y_ajustado = pendiente * np.array(raman_shift) + interseccion
-            y_ajustados[col] = intensidades - y_ajustado # RESTAMOS DE LA LINEA BASE BASE AJUSTADA A CADA INTENSIDAD
-        
-        # Convertimos los datos ajustados a DataFrame con las cabeceras originales
-        df_y_ajustados = pd.DataFrame(y_ajustados)
-        df_y_ajustados.columns = cabecera_aux
-        #   CORROBORAR LOS RESULTADOS 
-        # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
-        if pca_op == 0:
-            if opcion_s == 1:
-                mostrar_espectros(df_y_ajustados, 10, opcion, metodo_suavizado)
-            else:
-                mostrar_espectros(df_y_ajustados, 10, opcion,4)
-        else:
-            return df_y_ajustados   #FALTA HACER QUE LA FUNCION PCA LLAME A ESTA FUNCION
 
 
 
-def correcion_shirley(normalizado, pca_op) :
-    print("FALTA IMPLEMENTEAR")
-    
-    
 
-
-
-def espectro_acotado(datos, pca_op):
-    if pca_op == 0:
-        df_aux = df.to_numpy()
-        print("df_aux")
-        print(df_aux)
-        # # Reemplazar la cabecera con la primera fila
-        # df_aux.columns = df.iloc[0].astype(str)   # Asignar la fila 0 como cabecera
-        # print("df_aux.columns")
-        # print(df_aux)        
-        # df_aux = df_aux[1:]  # Eliminar la fila 0, ya que ahora es la cabecera
-        # print("df_aux eliminar fila cero")
-        # print(df_aux)
-        # # Resetear el índice si es necesario
-        # df_aux.reset_index(drop=True, inplace=True)
-        # print("df_aux")
-        # print(df_aux)
-        # df_filtrado = df_aux
-        # print("df_filtrado")
-        # print(df_filtrado)
-    else:
-        df_aux = datos.to_numpy()
-        
-        
-    cabecera_np = df_aux[0,:]   # la primera fila contiene los encabezados
-    intensidades_np = df_aux[1: , :] # apartamos las intensidades
-    
-    raman =  intensidades_np[:, 0].astype(float)  # Primera columna (Raman Shift)
-    intensidades =  intensidades_np[:, 1:].astype(float)  # Columnas restantes (intensidades)
-   
-    # Filtrado del rango de las intensidades
-    min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
-    max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
-    
-    
-    indices_acotados = (raman >= min_rango) & (raman <= max_rango)
-    
-    raman_acotado = raman[indices_acotados]
-    intensidades_acotadas = intensidades[indices_acotados,:]
-
-    
-        
-    # Imprimir resultados
-    print("Raman Shift Acotado:")
-    print(raman_acotado)
-    print("\nIntensidades Acotadas:")
-    print(intensidades_acotadas)
-        
-    
-    # Crear un DataFrame a partir de las dos variables
-    df_acotado = pd.DataFrame(
-    data=np.column_stack([raman_acotado, intensidades_acotadas]),
-    columns=["Raman Shift"] + list(cabecera_np[1:])  # Encabezados para el DataFrame
-    )
-
-    # Mostrar el DataFrame resultante
-    print(df_acotado)
-    
-    if pca_op == 0:  
-   
-        # Graficar los espectros
-        plt.figure(figsize=(10, 6))
-    
-    
-        #DESCOMENTAR EL CODIGO DE ABAJO ESE ES MIO, EL DE ARRIBA ES CHATGPT  
-         
-        leyendas = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
-        pos_y=0
-        for col in df_acotado.columns :
-                #print('entro normal')
-              for tipo in asignacion_colores:
-    
-                    if tipo == col :
-                      color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
-    
-                      if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
-    
-                            if tipo in leyendas:
-                                
-                                print("error 1")
-                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
-                                '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
-      
-                                break
-                            else:
-                                print("error 2")
-                                print(raman)
-                                print(df_acotado[col])
-                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
-                                leyendas.add(tipo) 
-                      pos_y+=1 
-           
-    
-        
-        plt.xlabel('Longitud de onda / Frecuencia')
-        plt.ylabel('Intensidad')
-        plt.title(f'Espectros del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
-        plt.show()
-    else: 
-        return(df_acotado) # creo que no hace falta retornarn nada ya que si una funcion le llama seria solamente para graficarla y retorna tiene quw retornar tambien su raman_shift acotado
 
 
 
@@ -1391,57 +1107,41 @@ if __name__ == "__main__":
 
 
 
-       # VER COMO ES EL FORMATO QUE TIENE QUE RECIBIR MOSTRAR_ESPECTROS 
     
     
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Datos originales
+x = np.array([1, 2, 3, 4, 5])  # Valores de X
+y = np.array([2, 3, 5, 7, 11])  # Valores originales de Y
 
+# Ajuste de regresión lineal
+m = 2.2  # Pendiente calculada
+b = -1   # Intersección calculada
+y_ajustado = m * x + b  # Valores ajustados según la línea de regresión
 
+# Gráfico
+plt.figure(figsize=(10, 6))
 
+# Puntos originales
+plt.scatter(x, y, label="Datos Originales", color="blue")
 
+# Línea ajustada
+plt.plot(x, y_ajustado, label=f"Línea Ajustada (y = {m}x + {b})", color="red", linestyle="--")
 
+# Opcional: Residuos
+for i in range(len(x)):
+    plt.plot([x[i], x[i]], [y[i], y_ajustado[i]], color="gray", linestyle=":")
 
+# Etiquetas y título
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Regresión Lineal - Prueba de Escritorio")
+plt.legend()
+plt.grid(True)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#PRUEBA TOKEN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Mostrar gráfico
+plt.show()
+    
+    
