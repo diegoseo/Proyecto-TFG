@@ -38,20 +38,20 @@ while existe == False:
         print("El archivo no existe.")
         archivo_nombre = input("Ingrese el nombre del archivo: ")
 
-print("DF ANTES DEL CORTE")
-print(df)
-print(df.shape)
+#print("DF ANTES DEL CORTE")
+#print(df)
+#print(df.shape)
 
 menor_cant_filas = df.dropna().shape[0] # Buscamos la columna con menor cantidad de intensidades
-print("menor cantidad de filas:", menor_cant_filas)
+#print("menor cantidad de filas:", menor_cant_filas)
 
 df_truncado = df.iloc[:menor_cant_filas] # Hacemos los cortes para igualar las columnas
 
 df = df_truncado
 
-print("DF DESPUES DEL CORTE")
-print(df)
-print(df.shape)
+#print("DF DESPUES DEL CORTE")
+#print(df)
+#print(df.shape)
 
 '''
     PREPARAMOS EL SIGUIENTE MENU
@@ -198,7 +198,7 @@ def main():
         elif opcion == '7':
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            mostrar_pca()       
+            mostrar_pca(0)       
         elif opcion == '8':
             metodo = 7
             print("Como deseas ver el espectro")
@@ -281,8 +281,8 @@ def main():
              
         elif opcion == '11':
               correcion_shirley(0,0)
-        # # elif opcion == '12':
-        # #      espectro_escalado(0,0)
+        elif opcion == '12':
+             graficar_loadings(mostrar_pca(1))
         elif opcion == '13':
               espectro_acotado(0,0,1)
         elif opcion == '14':
@@ -304,8 +304,8 @@ def mostrar_menu():
       print("9. SEGUNDA DERIVADA")
       print("10. CORRECCION BASE LINEAL")
       print("11. CORRECION SHIRLEY")
-      #print("12. ESPECTRO ESCALADO")
-      print("13. ESPECTRO ACOTADO")
+      print("12. GRAFICO DE LOADINGS")
+      print("13. ESPECTRO ACOTADO")      
       print("14. Salir")
       
 
@@ -327,13 +327,14 @@ types=tipos.tolist() #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
 #print(cabecera)
+#print(cabecera.shape)
+
 
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 #print(cant_tipos)
 
 tipos_nombres = df.iloc[0, 1:].unique() # OBTENEMOS LOS NOMBRES DE LOS TIPOS
 #print(tipos_nombres)
-
 
 
 # Seleccionar un colormap distintivo
@@ -365,8 +366,8 @@ df2 = df2.drop(0).reset_index(drop=True) #eliminamos la primera fila
 df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del rama_shift
 #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
-print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
-print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+#print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
+#print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
 
 
@@ -674,10 +675,10 @@ def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede 
     suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
     suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
     
-    print(suavizado_pd)
+    #print(suavizado_pd)
     
     if pca_op == 0 or pca_op == 1:
-        print("Entro aca 2")
+        #print("Entro aca 2")
         #print(suavizado_pd) 
         if pca_op == 0:
             mostrar_espectros(suavizado_pd,raman_shift,4,opcion,0)
@@ -687,7 +688,7 @@ def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede 
         #print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
         #print("suavizado savitkz golay:",suavizado_pd.shape) 
         #print(suavizado_pd)
-        print("aca si entro xD")
+        #print("aca si entro xD")
         return suavizado_pd
     
 
@@ -1556,7 +1557,7 @@ def correcion_shirley(normalizado, pca_op) :
 
 #COMENZAR CON EL PCA
 
-def  mostrar_pca():
+def  mostrar_pca(op_load):
     print("NORMALIZAR POR:")
     print("1-MEDIA")
     print("2-AREA")
@@ -1673,9 +1674,10 @@ def  mostrar_pca():
 
     datos = pd.DataFrame(normalizado_pca)
     
-    # print("DATOS:")
-    # print(datos)
+    #print("DATOS:")
+    #print(datos)
     datos = datos.dropna() #eliminamos las filas con valores NAN
+    #datos2 = datos.copy()
     # print("DATOS sin NaN:")
     # print(datos)
     
@@ -1684,12 +1686,19 @@ def  mostrar_pca():
     #print(datos_df)
     
     datos_np = datos_df.to_numpy() # PASAMOS DE UN DATAFRAME PANDAS A UN ARRAY NUMPY
-    #print(datos_np)
+    #print(datos_np.shape)
     
     pca = PCA(n_components=2)
     # Ajustar y transformar los datos
     dato_pca = pca.fit_transform(datos_np)
+    #print("dato_pca")
     #print(dato_pca)
+    #print(dato_pca.shape)
+    
+    
+    if op_load == 1:
+        return dato_pca
+
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
@@ -1722,8 +1731,8 @@ def  mostrar_pca():
 def grafico_tipo(datos,raman_shift,metodo,opcion,m_suavi):
 
     
-    print("ENTRO EN MOSTRAR ESPECTROS")
-    print(datos)
+    #print("ENTRO EN MOSTRAR ESPECTROS")
+    #print(datos)
     
     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
     
@@ -1904,10 +1913,13 @@ def grafico_tipo(datos,raman_shift,metodo,opcion,m_suavi):
 
 
 
-
-
-
-
+def graficar_loadings(loadings):
+   
+    print("LOANDINGS")
+    print(loadings)
+    print(loadings.shape)
+   
+   
 
 
 
@@ -1930,6 +1942,7 @@ if __name__ == "__main__":
 
 
 
+ 
 
 
 
