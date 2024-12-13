@@ -508,7 +508,8 @@ for col in df3.columns:
     
     # np.trapz para hallar el area bajo la curva por el metodo del trapecio
    
-    area = (np.trapz(df3[col], np_array)) *-1  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
+    area = (np.trapz(df3[col], np_array)) *(-1)  
+    #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
     if area != 0:
         df3_normalizado[col] = df3[col] / area
     else:
