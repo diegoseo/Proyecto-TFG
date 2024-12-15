@@ -39,9 +39,11 @@ while existe == False:
         print("El archivo no existe.")
         archivo_nombre = input("Ingrese el nombre del archivo: ")
 
-#print("DF ANTES DEL CORTE")
-#print(df)
-#print(df.shape)
+print("DF ANTES DEL CORTE")
+print(df)
+print(df.shape)
+
+print("LOGRO LEER EL ARCHIVO")
 
 menor_cant_filas = df.dropna().shape[0] # Buscamos la columna con menor cantidad de intensidades
 #print("menor cantidad de filas:", menor_cant_filas)
@@ -52,7 +54,7 @@ df = df_truncado
 
 #print("DF DESPUES DEL CORTE")
 #print(df)
-#print(df.shape)
+print(df.shape)
 
 '''
     PREPARAMOS EL SIGUIENTE MENU
@@ -1798,46 +1800,9 @@ def  mostrar_pca(op_load):
     if op_load == 1:
         
                 
-        # Paso 2: Preprocesamiento
-        # Seleccionar solo columnas numéricas
-        datos_numeric = datos.select_dtypes(include=['float64', 'int64'])
-        
-        # Eliminar filas con valores faltantes
-        datos_numeric = datos_numeric.dropna()
-        
-        # Escalar los datos (media=0, desviación estándar=1)
-        scaler = StandardScaler()
-        datos_escalados = scaler.fit_transform(datos_numeric)
-        
-        # Paso 3: Aplicar PCA
-        n_componentes = 2  # Número de componentes principales
-        pca = PCA(n_components=n_componentes)
-        pca_resultados = pca.fit_transform(datos_escalados)
-        
-        # Crear un DataFrame para los scores (coordenadas de las muestras en PC1 y PC2)
-        pca_scores = pd.DataFrame(
-            pca_resultados, 
-            columns=[f'PC{i+1}' for i in range(n_componentes)]
-        )
-        
-        # Crear un DataFrame para los loadings (contribución de las variables originales)
-        loadings = pd.DataFrame(
-            pca.components_.T,  # Transponer para que cada fila sea una variable
-            columns=[f'PC{i+1}' for i in range(n_componentes)],
-            index=datos_numeric.columns  # Nombres de las variables originales
-        )
-        
-        # Paso 4: Resultados
-        print("\nVarianza explicada por cada componente:")
-        print(pca.explained_variance_ratio_)
-        
-        print("\nScores (primeras muestras):")
-        print(pca_scores.head())
-        
-        print("\nLoadings (primeras variables):")
-        print(loadings.head())
-        return loadings
-
+      
+       print("LOADINGS")
+  
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
@@ -2209,7 +2174,7 @@ def hca():
    
    plt.figure(figsize=(10, 6))
    dendrogram(Z_ward)
-   plt.title('Dendrograma usando Ward linkage')
+   plt.title('Dendrograma usando Ward linkage (HCA)')
    plt.xlabel('Muestras')
    plt.ylabel('Distancia')
    plt.show()
