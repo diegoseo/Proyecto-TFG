@@ -11,6 +11,8 @@ Created on Tue Dec  3 09:15:28 2024
 import os
 import numpy as np
 import pandas as pd
+import csv
+import re
 #import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -30,11 +32,45 @@ print(f"Hola, {nombre}!")
 existe = False
 archivo_nombre = input("Ingrese el nombre del archivo: ")
  
+
+# Función para detectar el delimitador automáticamente por que los archivos pueden estar ceparados por , o ; etc
+def identificar_delimitador(archivo):
+    with open(archivo, 'r') as file:
+        muestra_csv = file.read(4096)  # Lee una muestra de 1024 bytes
+        caracter = csv.Sniffer()
+        delimitador = caracter.sniff(muestra_csv).delimiter
+    return delimitador
+
+
+
+
+def detectar_labels(df): #Detecta si los labels están en la fila o en la columna para ver si hacemos la transpuesta  o no
+
+    # Verificar la primera fila (si contiene strings)
+    if df.iloc[0].apply(lambda x: isinstance(x, str)).all():
+        return "fila" #si los labels están en la primera fila
+    
+    # Verificar la primera columna (si contiene strings)
+    elif df.iloc[:, 0].apply(lambda x: isinstance(x, str)).all():
+        return "columna" #si los labels están en la primera columna
+    
+    # Si no hay etiquetas detectadas
+    return "ninguno" #si no se detectan labels.
+
+
+
 while existe == False:   
-    if archivo_existe(archivo_nombre):
+    if archivo_existe(archivo_nombre):   
         bd_name = archivo_nombre #Este archivo contiene los datos espectroscópicos que serán leídos
-        df = pd.read_csv(bd_name, delimiter = ',' , header=None)
+        delimitador = identificar_delimitador(bd_name)
+        print("EL DELIMITADOR ES: ", delimitador)
+        df = pd.read_csv(bd_name, delimiter = delimitador , header=None)
         existe = True
+        if detectar_labels(df) == "columna" :
+            print("SE HIZO LA TRASPUESTA")
+            df = df.T
+        else:
+            print("NO SE HIZO LA TRANSPUESTA")
     else:
         print("El archivo no existe.")
         archivo_nombre = input("Ingrese el nombre del archivo: ")
@@ -44,6 +80,9 @@ print(df)
 print(df.shape)
 
 print("LOGRO LEER EL ARCHIVO")
+
+
+
 
 menor_cant_filas = df.dropna().shape[0] # Buscamos la columna con menor cantidad de intensidades
 #print("menor cantidad de filas:", menor_cant_filas)
@@ -55,6 +94,37 @@ df = df_truncado
 #print("DF DESPUES DEL CORTE")
 #print(df)
 print(df.shape)
+
+
+# renombramos la celda [0,0]
+
+print("Cambiar a cero: ",df.iloc[0,0])
+
+df.iloc[0,0] = float(0)
+
+print("Cambiar a cero: ",df.iloc[0,0])
+
+print(df)
+
+
+
+# HACEMOS LA ELIMINACION DE LOS SUFIJOS EN CASO DE TENER
+
+
+for col in df.columns:
+    valor = re.sub(r'[_\.]\d+$', '', str(df.at[0, col]).strip())  # Eliminar sufijos con _ o .
+    try:
+        df.at[0, col] = float(valor)  # Convertir de nuevo a float si es posible
+    except ValueError:
+        df.at[0, col] = valor  # Mantener como string si no es convertible
+
+
+print("Luego de eliminar los sufijos")
+print(df)
+
+
+
+
 
 '''
     PREPARAMOS EL SIGUIENTE MENU
@@ -407,7 +477,7 @@ def mostrar_menu():
 
 raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
 #print("gbdgb")
-#print(raman_shift)
+print(raman_shift)
 
 intensity = df.iloc[1:, 1:] # EXTRAEMOS TODAS DEMAS COLUMNAS EXCEPTO LA PRIMERA FILA Y PRIMERA COLUMNA
 #print(intensity)   
@@ -418,7 +488,7 @@ types=tipos.tolist() #OJO AUN NO AGREGAMOS ESTA LINEA A ULTIMO.PY
 #print(types)
 
 cabecera = df.iloc[[0]].copy() # EXTRAEMOS LA PRIMERA FILA 
-#print(cabecera)
+print(cabecera)
 #print(cabecera.shape)
 
 
@@ -459,7 +529,7 @@ df2 = df2.drop(df2.columns[0], axis=1) #eliminamos la primera columna el del ram
 #print(df2) # aca ya tenemos la tabla de la manera que necesitamos, fila cero es la cabecera con los nombres de los tipos anteriormente eran indice numericos consecutivos
 df2 = df2.apply(pd.to_numeric, errors='coerce') #CONVERTIMOS A NUMERICO
 #print("EL DATAFRAME DEL ESPECTRO SIN NORMALIZAR ES")
-#print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
+print(df2) #ESTA VARIABLE SE USA PARA EL PCA TAMBIEN
 #print(df2.shape)
 
 
@@ -498,10 +568,13 @@ df3 = pd.DataFrame(intensity)
 #print(df3)
 df3 = df3.apply(pd.to_numeric, errors='coerce')  # Convierte a numérico, colocando NaN donde haya problemas
 #print(df3)
-np_array = raman_shift.to_numpy() #CONVERTIMOS INTENSITY AL TIPO NUMPY POR QUE POR QUE NP.TRAPZ UTILIZA ESE TIPO DE DATOS
-#print(np_array)
+np_array = raman_shift.astype(float).to_numpy() #CONVERTIMOS INTENSITY AL TIPO NUMPY POR QUE POR QUE NP.TRAPZ UTILIZA ESE TIPO DE DATOS
+print("valor de np_array: ")
+print(np_array)
+
 df3_normalizado = df3.copy()
-#print(df3)
+print("EL VALOR DE DF3 ES :")
+print(df3)
 # Cálculamos el área bajo la curva para cada columna
 #print("\nÁreas bajo la curva para cada columna:")
 for col in df3.columns:
@@ -509,7 +582,6 @@ for col in df3.columns:
     #print(df3_normalizado[col])
     
     # np.trapz para hallar el area bajo la curva por el metodo del trapecio
-   
     area = (np.trapz(df3[col], np_array)) *-1  #MULTIPLIQUE POR -1 PARA QUE EL GRAFICO SALGA TODO HACIA ARRIBA ESTO SE DEBE A QUE EL RAMAN_SHIFT ESTA EN FORMA DECRECIENTE
     if area != 0:
         df3_normalizado[col] = df3[col] / area
@@ -572,10 +644,10 @@ def mostrar_espectros(datos,raman_shift,metodo,opcion,m_suavi):
                 color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
                 if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
                     if tipo in leyendas_tipos:
-                        plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col)   
+                        plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1,label=col)   
                         break
                     else:
-                        plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                        plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1) 
                         leyendas_tipos.add(tipo) 
                 pos_y+=1 
     
@@ -1034,7 +1106,7 @@ def espectro_acotado(datos, pca_op,nor_op):
                             if tipo in leyendas:
                                 
                                 #print("error 1")
-                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1,label=col) 
+                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.6, linewidth = 0.1,label=col) 
                                 '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
       
                                 break
@@ -1042,7 +1114,7 @@ def espectro_acotado(datos, pca_op,nor_op):
                                 #print("error 2")
                                 #print(raman)
                                 #print(df_acotado[col])
-                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.3, linewidth = 0.1) 
+                                plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.6, linewidth = 0.1) 
                                 leyendas.add(tipo) 
                       pos_y+=1 
            
