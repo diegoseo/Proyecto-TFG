@@ -11,8 +11,8 @@ Created on Tue Dec  3 09:15:28 2024
 import os
 import numpy as np
 import pandas as pd
-import csv
-import re
+import csv # PARA ENCONTRAR EL TIPO DE DELIMITADOR DEL ARCHIVO .CSV
+import re # PARA LA EXPRECION REGULAR DE LOS SUFIJOS
 #import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -36,7 +36,9 @@ archivo_nombre = input("Ingrese el nombre del archivo: ")
 # Función para detectar el delimitador automáticamente por que los archivos pueden estar ceparados por , o ; etc
 def identificar_delimitador(archivo):
     with open(archivo, 'r') as file:
-        muestra_csv = file.read(4096)  # Lee una muestra de 1024 bytes
+        muestra_csv = file.read(4096)  # Lee una muestra de 4096 bytes
+        #print("LA MUESTRA DEL CSV ES:")
+        #print(muestra_csv)
         caracter = csv.Sniffer()
         delimitador = caracter.sniff(muestra_csv).delimiter
     return delimitador
@@ -437,7 +439,7 @@ def main():
         elif opcion == '12':
             print("Procesando los datos")
             print("Por favor espere un momento...")
-            graficar_loadings(mostrar_pca(1))
+            graficar_loadings(wavelengths=None, n_components=2)
         elif opcion == '13':
              print("Procesando los datos")
              print("Por favor espere un momento...")
@@ -1864,17 +1866,11 @@ def  mostrar_pca(op_load):
     
     pca = PCA(n_components=2)
     # Ajustar y transformar los datos
-    dato_pca = pca.fit_transform(dato_escalado)
+    dato_pca = pca.fit_transform(dato_escalado) # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
     print("DATOS PCA")
     print(dato_pca)
     #print(dato_pca.shape)
-    
-    if op_load == 1:
-        
-                
-      
-       print("LOADINGS")
-  
+
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
@@ -2091,31 +2087,153 @@ def grafico_tipo(datos,raman_shift,metodo,opcion,m_suavi):
 
 
 
-def graficar_loadings(loadings):
-    print("falta")
-    print(loadings)
+def graficar_loadings(wavelengths=None, n_components=2):
+    print("NORMALIZAR POR:")
+    print("1-MEDIA")
+    print("2-AREA")
+    print("3-SIN NORMALIZAR")
     
-    #Graficar los loadings con colores por tipo
-    plt.figure(figsize=(8, 6))
+    opcion = input("Selecciona una opción: ")
     
-    # Iterar sobre los tipos y colores definidos en asignacion_colores
-    for tipo, color in asignacion_colores.items():
-        # Filtrar las filas del DataFrame por el tipo actual
-        subset = loadings[loadings.index.str.contains(tipo)]  # Filtrar por tipo
-        plt.scatter(subset['PC1'], subset['PC2'], alpha=0.7, color=color, label=tipo)
+ 
+    if opcion == '1'  :
+        normalizado_pca = df_media_pca
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,2)
+                # print("volvio")
+                #print(metodo_suavizado)
+            elif metodo_suavizado == 2:
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,2)
+            else:
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,2) 
+            
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+            print("1- PRIMERA DERIVADA")
+            print("2- SEGUNDA DERIVADA")
+            op_der= int(input("OPCION: "))
+            if op_der == 1:
+                 normalizado_pca = primera_derivada(normalizado_pca,4)
+            else:
+                 normalizado_pca = segunda_derivada(normalizado_pca,4)
+        
+    elif opcion == '2' :
+        #print("entor op 2")
+        normalizado_pca = df_concatenado_cabecera_nueva_area
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,2)
+            elif metodo_suavizado == 2:
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,2)
+            else:
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,2) 
+        #print("no suavizar xdd")
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+           print("1- PRIMERA DERIVADA")
+           print("2- SEGUNDA DERIVADA")
+           op_der= int(input("OPCION: "))
+           if op_der == 1:
+                print("si quiero derivar")
+                #print(normalizado_pca)
+                normalizado_pca = primera_derivada(normalizado_pca,4)
+           else:
+                normalizado_pca = segunda_derivada(normalizado_pca,4)      
+
+
+    elif opcion == '3' :
+        normalizado_pca = df2
+        print("Deseas Suavizar?")
+        print("1- SI")
+        print("2- NO")
+        suavizar = int(input("OPCION: "))
+        if suavizar == 1:
+            print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+            print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
+            print("2. SUAVIZADO POR FILTRO GAUSIANO")
+            print("3. SUAVIZADO POR MEDIA MOVIL")
+            metodo_suavizado = int(input("OPCION: "))
+            if metodo_suavizado == 1:
+                normalizado_pca = suavizado_saviztky_golay(normalizado_pca,2)
+            elif metodo_suavizado == 2:
+                normalizado_pca = suavizado_filtroGausiano(normalizado_pca,2)
+            else:
+                normalizado_pca = suavizado_mediamovil(normalizado_pca,2) 
+        print("\n--- DESEAS REALIZAR ALGUNA DERIVADA ---")  
+        print("1- SI")
+        print("2- NO")
+        #print(normalizado_pca)
+        opcion = int(input("OPCION: "))
+        if opcion == 1:
+            print("1- PRIMERA DERIVADA")
+            print("2- SEGUNDA DERIVADA")
+            op_der= int(input("OPCION: "))
+            if op_der == 1:
+                normalizado_pca = primera_derivada(normalizado_pca,4)
+            else:
+                normalizado_pca = segunda_derivada(normalizado_pca,4)      
+
+    else:
+        print("OPCION NO VALIDA")
+        print("SAlir...")
+        #mostrar_menu()
+        
+        
+    print(normalizado_pca)
+        
+    # Escalar los datos
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(normalizado_pca)
+
+    # Realizar PCA
+    pca = PCA(n_components=n_components)
+    pca.fit(scaled_data)
+    loadings = pca.components_
     
-    # Configuración del gráfico
-    plt.axhline(0, color='gray', linestyle='--', linewidth=0.5)
-    plt.axvline(0, color='gray', linestyle='--', linewidth=0.5)
-    plt.xlabel('PC1')
-    plt.ylabel('PC2')
-    plt.title('Gráfico de Loadings por Tipo')
-    #plt.legend()  # Mostrar la leyenda para identificar cada tipo
+    # Si no se proporcionan longitudes de onda, usar índices de las columnas
+    if wavelengths is None:
+        wavelengths = np.arange(1, normalizado_pca.shape[1] + 1)
+
+    # Graficar los loadings
+    plt.figure(figsize=(10, 5))
+    for i in range(n_components):
+        plt.plot(wavelengths, loadings[i], label=f"PC{i+1}", linestyle='--' if i else '-')
+
+    # Línea de referencia en y = 0
+    plt.axhline(0, color='gray', linewidth=0.8)
+    print("mostrar loading")
+    # Personalizar la gráfica
+    plt.xlabel("Wavelength (nm)" if wavelengths is not None else "Características")
+    plt.ylabel("PCA Loading Weight")
+    plt.title("PCA Loading Weights para Datos de Espectroscopia")
+    plt.legend()
     plt.grid()
     plt.show()
-
-
-
     
        
        
