@@ -628,6 +628,52 @@ def espectro_acotado(datos, pca_op,nor_op):
 
 
 
+ df_aux = datos.to_numpy()
+ print("PRINT")
+ print(df_aux)
+ cabecera_np = df.iloc[0, 1:].to_numpy()  # La primera fila contiene los encabezados
+ print("CABECERA_NP")
+ print(cabecera_np)
+ intensidades_np = df_aux[:, :]  # Excluir la primera fila y primera columna
+ print("INTENSIDADES_NP")
+ print(intensidades_np)
+ raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
+ print("RAMAN")
+ print(raman)
+ intensidades = intensidades_np.astype(float)  # Columnas restantes (intensidades)
+ print("INTENSIDADES")
+ print(intensidades)
+ # Solicitar el rango
+ min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
+ max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
+ 
+ # Filtrar los datos en el rango
+ indices_acotados = (raman >= min_rango) & (raman <= max_rango)  # Filtra los índices
+ print("INDICES_ACOTADOS")
+ print(indices_acotados)
+ print(indices_acotados.shape)
+ raman_acotado = raman[indices_acotados]
+ print("RAMAN_ACOTADO")
+ print(raman_acotado)
+ intensidades_acotadas = intensidades[indices_acotados, :]
+ print("INTENSIDADES_ACOTADAS")
+ print(intensidades_acotadas)
+ 
+ 
+ # Crear DataFrame filtrado
+ df_acotado = pd.DataFrame(
+     data=np.column_stack([raman_acotado, intensidades_acotadas]),
+     columns=["Raman Shift"] + list(cabecera_np[:])  # Encabezados para el DataFrame
+ )
+
+
+
+
+
+
+
+
+
 
 
 
