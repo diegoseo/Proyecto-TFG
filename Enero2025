@@ -16,6 +16,7 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import sys  # Para usar sys.exit()
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from sklearn.decomposition import PCA
 from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
@@ -199,22 +200,34 @@ print(df)
 ##### PENSAR EN COMO HACER LA OPCION DE IR HACIA ATRAS Y DE GENERAR .CSV PARA DESCARGAR
 
 def mostrar_menu():
-      print("\n--- Menú Principal ---")
-      print("1. MOSTRAR ESPECTROS")
-      print("2. NORMALIZAR POR MEDIA")
-      print("3. NORMALIZAR POR AREA")
-      print("4. SUAVIZADO POR SAVIZTKY-GOLAY")
-      print("5. SUAVIZADO POR FILTRO GAUSIANO")
-      print("6. SUAVIZADO POR MEDIA MOVIL")
-      print("7. PCA")
-      print("8. PRIMERA DERIVADA")
-      print("9. SEGUNDA DERIVADA")
-      print("10. CORRECCION BASE LINEAL")
-      print("11. CORRECION SHIRLEY")
-      print("12. GRAFICO DE LOADINGS")
-      print("13. ESPECTRO ACOTADO")
-      print("14. GRAFICO HCA")
-      print("15. Salir")
+     print("\n--- Menú Principal ---")
+     print("1. MOSTRAR ESPECTROS")
+     print("2. NORMALIZAR POR MEDIA")
+     print("3. NORMALIZAR POR AREA")
+     print("4. SUAVIZADO POR SAVIZTKY-GOLAY")
+     print("5. SUAVIZADO POR FILTRO GAUSIANO")
+     print("6. SUAVIZADO POR MEDIA MOVIL")
+     print("7. PCA")
+     print("8. PRIMERA DERIVADA")
+     print("9. SEGUNDA DERIVADA")
+     print("10. CORRECCION BASE LINEAL")
+     print("11. CORRECION SHIRLEY")
+     print("12. GRAFICO DE LOADINGS")
+     print("13. ESPECTRO ACOTADO")
+     print("14. GRAFICO HCA")
+     print("15. Salir")
+      
+def sub_menu():
+    print("Como deseas ver el espectro")
+    print("1- Grafico completo") #ok
+    print("2- Grafico acotado") #ok
+    print("3- Grafico por tipo") #ok
+    print("4- Grafico acotado por tipo") #ok
+    print("5- Descargar .csv ") #ok
+    print("6- Descargar .csv acotado") #ok
+    print("7- Descargar .csv por tipo") #ok
+    print("8- Descargar .csv acotado por tipo")
+    print("9- Volver") #ok
       
 raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
 print(raman_shift)
@@ -369,33 +382,24 @@ def main():
     while True:
         mostrar_menu()
         opcion = input("Selecciona una opción: ")
-        
+        print("volvio a salir")
         if opcion == '1':
             
             metodo = 1
-            print("Como deseas ver el espectro")
-            print("1- Grafico completo") #ok
-            print("2- Grafico acotado") #ok
-            print("3- Grafico por tipo") #ok
-            print("4- Grafico acotado por tipo") #ok
-            print("5- Descargar .csv sin normalizar") #ok
-            print("6- Descargar .csv acotado sin normalizar") #ok
-            print("7- Descargar .csv por tipo") #ok
-            print("8- Descargar .csv acotado por tipo")
-            print("9- Volver") #ok
+            sub_menu()
             metodo_grafico = int(input("Opcion: "))
             if metodo_grafico == 1:
                 print("Procesando los datos")
                 print("Por favor espere un momento...")
-                mostrar_espectros(datos_sin_normalizar(),raman_shift,metodo)
+                mostrar_espectros(datos_sin_normalizar(),raman_shift,metodo,0)
             elif metodo_grafico == 2:
                 espectro_acotado(datos_sin_normalizar(), 0,1)
             elif metodo_grafico == 3:
-                grafico_tipo(datos_sin_normalizar(),raman_shift,metodo)
+                grafico_tipo(datos_sin_normalizar(),raman_shift,0,metodo)
             elif metodo_grafico == 4:
-                grafico_acotado_tipo(datos_sin_normalizar(),raman_shift,metodo)
+                grafico_acotado_tipo(datos_sin_normalizar(),raman_shift,metodo,0)
             elif metodo_grafico == 5: 
-                descargar_csv(1) # 1 PARA SABER QUE VIENE SIN NORMALIZAR                
+                descargar_csv(1,0) # 1 PARA SABER QUE VIENE SIN NORMALIZAR   y 0 por que no necesito mandar el DataFrame              
             elif metodo_grafico == 6:
                 descargar_csv_acotado(datos_sin_normalizar(),1) # 1 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
             elif metodo_grafico == 7:
@@ -409,29 +413,20 @@ def main():
         elif opcion == '2':
             
             metodo = 2
-            print("Como deseas ver el espectro")
-            print("1-Grafico completo") #ok
-            print("2-Grafico acotado") #ok
-            print("3-Grafico por tipo") #ok
-            print("4-Grafico acotado por tipo") #ok
-            print("5- Descargar .csv normalizado por la media") #ok 
-            print("6- Descargar .csv acotado por la media") #ok
-            print("7- Descargar .csv por tipo") #ok
-            print("8- Descargar .csv acotado por tipo")
-            print("9-Volver") #ok
+            sub_menu()
             metodo_grafico = int(input("Opcion: "))
             if metodo_grafico == 1:
                 print("Procesando los datos")
                 print("Por favor espere un momento...")
-                mostrar_espectros(normalizado_media(),raman_shift,metodo)
+                mostrar_espectros(normalizado_media(),raman_shift,metodo,0)
             elif metodo_grafico == 2:
                 espectro_acotado(normalizado_media(), 0,2)
             elif metodo_grafico == 3:
-                grafico_tipo(normalizado_media(),raman_shift,metodo)
+                grafico_tipo(normalizado_media(),raman_shift,0,metodo)
             elif metodo_grafico == 4:
-                grafico_acotado_tipo(normalizado_media(),raman_shift,metodo)
+                grafico_acotado_tipo(normalizado_media(),raman_shift,metodo,0)
             elif metodo_grafico == 5:
-                descargar_csv(2) # 2 PARA SABER QUE VIENE DE LA MEDIA
+                descargar_csv(2,0) # 2 PARA SABER QUE VIENE DE LA MEDIA y 0 por que no necesito mandar el DataFrame  
             elif metodo_grafico == 6:
                 descargar_csv_acotado(normalizado_media(),2) # 2 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
             elif metodo_grafico == 7:
@@ -442,31 +437,24 @@ def main():
                 main()
                 
                 
-        elif opcion == '3':
+        elif opcion == '3': 
             
              metodo = 3
-             print("Como deseas ver el espectro")
-             print("1-Grafico completo")   #ok
-             print("2-Grafico acotado") #ok
-             print("3-Grafico por tipo") #ok
-             print("4-Grafico acotado por tipo") #ok
-             print("5-Descargar .csv normalizado por Area")  #ok
-             print("6- Descargar .csv acotado por Area") #ok
-             print("7- Descargar .csv por tipo") #ok
-             print("8- Descargar .csv acotado por tipo")
-             print("9-Volver") #ok
+             sub_menu()
              metodo_grafico = int(input("Opcion: "))
                  
              if metodo_grafico == 1:
                  print("Procesando los datos")
                  print("Por favor espere un momento...")
-                 mostrar_espectros(normalizado_area(),raman_shift,metodo)
+                 mostrar_espectros(normalizado_area(),raman_shift,metodo,0)
              elif metodo_grafico == 2:
                  espectro_acotado(normalizado_area(), 0,3)
              elif metodo_grafico == 3:
-                 grafico_tipo(normalizado_area(),raman_shift,metodo)
+                 grafico_tipo(normalizado_area(),raman_shift,0,metodo)
+             elif metodo_grafico == 4:
+                 grafico_acotado_tipo(normalizado_area(),raman_shift,metodo,0)
              elif metodo_grafico == 5:
-                 descargar_csv(3) # 3 PARA SABER QUE VIENE DEL AREA
+                 descargar_csv(3,0) # 3 PARA SABER QUE VIENE DEL AREA y 0 por que no necesito mandar el DataFrame  
              elif metodo_grafico == 6:
                 descargar_csv_acotado(normalizado_area(),3) # 3 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
              elif metodo_grafico == 7:
@@ -476,53 +464,103 @@ def main():
              elif metodo_grafico == 9:
                  main()
          
-        elif opcion == '4':        
-             metodo = 4
-             print("Como deseas ver el espectro")
-             print("1-Grafico completo")
-             print("2-Grafico acotado")
-             print("3-Grafico por tipo")
-             print("4-Grafico acotado por tipo")
-             metodo_grafico = int(input("Opcion: "))
-             if metodo_grafico == 1:
-                 print("Procesando los datos")
-                 print("Por favor espere un momento...")
-                 suavizado_saviztky_golay(0,0)
-             elif metodo_grafico == 2:
-                 print("Procesando los datos")
-                 print("Por favor espere un momento...")
-                 espectro_acotado(suavizado_saviztky_golay(0,1), 2,4)
-             elif metodo_grafico == 3:
-                 print("NORMALIZAR POR:")
-                 print("1-Media")
-                 print("2-Area")
-                 print("3-Sin normalizar")
-                 opcion = int(input("Selecciona una opción: "))
-                 if opcion == 1:
-                     print("Procesando los datos")
-                     print("Por favor espere un momento...")
-                     grafico_tipo(suavizado_saviztky_golay(0,2),raman_shift,metodo,'1',0)
-                 elif opcion == 2:
-                     print("Procesando los datos")
-                     print("Por favor espere un momento...")
-                     grafico_tipo(suavizado_saviztky_golay(0,3),raman_shift,metodo,'2',0)
-                 else: 
-                     print("Procesando los datos")
-                     print("Por favor espere un momento...")
-                     grafico_tipo(suavizado_saviztky_golay(0,4),raman_shift,metodo,'3',0)
-             # else
-             #     #grafico_tipo_acotado()
-             
-             
-             
+        elif opcion == '4':  
+            print("sigue dentro")
+            while True:  # Bucle para mantener al usuario en el submenú
+              metodo = 4
+              
+              sub_menu()
+              metodo_grafico = int(input("Opcion: "))               
+              if metodo_grafico == 1:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  mostrar_espectros(dato_suavizado,raman_shift,metodo,nor_op)
+              elif metodo_grafico == 2:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  if nor_op == 1:
+                      metodo = 4
+                  elif nor_op == 2:
+                      metodo = 5
+                  elif nor_op == 3:
+                      metodo = 6
+                  espectro_acotado(dato_suavizado,0,metodo)
+              elif metodo_grafico == 3:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  grafico_tipo(dato_suavizado,raman_shift,nor_op,metodo)
+              elif metodo_grafico == 4:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  grafico_acotado_tipo(dato_suavizado,raman_shift,metodo,nor_op)
+              elif metodo_grafico == 5:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  descargar_csv(4, dato_suavizado) # 4 PARA SABER QUE VIENE DEL SUAVIZADO POR suavizado_saviztky_golay
+              elif metodo_grafico == 6:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  descargar_csv_acotado(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+              elif metodo_grafico == 7:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  descargar_csv_tipo(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+              elif metodo_grafico == 8:
+                  dato,nor_op = suavizado_menu()
+                  if dato is None:  # Manejar la opción "Volver"
+                      continue 
+                  dato_suavizado = suavizado_saviztky_golay(dato)
+                  descargar_csv_acotado_tipo(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+              elif metodo_grafico == 9:
+                  main()
+              
+                  
         elif opcion == '15':
             print("Saliendo del programa...")
-            break  
+            sys.exit()  # Termina completamente el programa
         else:
             print("Opción no válida. Inténtalo de nuevo.")
 
 
-def descargar_csv(normalizado):
+
+def suavizado_menu():
+    print("NORMALIZAR POR:")
+    print("1-Media")
+    print("2-Area")
+    print("3-Sin normalizar")
+    print("4- Volver")
+    opcion = int(input("Selecciona una opción: "))
+    
+    if opcion == 1 :
+        suavizar = normalizado_media()
+    elif opcion == 2 :
+        suavizar = normalizado_area()
+    elif opcion == 3 :
+        suavizar = datos_sin_normalizar()
+    elif opcion == 4 :
+        return None , None
+
+    return suavizar , opcion
+
+
+
+
+
+def descargar_csv(normalizado,dato):
     if normalizado == 1:
         df.to_csv('output_sin_normalizar.csv', index=False, header=False)
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_sin_normalizar.csv")
@@ -536,13 +574,25 @@ def descargar_csv(normalizado):
         df_aux = normalizado_area() # obtenemos el dataframe              
         raman_shift_aux = raman_shift[:len(df_aux)] #nos aseguramos de que el tengan la misa longitud         
         df_aux.insert(0, '', raman_shift_aux)    # Insertamos la columna raman_shift en la posición 0
+        print("df_aux de descargar csv")
+        print(df_aux)
         df_aux.to_csv('output_area.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_area.csv")
+    elif normalizado == 4:
+        df_aux = dato # obtenemos el dataframe  
+        print("df_aux de descargar csv suavizado")
+        print(df_aux)           
+        raman_shift_aux = raman_shift[:len(df_aux)] #nos aseguramos de que el tengan la misa longitud         
+        df_aux.insert(0, '', raman_shift_aux)    # Insertamos la columna raman_shift en la posición 0
+        df_aux.to_csv('output_suavizado_saviztky_golay.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_suavizado_saviztky_golay.csv")
+
+
 
 def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA QUE 2-Grafico acotado  Y 6- Descargar .csv acotado por la media HACE LA MISMA COSA, SOLO QUE UNO GENERA UN .CSV Y EL OTRO LO GRAFICA
     df_aux = datos.to_numpy()
-    #print("PRINT")
-    #print(df_aux)
+    print("PRINT")
+    print(df_aux)
     cabecera_np = df.iloc[0, 1:].to_numpy()  # La primera fila contiene los encabezados
     #print("CABECERA_NP")
     #print(cabecera_np)
@@ -586,6 +636,9 @@ def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA Q
     elif opcion == 3:
         df_acotado.to_csv('output_acotado_area.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_area.csv")
+    elif opcion == 4:
+        df_acotado.to_csv('output_acotado_suavizado_saviztky_golay.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_suavizado_saviztky_golay.csv")
     
 
 def descargar_csv_tipo(datos,opcion):
@@ -617,6 +670,9 @@ def descargar_csv_tipo(datos,opcion):
     elif opcion == 3:
         datos_filtrados.to_csv('output_tipo_area.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_area.csv")
+    elif opcion == 4:
+        datos_filtrados.to_csv('output_tipo_suavizado_saviztky_golay.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_suavizado_saviztky_golay.csv")
 
 
 def descargar_csv_acotado_tipo(datos,opcion):
@@ -688,16 +744,22 @@ def descargar_csv_acotado_tipo(datos,opcion):
     elif opcion == 3:
         datos_acotado_tipo.to_csv('output_acotado_tipo_area.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_area.csv")
+    elif opcion == 4:
+        datos_acotado_tipo.to_csv('output_acotado_tipo_suavizado_saviztky_golay.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_suavizado_saviztky_golay.csv")
 
 
-
-def mostrar_espectros(datos,raman_shift,metodo):
+def mostrar_espectros(datos,raman_shift,metodo,nor_op):
     
     
     #print("ENTRO EN MOSTRAR ESPECTROS")
     #print(datos)
     
     # Graficar los espectros
+    if nor_op != 0:
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+    
     plt.figure(figsize=(10, 6))
  
   
@@ -720,7 +782,7 @@ def mostrar_espectros(datos,raman_shift,metodo):
                 pos_y+=1 
     
     
-    titulo_plot_mostrar(metodo)
+    titulo_plot_mostrar(metodo,nor_op)
 
 
 
@@ -729,7 +791,7 @@ def mostrar_espectros(datos,raman_shift,metodo):
 
 
 
-def titulo_plot_mostrar(metodo):
+def titulo_plot_mostrar(metodo,nor_op):
     # TODO ESTE CONDICIONAL ES SOLO PARA QUE EL TITULO DEL GRAFICO MUESTRE POR CUAL METODO SE NORMALIZO
     if metodo == 1:
         plt.xlabel('Longitud de onda / Frecuencia')
@@ -746,6 +808,22 @@ def titulo_plot_mostrar(metodo):
         plt.ylabel('Intensidad')
         plt.title(f'Espectros del archivo {bd_name} Normalizado por Area')
         plt.show()
+    elif metodo == 4:
+        if nor_op == 1:
+               plt.xlabel('Longitud de onda / Frecuencia')
+               plt.ylabel('Intensidad')
+               plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media')
+               plt.show()   
+        elif nor_op == 2:
+               plt.xlabel('Longitud de onda / Frecuencia')
+               plt.ylabel('Intensidad')
+               plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado Area')
+               plt.show() 
+        else:
+               plt.xlabel('Longitud de onda / Frecuencia')
+               plt.ylabel('Intensidad')
+               plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar ')
+               plt.show()  
         
   
 def titulo_plot_acotado(nor_op,min_rango,max_rango):
@@ -767,31 +845,27 @@ def titulo_plot_acotado(nor_op,min_rango,max_rango):
      elif nor_op == 4:
          plt.xlabel('Longitud de onda / Frecuencia')
          plt.ylabel('Intensidad')
-         plt.title(f'Espectros del archivo {bd_name}  SUAVIZADO POR SAVIZTKY-GOLAY en el rango de {min_rango} a {max_rango}')
-         plt.show() 
+         plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media')
+         plt.show()   
      elif nor_op == 5:
          plt.xlabel('Longitud de onda / Frecuencia')
          plt.ylabel('Intensidad')
-         plt.title(f'Espectros del archivo {bd_name}  SUAVIZADO POR FILTRO GAUSIANO en el rango de {min_rango} a {max_rango}')
+         plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado Area')
          plt.show() 
      elif nor_op == 6:
          plt.xlabel('Longitud de onda / Frecuencia')
          plt.ylabel('Intensidad')
-         plt.title(f'Espectros del archivo {bd_name}  SUAVIZADO POR MEDIA MOVIL en el rango de {min_rango} a {max_rango}')
-         plt.show()
-     elif nor_op == 8:
-         plt.xlabel('Longitud de onda / Frecuencia')
-         plt.ylabel('Intensidad')
-         plt.title(f'Primera derivada del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
-         plt.show()
-     elif nor_op == 9:
-         plt.xlabel('Longitud de onda / Frecuencia')
-         plt.ylabel('Intensidad')
-         plt.title(f'Segunda derivada del archivo {bd_name} en el rango de {min_rango} a {max_rango}')
-         plt.show()
+         plt.title(f'Espectros del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar ')
+         plt.show()  
         
+         
 
-def titulo_plot_tipo(metodo,mostrar_tipo,m_suavi):
+
+
+
+
+
+def titulo_plot_tipo(metodo,mostrar_tipo,opcion,m_suavi):
     # TODO ESTE CONDICIONAL ES SOLO PARA QUE EL TITULO DEL GRAFICO MUESTRE POR CUAL METODO SE NORMALIZO
     if metodo == 1:
         plt.xlabel('Longitud de onda / Frecuencia')
@@ -809,12 +883,12 @@ def titulo_plot_tipo(metodo,mostrar_tipo,m_suavi):
         plt.title(f'Espectro del tipo: {mostrar_tipo} del archivo {bd_name} Normalizado por Area')
         plt.show()
     elif metodo == 4:
-        if opcion == '1':
+        if opcion == 1:
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectro del tipo: {mostrar_tipo}  Suavizado por Saviztky_golay y Normalizado por la media')
             plt.show()   
-        elif opcion == '2':
+        elif opcion == 2:
             plt.xlabel('Longitud de onda / Frecuencia')
             plt.ylabel('Intensidad')
             plt.title(f'Espectro del tipo: {mostrar_tipo} Suavizado por Saviztky_golay y Normalizado Area')
@@ -966,12 +1040,12 @@ def titulo_plot_tipo_acotado(metodo,mostrar_tipo,min_rango,max_rango,m_suavi):
      plt.title(f'Espectro del tipo: {mostrar_tipo} del archivo {bd_name} Normalizado por Area en el rango:[{min_rango},{max_rango}]')
      plt.show()
  elif metodo == 4:
-     if opcion == '1':
+     if m_suavi == 1:
          plt.xlabel('Longitud de onda / Frecuencia')
          plt.ylabel('Intensidad')
          plt.title(f'Espectro del tipo: {mostrar_tipo}  Suavizado por Saviztky_golay y Normalizado por la media')
          plt.show()   
-     elif opcion == '2':
+     elif m_suavi == 2:
          plt.xlabel('Longitud de onda / Frecuencia')
          plt.ylabel('Intensidad')
          plt.title(f'Espectro del tipo: {mostrar_tipo} Suavizado por Saviztky_golay y Normalizado Area')
@@ -1107,35 +1181,39 @@ def titulo_plot_tipo_acotado(metodo,mostrar_tipo,min_rango,max_rango,m_suavi):
 def espectro_acotado(datos, pca_op,nor_op):
       
     df_aux = datos.to_numpy()
-    print("PRINT")
-    print(df_aux)
+    #print("PRINT")
+    #print(df_aux)
     cabecera_np = df.iloc[0, 1:].to_numpy()  # La primera fila contiene los encabezados
-    print("CABECERA_NP")
-    print(cabecera_np)
+    #print("CABECERA_NP")
+    #print(cabecera_np)
     intensidades_np = df_aux[:, :]  # Excluir la primera fila y primera columna
-    print("INTENSIDADES_NP")
-    print(intensidades_np)
+    #print("INTENSIDADES_NP")
+    #print(intensidades_np)
     raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
-    print("RAMAN")
-    print(raman)
+    #print("RAMAN")
+    #print(raman)
     intensidades = intensidades_np.astype(float)  # Columnas restantes (intensidades)
-    print("INTENSIDADES")
-    print(intensidades)
+    #print("INTENSIDADES")
+    #print(intensidades)
     # Solicitar el rango
     min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
     max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
     
+    if pca_op == 0:
+        print("Procesando los datos")
+        print("Por favor espere un momento...")
+    
     # Filtrar los datos en el rango
     indices_acotados = (raman >= min_rango) & (raman <= max_rango)  # Filtra los índices
-    print("INDICES_ACOTADOS")
-    print(indices_acotados)
-    print(indices_acotados.shape)
+    #print("INDICES_ACOTADOS")
+    #print(indices_acotados)
+    #print(indices_acotados.shape)
     raman_acotado = raman[indices_acotados]
-    print("RAMAN_ACOTADO")
-    print(raman_acotado)
+    #print("RAMAN_ACOTADO")
+    #print(raman_acotado)
     intensidades_acotadas = intensidades[indices_acotados, :]
-    print("INTENSIDADES_ACOTADAS")
-    print(intensidades_acotadas)
+    #print("INTENSIDADES_ACOTADAS")
+    #print(intensidades_acotadas)
     
     
     # Crear DataFrame filtrado
@@ -1182,6 +1260,7 @@ def espectro_acotado(datos, pca_op,nor_op):
     
         titulo_plot_acotado(nor_op,min_rango,max_rango)
         
+        
     else: 
         return df_acotado , raman_acotado # creo que no hace falta retornarn nada ya que si una funcion le llama seria solamente para graficarla y retorna tiene quw retornar tambien su raman_shift acotado
 
@@ -1193,7 +1272,7 @@ def espectro_acotado(datos, pca_op,nor_op):
 
 
 
-def grafico_tipo(datos,raman_shift,metodo):
+def grafico_tipo(datos,raman_shift,nor_op,metodo):
 
     
     #print("ENTRO EN MOSTRAR ESPECTROS")
@@ -1226,12 +1305,11 @@ def grafico_tipo(datos,raman_shift,metodo):
                             leyendas_tipos.add(tipo) 
                     pos_y+=1 
     
-    titulo_plot_tipo(metodo,mostrar_tipo,metodo)
+    titulo_plot_tipo(metodo,mostrar_tipo,nor_op,metodo)
 
 
 
-
-def grafico_acotado_tipo(datos,raman_shift,metodo):
+def grafico_acotado_tipo(datos,raman_shift,metodo,opcion):
     
     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
 
@@ -1333,90 +1411,28 @@ def grafico_acotado_tipo(datos,raman_shift,metodo):
                     pos_y+=1 
            
     
-    titulo_plot_tipo_acotado(metodo,mostrar_tipo,min_rango,max_rango,0) #el 0 es por el m_suavi que no esta implementado aun
+    titulo_plot_tipo_acotado(metodo,mostrar_tipo,min_rango,max_rango,opcion) #el 0 es por el m_suavi que no esta implementado aun
         
 
 
 
-'''
+
 
 # SUAVIZADO POR SAVIZTKY-GOLAY
 
-def suavizado_saviztky_golay(normalizado_pca, pca_op):  #acordarse que se puede suavizar por la media, area y directo
-    if pca_op == 0 or pca_op == 1:
-        print("NORMALIZAR POR: xdf")
-        print("1-MEDIA")
-        print("2-AREA")
-        print("3-SIN NORMALIZAR")
-        opcion = input("Selecciona una opción: ")
-        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
-        orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
-        print("Procesando los datos")
-        print("Por favor espere un momento...")
-     
-        if opcion == '1'  :
-            normalizado_pca = df_media_pca
-            #print(normalizado_pca)
-        elif opcion == '2' :
-            normalizado_pca = df_concatenado_cabecera_nueva_area
-            #print(normalizado_pca)
-        elif opcion == '3' :
-            normalizado_pca = df2
-            #print(normalizado_pca)
-        else:
-            print("OPCION NO VALIDA")
-            print("SALIR...")
-            #mostrar_menu()
-    else:
-        print("entro 3")
-        ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
-        orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
-        print("Procesando los datos")
-        print("Por favor espere un momento...")
-        #ESTAS CONDICIONALES FUNCIONA PARA CUANDO ENTRE EN GRAFICAR POR TIPOS
-        if pca_op == 2:
-            normalizado_pca = df_media_pca
-        elif pca_op == 3:
-            normalizado_pca = df_concatenado_cabecera_nueva_area
-        else:
-            normalizado_pca = df2
-     
-      
-    
-    dato = normalizado_pca.to_numpy() #PASAMOS LOS DATOS A NUMPY POR QUE SAVGOL_FILTER USA SOLO NUMPY COMO PARAMETRO (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
+def suavizado_saviztky_golay(dato_suavizar):  #acordarse que se puede suavizar por la media, area y directo
 
+    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+    orden = int(input("INGRESE EL VALOR DEL ORDEN: "))
+            
+    dato = dato_suavizar.to_numpy() #PASAMOS LOS DATOS A NUMPY POR QUE SAVGOL_FILTER USA SOLO NUMPY COMO PARAMETRO (PIERDE LA CABECERA DE TIPOS AL HACER ESTO)
     suavizado = savgol_filter(dato, window_length=ventana, polyorder=orden)
     suavizado_pd = pd.DataFrame(suavizado) # PASAMOS SUAVIZADO A PANDAS Y GUARDAMOS EN SUAVIZADO_PD
-    suavizado_pd.columns = normalizado_pca.columns # AGREGAMOS LA CABECERA DE TIPOS
+    suavizado_pd.columns = dato_suavizar.columns # AGREGAMOS LA CABECERA DE TIPOS
+        
+  
     
-    #print(suavizado_pd)
-    
-    if pca_op == 0 or pca_op == 1:
-        #print("Entro aca 2")
-        #print(suavizado_pd) 
-        if pca_op == 0:
-            mostrar_espectros(suavizado_pd,raman_shift,4,opcion,0)
-        else:
-            return suavizado_pd
-    else:
-        #print("ESPECTRO SUAVIZADO POR SAVITZKY GOLAY")
-        #print("suavizado savitkz golay:",suavizado_pd.shape) 
-        #print(suavizado_pd)
-        #print("aca si entro xD")
-        return suavizado_pd
-'''
-
-
-
-
-
-
-
-
-
-#### CONTINUAR CON LOS METODOS DE SUAVIZADO, EMPEZAR CON SAVIZTKY-GOLAY
-
-
+    return suavizado_pd
 
 
 
