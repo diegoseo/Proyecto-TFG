@@ -391,7 +391,7 @@ def main():
             if metodo_grafico == 1:
                 print("Procesando los datos")
                 print("Por favor espere un momento...")
-                mostrar_espectros(datos_sin_normalizar(),raman_shift,metodo,0,0)
+                mostrar_espectros(datos_sin_normalizar(),raman_shift,metodo,0,0,0)
             elif metodo_grafico == 2:
                 espectro_acotado(datos_sin_normalizar(), 0,1,0,0)
             elif metodo_grafico == 3:
@@ -654,7 +654,7 @@ def main():
         elif opcion == '7':           
                     print("sigue dentro")
                     while True:  # Bucle para mantener al usuario en el submenú
-                      metodo = 6          
+                      metodo = 7          
                       sub_menu()
                       metodo_grafico = int(input("Opcion: "))               
                       if metodo_grafico == 1:
@@ -710,7 +710,7 @@ def main():
         elif opcion == '8':           
                     print("sigue dentro")
                     while True:  # Bucle para mantener al usuario en el submenú
-                      metodo = 6          
+                      metodo = 8          
                       sub_menu()
                       metodo_grafico = int(input("Opcion: "))               
                       if metodo_grafico == 1:
@@ -763,7 +763,61 @@ def main():
                           descargar_csv_acotado_tipo(dato_suavizado,8) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
                           main()     
-                      
+        elif opcion == '9':
+                      while True:  # Bucle para mantener al usuario en el submenú
+                        metodo = 9          
+                        sub_menu()
+                        metodo_grafico = int(input("Opcion: "))               
+                        if metodo_grafico == 1:
+                            dato,nor_op ,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
+                            mostrar_espectros(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,3)
+                        elif metodo_grafico == 2:
+                            dato,nor_op,m_suavi= menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            espectro_acotado(dato_suavizado,0,nor_op,m_suavi,3)
+                        elif metodo_grafico == 3:
+                            dato,nor_op,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            grafico_tipo(dato_suavizado,raman_shift,nor_op,metodo,m_suavi,3)
+                        elif metodo_grafico == 4:
+                            dato,nor_op,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            grafico_acotado_tipo(dato_suavizado,raman_shift,metodo,nor_op,m_suavi,3)
+                        elif metodo_grafico == 5:
+                                dato,nor_op,m_suavi = menu_correccion()
+                                if dato is None:  # Manejar la opción "Volver"
+                                    continue 
+                                dato_suavizado = correcion_LineaB(dato)
+                                descargar_csv(9, dato_suavizado) # 9 PARA SABER QUE VIENE DE CORRECCION LINEAL
+                        elif metodo_grafico == 6:
+                            dato,nor_op,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            descargar_csv(9, dato_suavizado) # 9 PARA SABER QUE VIENE DE LA CORRECCION BASE LINEAL                          
+                        elif metodo_grafico == 7:
+                            dato,nor_op,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            descargar_csv_tipo(dato_suavizado,9) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                        elif metodo_grafico == 8:
+                            dato,nor_op,m_suavi = menu_correccion()
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue 
+                            dato_suavizado = correcion_LineaB(dato)
+                            descargar_csv_acotado_tipo(dato_suavizado,9) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                        elif metodo_grafico == 9:
+                            main() 
                       
                       
                       
@@ -797,7 +851,7 @@ def suavizado_menu():
     return suavizar , opcion
 
 
-##ESTE CODIGO FUNCIONA PARA LAS OPCIONES 8,9 PARA LAS DERIVADAS
+##ESTE CODIGO FUNCIONA PARA LAS OPCIONES 7.8 PARA LAS DERIVADAS
 def suavizado_menu_derivadas():
    while True:  # Ciclo para permitir "Volver" sin salir de la función
         print("NORMALIZAR POR:")
@@ -857,6 +911,132 @@ def suavizado_menu_derivadas():
                 print("Opción no válida. Inténtalo de nuevo.")
                 continue
             
+
+
+# ##ESTE CODIGO FUNCIONA PARA LAS OPCIONES 9,10 PARA LAS CORRECIONES
+def menu_correccion():
+    print("entrooooooooooooo")
+    while True:  # Ciclo principal para manejar "Volver"
+        print("NORMALIZAR POR:")
+        print("1- Media")
+        print("2- Área")
+        print("3- Sin normalizar")
+        print("4- Volver")
+        
+ 
+        opcion = int(input("Selecciona una opción: "))
+
+
+        if opcion == 1:
+            suavizar = normalizado_media()
+        elif opcion == 2:
+            suavizar = normalizado_area()
+        elif opcion == 3:
+            suavizar = datos_sin_normalizar()
+        elif opcion == 4:
+            return None, None, None
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
+            continue
+
+        opcion_s = 0
+        while True:  # Submenú 
+             if opcion_s == 3:
+                 break
+             while True:
+                print("DESEA SUAVIZAR")
+                print("1. Sí")
+                print("2. No")
+                print("3. Volver")
+    
+                opcion_s = int(input("Opción: "))
+    
+                if opcion_s == 1:
+                    while True:  # Submenú de métodos de suavizado
+                        print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+                        print("1- Suavizado por Saviztky-Golay")
+                        print("2- Suavizado por Filtro Gaussiano")
+                        print("3- Suavizado por Media Móvil")
+                        print("4- Volver")
+                        
+    
+                        metodo_suavizado = int(input("Opción: "))
+                        
+    
+                        if metodo_suavizado == 1:
+                            suavizar = suavizado_saviztky_golay(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 2:
+                            suavizar = suavizado_filtroGausiano(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 3:
+                            suavizar = suavizado_mediamovil(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                    # Ir al menú de derivadas después del suavizado
+                    while True:  # Submenú para derivadas
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+    
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            derivada = primera_derivada(suavizar)
+                            print("Primera derivada aplicada.")
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 2:
+                            derivada = segunda_derivada(suavizar)
+                            print("Segunda derivada aplicada.")
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 3:
+                            print("No se aplicó derivada.")
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 4:
+                            print("Volviendo al menú '¿Desea suavizar?'.")
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 2:
+                    metodo_suavizado = 5  # Valor para indicar que no se aplicó suavizado
+                    
+                    # Ir directamente al menú de derivadas
+                    while True:
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+                        
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            derivada = primera_derivada(suavizar)
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 2:
+                            derivada = segunda_derivada(suavizar)
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 3:
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 3:
+                    break  # Regresa al menú principal
+                else:
+                    print("Opción no válida. Inténtalo de nuevo.")
+                    continue
 
 
 
@@ -955,10 +1135,13 @@ def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA Q
     elif opcion == 7:
         df_acotado.to_csv('output_acotado_primera_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_primera_derivada.csv")
-    elif opcion == 7:
+    elif opcion == 8:
         df_acotado.to_csv('output_acotado_segunda_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_segunda_derivada.csv")
-                  
+    elif opcion == 9:
+        df_acotado.to_csv('output_acotado_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_corregido.csv")
+                            
         
         
         
@@ -1002,11 +1185,14 @@ def descargar_csv_tipo(datos,opcion):
         datos_filtrados.to_csv('output_tipo_suavizado_media_movil.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_media_movil.csv")
     elif opcion == 7:
-        datos_filtrados.to_csv('output_tipo_suavizado_primera_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        datos_filtrados.to_csv('output_tipo_primera_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_primera_derivada.csv")
     elif opcion == 8:
-        datos_filtrados.to_csv('output_tipo_suavizado_segunda_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        datos_filtrados.to_csv('output_tipo_segunda_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_segunda_derivada.csv")
+    elif opcion == 9:
+        datos_filtrados.to_csv('output_tipo_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_corregido.csv")
 
 
 
@@ -1095,6 +1281,9 @@ def descargar_csv_acotado_tipo(datos,opcion):
     elif opcion == 8:
         datos_acotado_tipo.to_csv('output_acotado_tipo_segunda_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_segunda_derivada.csv")
+    elif opcion == 9:
+        datos_acotado_tipo.to_csv('output_acotado_tipo_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_corregido.csv")
 
 
 
@@ -1138,6 +1327,8 @@ def mostrar_espectros(datos,raman_shift,metodo,nor_op,op_der,derivada): # LA VAR
         titulo_plot_primera_derivada(nor_op,op_der)
     elif derivada == 2:
         titulo_plot_segunda_derivada(nor_op,op_der)
+    elif derivada == 3:  # PARA QUE VAYA AL PLOT DE CORRECION DE LINEA BASE OPCION 9
+        titulo_plot_correcion_base(nor_op,op_der)
 
 
 
@@ -1836,7 +2027,73 @@ def espectro_acotado(datos, pca_op,nor_op,op_der,derivada):
 
 
 
-
+def titulo_plot_correcion_base(nor_op,metodo_suavizado):
+    print("entro aca")
+    if nor_op == 1:
+        if metodo_suavizado == 1:
+            print("correccopn xDDDD")
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por la media ')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Sin Suavizar y Normalizado por la media ')
+            plt.show()
+    elif nor_op  == 2:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por Area')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Sin Suavizar y Normalizado por Area')
+            plt.show()
+    else:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y sin Normalizar ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y sin Normalizar')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Sin Suavizar y sin Normalizar')
+            plt.show()
+        
 
 
 
@@ -2112,171 +2369,57 @@ def segunda_derivada(datos):
 
 
 
-# # POR EL METODO DE REGRESION LINEAL
-# def correcion_LineaB(normalizado, pca_op):
-#         if pca_op == 0 or pca_op == 5:
-#             print("NORMALIZAR POR:")
-#             print("1-Media")
-#             print("2-Area")
-#             print("3-Sin normalizar")
-#             opcion = int(input("Selecciona una opción: "))
-               
-#             if opcion == 1  :
-#                 normalizado = df_media_pca
-#             elif opcion == 2 :
-#                 normalizado = df_concatenado_cabecera_nueva_area
-#             elif opcion == 3 :
-#                 normalizado = df2
-#             else:
-#                 print("OPCION NO VALIDA")
-#                 print("Salir...")
-           
-#             #print("EL normalizado.SHAPE antes ES:", normalizado.shape)
-            
-#             print("DESEA SUAVIZAR")
-#             print("1. SI")
-#             print("2. NO")
-#             opcion_s =  int(input("OPCION: "))
-#             if opcion_s == 1:
-#                 print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
-#                 print("1. SUAVIZADO POR SAVIZTKY-GOLAY")
-#                 print("2. SUAVIZADO POR FILTRO GAUSIANO")
-#                 print("3. SUAVIZADO POR MEDIA MOVIL")
-#                 metodo_suavizado = int(input("OPCION: "))
-#                 if metodo_suavizado == 1:
-#                     aux = suavizado_saviztky_golay(normalizado,2)
-#                     #print("EL aux.SHAPE antes ES:", aux.shape)
-#                     #normalizado = suavizado_saviztky_golay(normalizado,1)
-#                 elif metodo_suavizado == 2:
-#                     #print("normalizado shape por FG = ", normalizado.shape)
-#                     #normalizado = suavizado_filtroGausiano(normalizado,1)
-#                     aux = suavizado_filtroGausiano(normalizado,2)
-#                     #print("normalizado shape despues por FG = ", normalizado.shape)
-#                 elif metodo_suavizado == 3:
-#                     #normalizado = suavizado_mediamovil(normalizado,1) 
-#                     aux = suavizado_mediamovil(normalizado,2) 
-#             else:
-#                     metodo_suavizado = 4         
-#                     #print("No se va a suavizar, directamente la correccion")
-                     
-#                       # si viene 0 que haga todo eso pero si viene 1 desde la funcion del PCA que haller directo la primera derivada con esos parametros
-               
-#         else:
-#            #daba error por que no retornaba nada
-#            #print("entro en el else de correccion base")
-#            normalizado_correccion = normalizado
-        
-#         if (pca_op == 0 or pca_op == 3 or pca_op == 5) and opcion_s == 1:
-#             #print("entro aca")
-#             normalizado_f = aux
-#             #print("EL DF NORMALIZADO_F ES:")
-#             #print(normalizado_f)
-#         elif (pca_op == 0 or pca_op == 3 or pca_op == 5) and opcion_s == 2:
-#             normalizado_f = normalizado
-#         else:
-#             normalizado_f = normalizado_correccion #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
-#             #print("aca va lo del PCA")
-        
-#         #print("NORMALIZADO-F")
-#         #print(normalizado_f)
-#         cabecera_aux = normalizado_f.columns
-#         #print("XDDDDDDDDDD")
-#         #print(cabecera_aux)
-#         np_corregido = normalizado_f.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
-#         #print("DF_CORREGIDO")
-#         #print(np_corregido)
-#         #print("DF_CORREGIDO")
-#         df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
-#         #print(df_corregido)
-        
-        
-      
-#         pendientes = {}   # Crear un diccionario para almacenar las pendientes
-#         intersecciones = {}
-#         y_ajustados = {}
-#         #dic_prueba = {}
+# # # POR EL METODO DE REGRESION LINEAL
+def correcion_LineaB(dato):
+    print("NORMALIZADO-F")
+    print(dato)
+    cabecera_aux = dato.columns
+    np_corregido = dato.to_numpy()
+    df_corregido = pd.DataFrame(np_corregido)
 
-#         pos = 0  
-#         # Asignar la primera columna como Raman shift
-#         #raman_shift = df_corregido.iloc[:, 0]  # Primera columna
-#         #print("Raman shift")
-#         #print(raman_shift)
-#         #print("Cant filas = ", len(raman_shift))
+    pendientes = {}
+    intersecciones = {}
+    y_ajustados = {}
 
-#         #y_ajustados = pd.DataFrame(raman_shift)
-#         #print(y_ajustados)
+    # Definir Raman Shift
+    raman_shift = df_corregido.iloc[:, 0]
+    raman_shift = pd.to_numeric(raman_shift, errors='coerce').dropna()  # Asegurarse de que sea numérico y sin NaN
 
-#         #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
-#         #print("RAMAN SHIFT")
-#         #print(raman_shift)
-        
-#         # Iterar sobre las demás columnas
-#         for col in df_corregido.columns:
-#             intensidades = df_corregido[col]  # Extraer la columna actual
-#             intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
-#             #print(intensidades)
-#             # print(cont)                        
-#             # Calcularmos la pendiente 
-#             coef = np.polyfit(raman_shift, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
-#             # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
-#             pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
-#             interseccion = coef[1] # La interseccion (b) esta en el indice 1 
-#             # Guardamos la pendiente y intersecciones en el diccionario
-#             pendientes[col] = pendiente
-#             intersecciones[col] = interseccion
-#             #print(raman_shift[pos])
-#             #print("xD")
-#             y_ajustado = []
-#             for pos, intensidad in enumerate(intensidades):
-#                 y = pendiente * raman_shift[pos] + interseccion  
-#                 #print()
-#                 #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
-#                 y_ajustado.append(y)
-#                 #dic_prueba.append(y)
-#             y_ajustados[col] = intensidades - y_ajustado
-#             #dic_prueba[col] = y_ajustado
-#             #print(intensidades, "-", dic_prueba[col] , "=", y_ajustados[col])
-#             #print("XDDDDDDDDDDDD")
-#             #print(y_ajustado)
-#             # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
-#             #     pos = 0
-#             #     #print("entro")
-                
-  
-#             # else:
-#             #     pos += 1 
-#             #     #print("emtro2")
-                
-                
-#         df_y_ajustados = pd.DataFrame(y_ajustados)
-#         #df_y_ajustados.index.name = "Raman Shift"  
-#         #print(len(df_y_ajustados.columns))
-#         #print(len(cabecera))
-#         df_y_ajustados.columns = cabecera_aux
-#         #print(df_y_ajustados)    
-        
-#         #print()
-#         #print("LA PENDIENTE SON:", pendientes)
-#         # print(type(pendientes))
-#         #print()
-#         #print("LA INTERSECCIONES SON:", intersecciones)
-#         # print(type(intersecciones))
-#         #print()
-#         #print("Y AJUSTADO =", y_ajustados)
-#         # print(type(y_ajustados))
-        
-#         #   CORROBORAR LOS RESULTADOS 
-#         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
-#         if pca_op == 0 and pca_op != 5:
-#             if opcion_s == 1:
-#                 mostrar_espectros(df_y_ajustados,raman_shift, 10, opcion, metodo_suavizado)
-#             else:
-#                 mostrar_espectros(df_y_ajustados,raman_shift, 10, opcion,4)
-#         else:
-#             #print("entro en el else para retornar el df")
-#             return df_y_ajustados   #FALTA HACER QUE LA FUNCION PCA LLAME A ESTA FUNCION
+    for col in df_corregido.columns:
+        intensidades = df_corregido[col]
+        intensidades = pd.to_numeric(intensidades, errors='coerce').dropna()
 
+        # Crear una máscara para limpiar ambos arrays
+        mask = ~np.isnan(raman_shift) & ~np.isnan(intensidades) & ~np.isinf(raman_shift) & ~np.isinf(intensidades)
+        raman_shift_clean = raman_shift[mask]
+        intensidades_clean = intensidades[mask]
 
+        # # Validar si los datos son suficientes para np.polyfit
+        # if len(raman_shift_clean) < 2 or len(intensidades_clean) < 2:
+        #     print(f"Datos insuficientes para realizar el ajuste en la columna {col}.")
+        #     continue
+
+        # Ajustar polinomio de grado 1
+        try:
+            coef = np.polyfit(raman_shift_clean, intensidades_clean, 1)
+        except np.linalg.LinAlgError as e:
+            print(f"Error en np.polyfit para la columna {col}: {e}")
+            coef = [0, 0]  # Coeficientes por defecto en caso de error
+
+        pendiente = coef[0]
+        interseccion = coef[1]
+        pendientes[col] = pendiente
+        intersecciones[col] = interseccion
+
+        # Calcular y ajustado
+        y_ajustado = pendiente * raman_shift_clean + interseccion
+        y_ajustados[col] = intensidades_clean - y_ajustado
+
+    df_y_ajustados = pd.DataFrame(y_ajustados)
+    df_y_ajustados.columns = cabecera_aux
+    print("LLEGO HASTA ACA")
+    print(df_y_ajustados)
+    return df_y_ajustados , raman_shift
 
 # def correcion_shirley(normalizado, pca_op) :
 #     print("FALTA IMPLEMENTEAR")
