@@ -26,8 +26,8 @@ from scipy.cluster.hierarchy import linkage, cut_tree, dendrogram
 def archivo_existe(ruta_archivo):
     return os.path.isfile(ruta_archivo)
 
-nombre = input("Por favor, ingresa tu nombre: ")
-print(f"Hola, {nombre}!")
+#nombre = input("Por favor, ingresa tu nombre: ")
+#print(f"Hola, {nombre}!")
 
 existe = False
 archivo_nombre = input("Ingrese el nombre del archivo: ")
