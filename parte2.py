@@ -676,4 +676,129 @@ def espectro_acotado(datos, pca_op,nor_op):
 
 
 
+def correcion_LineaB(normalizado_f):
+    print("NORMALIZADO-F")
+    print(normalizado_f)
+    # Obtener los índices de las filas válidas
+    indices_validos = normalizado_f.dropna().index
+    
+    # Filtrar raman_shift por los índices válidos
+    raman_shift_filtrado = raman_shift.loc[indices_validos]
+
+    cabecera_aux = normalizado_f.columns
+
+    np_corregido = normalizado_f.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
+
+    df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
+
+    pendientes = {}   # Crear un diccionario para almacenar las pendientes
+    intersecciones = {}
+    y_ajustados = {}
+
+    pos = 0  
+
+    for col in df_corregido.columns:
+        intensidades = df_corregido[col]  # Extraer la columna actual
+        intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
+
+        coef = np.polyfit(raman_shift_filtrado, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
+
+        pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
+        interseccion = coef[1] # La interseccion (b) esta en el indice 1 
+
+        pendientes[col] = pendiente
+        intersecciones[col] = interseccion
+
+        y_ajustado = []
+        for pos, intensidad in enumerate(intensidades):
+            y = pendiente * raman_shift[pos] + interseccion  
+            #print()
+            #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
+            y_ajustado.append(y)
+            #dic_prueba.append(y)
+        y_ajustados[col] = intensidades - y_ajustado
+   
+    df_y_ajustados = pd.DataFrame(y_ajustados)
+
+    df_y_ajustados.columns = cabecera_aux
+
+    
+   
+    
+    print("LLEGO HASTA ACA")
+    print(df_y_ajustados)
+    return df_y_ajustados , raman_shift
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  print("NORMALIZADO-F")
+  print(normalizado_f)
+
+  # Obtener los índices de las filas válidas
+  indices_validos = normalizado_f.dropna().index
+
+  # Filtrar raman_shift por los índices válidos
+  raman_shift_filtrado = raman_shift.loc[indices_validos]
+
+  # Filtrar normalizado_f por los índices válidos
+  normalizado_f_filtrado = normalizado_f.loc[indices_validos]
+
+
+  cabecera_aux = normalizado_f_filtrado.columns
+ 
+  np_corregido = normalizado_f_filtrado.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
+  
+  df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
+ 
+  pendientes = {}   # Crear un diccionario para almacenar las pendientes
+  intersecciones = {}
+  y_ajustados = {}
+
+  pos = 0  
+
+  for col in df_corregido.columns:
+          intensidades = df_corregido[col]  # Extraer la columna actual
+          intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
+
+          coef = np.polyfit(raman_shift_filtrado, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
+          # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
+          pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
+          interseccion = coef[1] # La interseccion (b) esta en el indice 1 
+
+          pendientes[col] = pendiente
+          intersecciones[col] = interseccion
+   
+          y_ajustado = []
+          for pos, intensidad in enumerate(intensidades):
+              y = pendiente * raman_shift_filtrado[pos] + interseccion  
+
+              y_ajustado.append(y)
+ 
+          y_ajustados[col] = intensidades - y_ajustado
+ 
+              
+  df_y_ajustados = pd.DataFrame(y_ajustados)
+
+  df_y_ajustados.columns = cabecera_aux
+
+
+
+
+
+
+
+
+
+
 
