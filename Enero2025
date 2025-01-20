@@ -23,6 +23,8 @@ from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
 from scipy.ndimage import gaussian_filter # PARA EL FILTRO GAUSSIANO
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import linkage, cut_tree, dendrogram
+import gc
+import importlib
 
 
 pila = []
@@ -393,19 +395,19 @@ def main():
                 print("Por favor espere un momento...")
                 mostrar_espectros(datos_sin_normalizar(),raman_shift,metodo,0,0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(datos_sin_normalizar(), 0,1,0,0)
+                espectro_acotado(datos_sin_normalizar(),0, 0,1,0,0)
             elif metodo_grafico == 3:
                 grafico_tipo(datos_sin_normalizar(),raman_shift,0,metodo,0,0)
             elif metodo_grafico == 4:
                 grafico_acotado_tipo(datos_sin_normalizar(),raman_shift,metodo,0,0,0)
             elif metodo_grafico == 5: 
-                descargar_csv(1,datos_sin_normalizar()) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
+                descargar_csv(1,datos_sin_normalizar(),raman_shift) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
             elif metodo_grafico == 6:
-                descargar_csv_acotado(datos_sin_normalizar(),1) # 1 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                descargar_csv_acotado(datos_sin_normalizar(),1,raman_shift) # 1 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
             elif metodo_grafico == 7:
-                descargar_csv_tipo(datos_sin_normalizar(),1) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
+                descargar_csv_tipo(datos_sin_normalizar(),1,raman_shift) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
             elif metodo_grafico == 8:
-                descargar_csv_acotado_tipo(datos_sin_normalizar(),1) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
+                descargar_csv_acotado_tipo(datos_sin_normalizar(),1,raman_shift) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
             elif metodo_grafico == 9:
                 main()
                 
@@ -420,19 +422,19 @@ def main():
                 print("Por favor espere un momento...")
                 mostrar_espectros(normalizado_media(),raman_shift,metodo,0,0,0)
             elif metodo_grafico == 2:
-                espectro_acotado(normalizado_media(), 0,2,0,0)
+                espectro_acotado(normalizado_media(),0, 0,2,0,0)
             elif metodo_grafico == 3:
                 grafico_tipo(normalizado_media(),raman_shift,0,metodo,0,0)
             elif metodo_grafico == 4:
                 grafico_acotado_tipo(normalizado_media(),raman_shift,metodo,0,0,0)
             elif metodo_grafico == 5:
-                descargar_csv(2,normalizado_media()) # 2 PARA SABER QUE VIENE DE LA MEDIA  
+                descargar_csv(2,normalizado_media(),raman_shift) # 2 PARA SABER QUE VIENE DE LA MEDIA  
             elif metodo_grafico == 6:
-                descargar_csv_acotado(normalizado_media(),2) # 2 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                descargar_csv_acotado(normalizado_media(),2,raman_shift) # 2 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
             elif metodo_grafico == 7:
-                descargar_csv_tipo(normalizado_media(),2) # 2 PARA SABER QUE VIENE  NORMALIZAR MEDIA
+                descargar_csv_tipo(normalizado_media(),2,raman_shift) # 2 PARA SABER QUE VIENE  NORMALIZAR MEDIA
             elif metodo_grafico == 8:
-                descargar_csv_acotado_tipo(normalizado_media(),2) # 2 PARA SABER QUE VIENE SIN NORMALIZAR 
+                descargar_csv_acotado_tipo(normalizado_media(),2,raman_shift) # 2 PARA SABER QUE VIENE SIN NORMALIZAR 
             elif metodo_grafico == 9:
                 main()
                 
@@ -448,19 +450,19 @@ def main():
                  print("Por favor espere un momento...")
                  mostrar_espectros(normalizado_area(),raman_shift,metodo,0,0,0)
              elif metodo_grafico == 2:
-                 espectro_acotado(normalizado_area(), 0,3,0,0)
+                 espectro_acotado(normalizado_area(), 0,0,3,0,0)
              elif metodo_grafico == 3:
                  grafico_tipo(normalizado_area(),raman_shift,0,metodo,0,0)
              elif metodo_grafico == 4:
                  grafico_acotado_tipo(normalizado_area(),raman_shift,metodo,0,0,0)
              elif metodo_grafico == 5:
-                 descargar_csv(3,normalizado_area()) # 3 PARA SABER QUE VIENE DEL AREA   
+                 descargar_csv(3,normalizado_area(),raman_shift) # 3 PARA SABER QUE VIENE DEL AREA   
              elif metodo_grafico == 6:
-                descargar_csv_acotado(normalizado_area(),3) # 3 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                descargar_csv_acotado(normalizado_area(),3,raman_shift) # 3 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
              elif metodo_grafico == 7:
-                 descargar_csv_tipo(normalizado_area(),3) # 3 PARA SABER QUE VIENE  NORMALIZAR AREA
+                 descargar_csv_tipo(normalizado_area(),3,raman_shift) # 3 PARA SABER QUE VIENE  NORMALIZAR AREA
              elif metodo_grafico == 8:
-                 descargar_csv_acotado_tipo(normalizado_area(),3) # 3 PARA SABER QUE VIENE SIN NORMALIZAR 
+                 descargar_csv_acotado_tipo(normalizado_area(),3,raman_shift) # 3 PARA SABER QUE VIENE SIN NORMALIZAR 
              elif metodo_grafico == 9:
                  main()
          
@@ -488,7 +490,7 @@ def main():
                       metodo = 5
                   elif nor_op == 3:
                       metodo = 6
-                  espectro_acotado(dato_suavizado,0,metodo,0,0)
+                  espectro_acotado(dato_suavizado,0,0,metodo,0,0)
               elif metodo_grafico == 3:
                   dato,nor_op = suavizado_menu()
                   if dato is None:  # Manejar la opción "Volver"
@@ -506,25 +508,25 @@ def main():
                   if dato is None:  # Manejar la opción "Volver"
                       continue 
                   dato_suavizado = suavizado_saviztky_golay(dato)
-                  descargar_csv(4, dato_suavizado) # 4 PARA SABER QUE VIENE DEL SUAVIZADO POR suavizado_saviztky_golay
+                  descargar_csv(4, dato_suavizado,raman_shift) # 4 PARA SABER QUE VIENE DEL SUAVIZADO POR suavizado_saviztky_golay
               elif metodo_grafico == 6:
                   dato,nor_op = suavizado_menu()
                   if dato is None:  # Manejar la opción "Volver"
                       continue 
                   dato_suavizado = suavizado_saviztky_golay(dato)
-                  descargar_csv_acotado(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                  descargar_csv_acotado(dato_suavizado,4,raman_shift) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
               elif metodo_grafico == 7:
                   dato,nor_op = suavizado_menu()
                   if dato is None:  # Manejar la opción "Volver"
                       continue 
                   dato_suavizado = suavizado_saviztky_golay(dato)
-                  descargar_csv_tipo(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                  descargar_csv_tipo(dato_suavizado,4,raman_shift) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
               elif metodo_grafico == 8:
                   dato,nor_op = suavizado_menu()
                   if dato is None:  # Manejar la opción "Volver"
                       continue 
                   dato_suavizado = suavizado_saviztky_golay(dato)
-                  descargar_csv_acotado_tipo(dato_suavizado,4) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                  descargar_csv_acotado_tipo(dato_suavizado,4,raman_shift) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
               elif metodo_grafico == 9:
                   main()
         elif opcion == '5':  
@@ -550,7 +552,7 @@ def main():
                         metodo = 8
                     elif nor_op == 3:
                         metodo = 9
-                    espectro_acotado(dato_suavizado,0,metodo,0,0)
+                    espectro_acotado(dato_suavizado,0,0,metodo,0,0)
                 elif metodo_grafico == 3:
                     dato,nor_op = suavizado_menu()
                     if dato is None:  # Manejar la opción "Volver"
@@ -568,25 +570,25 @@ def main():
                     if dato is None:  # Manejar la opción "Volver"
                         continue 
                     dato_suavizado = suavizado_filtroGausiano(dato)
-                    descargar_csv(5, dato_suavizado) # 5 PARA SABER QUE VIENE DEL SUAVIZADO POR Filtro Gaussiano
+                    descargar_csv(5, dato_suavizado,raman_shift) # 5 PARA SABER QUE VIENE DEL SUAVIZADO POR Filtro Gaussiano
                 elif metodo_grafico == 6:
                     dato,nor_op = suavizado_menu()
                     if dato is None:  # Manejar la opción "Volver"
                         continue 
                     dato_suavizado = suavizado_filtroGausiano(dato)
-                    descargar_csv_acotado(dato_suavizado,5) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                    descargar_csv_acotado(dato_suavizado,5,raman_shift) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                 elif metodo_grafico == 7:
                     dato,nor_op = suavizado_menu()
                     if dato is None:  # Manejar la opción "Volver"
                         continue 
                     dato_suavizado = suavizado_filtroGausiano(dato)
-                    descargar_csv_tipo(dato_suavizado,5) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                    descargar_csv_tipo(dato_suavizado,5,raman_shift) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                 elif metodo_grafico == 8:
                     dato,nor_op = suavizado_menu()
                     if dato is None:  # Manejar la opción "Volver"
                         continue 
                     dato_suavizado = suavizado_filtroGausiano(dato)
-                    descargar_csv_acotado_tipo(dato_suavizado,5) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                    descargar_csv_acotado_tipo(dato_suavizado,5,raman_shift) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                 elif metodo_grafico == 9:
                     main()    
         elif opcion == '6':  
@@ -612,7 +614,7 @@ def main():
                           metodo = 11
                       elif nor_op == 3:
                           metodo = 12
-                      espectro_acotado(dato_suavizado,0,metodo,0,0)
+                      espectro_acotado(dato_suavizado,0,0,metodo,0,0)
                   elif metodo_grafico == 3:
                       dato,nor_op = suavizado_menu()
                       if dato is None:  # Manejar la opción "Volver"
@@ -630,25 +632,25 @@ def main():
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
                       dato_suavizado = suavizado_mediamovil(dato)
-                      descargar_csv(6, dato_suavizado) # 6 PARA SABER QUE VIENE DEL SUAVIZADO POR media movil
+                      descargar_csv(6, dato_suavizado,raman_shift) # 6 PARA SABER QUE VIENE DEL SUAVIZADO POR media movil
                   elif metodo_grafico == 6:
                       dato,nor_op = suavizado_menu()
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
                       dato_suavizado = suavizado_mediamovil(dato)
-                      descargar_csv_acotado(dato_suavizado,6) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                      descargar_csv_acotado(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 7:
                       dato,nor_op = suavizado_menu()
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
                       dato_suavizado = suavizado_mediamovil(dato)
-                      descargar_csv_tipo(dato_suavizado,6) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                      descargar_csv_tipo(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 8:
                       dato,nor_op = suavizado_menu()
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
                       dato_suavizado = suavizado_mediamovil(dato)
-                      descargar_csv_acotado_tipo(dato_suavizado,6) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                      descargar_csv_acotado_tipo(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 9:
                       main()                   
         elif opcion == '7':           
@@ -668,7 +670,7 @@ def main():
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = primera_derivada(dato)
-                          espectro_acotado(dato_suavizado,0,nor_op,m_suavi,1)
+                          espectro_acotado(dato_suavizado,0,0,nor_op,m_suavi,1)
                       elif metodo_grafico == 3:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
@@ -686,25 +688,25 @@ def main():
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = primera_derivada(dato)
-                          descargar_csv(7, dato_suavizado) # 7 PARA SABER QUE VIENE DE LA PRIMERA DERIVADA
+                          descargar_csv(7, dato_suavizado,raman_shift) # 7 PARA SABER QUE VIENE DE LA PRIMERA DERIVADA
                       elif metodo_grafico == 6:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = primera_derivada(dato)
-                          descargar_csv_acotado(dato_suavizado,7) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_acotado(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 7:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = primera_derivada(dato)
-                          descargar_csv_tipo(dato_suavizado,7) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_tipo(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 8:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = primera_derivada(dato)
-                          descargar_csv_acotado_tipo(dato_suavizado,7) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_acotado_tipo(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
                           main()                     
         elif opcion == '8':           
@@ -724,7 +726,7 @@ def main():
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = segunda_derivada(dato)
-                          espectro_acotado(dato_suavizado,0,nor_op,m_suavi,2)
+                          espectro_acotado(dato_suavizado,0,0,nor_op,m_suavi,2)
                       elif metodo_grafico == 3:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
@@ -742,25 +744,25 @@ def main():
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = segunda_derivada(dato)
-                          descargar_csv(8, dato_suavizado) # 8 PARA SABER QUE VIENE DE LA SEGUNDA DERIVADA
+                          descargar_csv(8, dato_suavizado,raman_shift) # 8 PARA SABER QUE VIENE DE LA SEGUNDA DERIVADA
                       elif metodo_grafico == 6:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = segunda_derivada(dato)
-                          descargar_csv_acotado(dato_suavizado,8) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_acotado(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 7:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = segunda_derivada(dato)
-                          descargar_csv_tipo(dato_suavizado,8) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_tipo(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 8:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas()
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
                           dato_suavizado = segunda_derivada(dato)
-                          descargar_csv_acotado_tipo(dato_suavizado,8) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                          descargar_csv_acotado_tipo(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
                           main()     
         elif opcion == '9':
@@ -778,44 +780,44 @@ def main():
                             dato,nor_op,m_suavi= menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            espectro_acotado(dato_suavizado,0,nor_op,m_suavi,3)
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            espectro_acotado(dato_suavizado,raman_shift_corregido,0,nor_op,m_suavi,3)
                         elif metodo_grafico == 3:
                             dato,nor_op,m_suavi = menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            grafico_tipo(dato_suavizado,raman_shift,nor_op,metodo,m_suavi,3)
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            grafico_tipo(dato_suavizado,raman_shift_corregido,nor_op,metodo,m_suavi,3)
                         elif metodo_grafico == 4:
                             dato,nor_op,m_suavi = menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            grafico_acotado_tipo(dato_suavizado,raman_shift,metodo,nor_op,m_suavi,3)
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            grafico_acotado_tipo(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,3)
                         elif metodo_grafico == 5:
                                 dato,nor_op,m_suavi = menu_correccion()
                                 if dato is None:  # Manejar la opción "Volver"
                                     continue 
-                                dato_suavizado = correcion_LineaB(dato)
-                                descargar_csv(9, dato_suavizado) # 9 PARA SABER QUE VIENE DE CORRECCION LINEAL
+                                dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                                descargar_csv(9, dato_suavizado,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE CORRECCION LINEAL
                         elif metodo_grafico == 6:
                             dato,nor_op,m_suavi = menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            descargar_csv(9, dato_suavizado) # 9 PARA SABER QUE VIENE DE LA CORRECCION BASE LINEAL                          
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            descargar_csv_acotado(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE LA CORRECCION BASE LINEAL                          
                         elif metodo_grafico == 7:
                             dato,nor_op,m_suavi = menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            descargar_csv_tipo(dato_suavizado,9) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            descargar_csv_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                         elif metodo_grafico == 8:
                             dato,nor_op,m_suavi = menu_correccion()
                             if dato is None:  # Manejar la opción "Volver"
                                 continue 
-                            dato_suavizado = correcion_LineaB(dato)
-                            descargar_csv_acotado_tipo(dato_suavizado,9) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                            descargar_csv_acotado_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                         elif metodo_grafico == 9:
                             main() 
                       
@@ -1041,10 +1043,10 @@ def menu_correccion():
 
 
 
-def descargar_csv(normalizado,dato):
+def descargar_csv(normalizado,dato,raman_shift_actual):
    
     df_aux = dato # obtenemos el dataframe              
-    raman_shift_aux = raman_shift[:len(df_aux)] #nos aseguramos de que el tengan la misa longitud         
+    raman_shift_aux = raman_shift_actual[:len(df_aux)] #nos aseguramos de que el tengan la misa longitud         
     df_aux.insert(0, '', raman_shift_aux)    # Insertamos la columna raman_shift en la posición 0
    
     if normalizado == 1:
@@ -1076,7 +1078,7 @@ def descargar_csv(normalizado,dato):
 
 
 
-def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA QUE 2-Grafico acotado  Y 6- Descargar .csv acotado por la media HACE LA MISMA COSA, SOLO QUE UNO GENERA UN .CSV Y EL OTRO LO GRAFICA
+def descargar_csv_acotado(datos, opcion,raman_shift_actual):   # ESTA PARTE SE PUEDE OPTIMIZAR YA QUE 2-Grafico acotado  Y 6- Descargar .csv acotado por la media HACE LA MISMA COSA, SOLO QUE UNO GENERA UN .CSV Y EL OTRO LO GRAFICA
     df_aux = datos.to_numpy()
     print("PRINT")
     print(df_aux)
@@ -1086,9 +1088,10 @@ def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA Q
     intensidades_np = df_aux[:, :]  # Excluir la primera fila y primera columna
     #print("INTENSIDADES_NP")
     #print(intensidades_np)
-    raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
-    #print("RAMAN")
-    #print(raman)
+    #raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift) este es el ORIGINAL
+    raman = raman_shift_actual.to_numpy().astype(float)
+    print("RAMAN")
+    print(raman)
     intensidades = intensidades_np.astype(float)  # Columnas restantes (intensidades)
     #print("INTENSIDADES")
     #print(intensidades)
@@ -1146,7 +1149,7 @@ def descargar_csv_acotado(datos, opcion):   # ESTA PARTE SE PUEDE OPTIMIZAR YA Q
         
         
 
-def descargar_csv_tipo(datos,opcion):
+def descargar_csv_tipo(datos,opcion,raman_shift_actual):
     
     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
 
@@ -1160,7 +1163,7 @@ def descargar_csv_tipo(datos,opcion):
 
     datos_filtrados = datos.drop(columns=columnas_eliminar) # CREAMOS UN DATAFRAME ELIMINANDO TODO LO QUE ESTE DENTRO DE columnas_eliminar
     
-    datos_filtrados.insert(0, "raman_shift",raman_shift)  # Insertamos en la primera posición los valores de raman_shift
+    datos_filtrados.insert(0, "raman_shift",raman_shift_actual)  # Insertamos en la primera posición los valores de raman_shift
     #print("Datos filtrados con 'raman_shift' agregado:")
     #print(datos_filtrados)
         
@@ -1197,7 +1200,7 @@ def descargar_csv_tipo(datos,opcion):
 
 
 
-def descargar_csv_acotado_tipo(datos,opcion):
+def descargar_csv_acotado_tipo(datos,opcion,raman_shift_actual):
    
     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
 
@@ -1212,7 +1215,7 @@ def descargar_csv_acotado_tipo(datos,opcion):
 
     datos_filtrados = datos.drop(columns=columnas_eliminar) # CREAMOS UN DATAFRAME ELIMINANDO TODO LO QUE ESTE DENTRO DE columnas_eliminar
     
-    datos_filtrados.insert(0, "raman_shift",raman_shift)  # Insertamos en la primera posición los valores de raman_shift
+    datos_filtrados.insert(0, "raman_shift",raman_shift_actual)  # Insertamos en la primera posición los valores de raman_shift
     #print("Datos filtrados con 'raman_shift' agregado:")
     #print(datos_filtrados)
     datos_filtrados = datos_filtrados.astype(object)  # Convierte todo el DataFrame a tipo object       
@@ -1226,7 +1229,7 @@ def descargar_csv_acotado_tipo(datos,opcion):
     intensidades_np = df_aux[:, :]
     #print("INTENSIDADES_NP")
     #print(intensidades_np)
-    raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
+    raman = raman_shift_actual.to_numpy().astype(float)  # Primera columna (Raman Shift)
     #print("RAMAN")
     #print(raman)
     intensidades = intensidades_np.astype(float)  # Columnas restantes (intensidades)
@@ -1929,7 +1932,7 @@ def titulo_plot_segunda_derivada(opcion,metodo_suavizado):
 
 ##### ver como solucionar el tema de los datos que tiran todo iguales sus graficos, 
 
-def espectro_acotado(datos, pca_op,nor_op,op_der,derivada):
+def espectro_acotado(datos,raman_shift_corregido ,pca_op,nor_op,op_der,derivada): # raman_shift_corregido = es por que la correcion de linea base modifica el raman_shift original
       
     df_aux = datos.to_numpy()
     #print("PRINT")
@@ -1940,7 +1943,23 @@ def espectro_acotado(datos, pca_op,nor_op,op_der,derivada):
     intensidades_np = df_aux[:, :]  # Excluir la primera fila y primera columna
     #print("INTENSIDADES_NP")
     #print(intensidades_np)
-    raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
+    
+    #TODO ESTE CODIGO DE ABAJO ES POR QUE RAMAN_SHIFT_CORREGIDO NO ES UN TIPO DE DATO NUMERO
+    if isinstance(raman_shift_corregido, (int, float)) and raman_shift_corregido == 0:
+        print("ENTRO EN EL IF POR QUE NO VIENE DE NINGUN METODO DE CORRECCION")
+        raman = df.iloc[1:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
+    elif isinstance(raman_shift_corregido, pd.Series) and not raman_shift_corregido.empty:
+        print("Entro en el else con un Pandas Series no vacío")
+        raman = raman_shift_corregido.to_numpy().astype(float)
+    elif isinstance(raman_shift_corregido, np.ndarray) and raman_shift_corregido.size > 0:
+        print("Entro en el else con un NumPy array no vacío")
+        raman = raman_shift_corregido.astype(float)
+    else:
+        print("Entro en el else para cualquier otro caso")
+        raman = df.iloc[1:, 0].to_numpy().astype(float)  # Manejo por defecto
+        
+        
+        
     #print("RAMAN")
     #print(raman)
     intensidades = intensidades_np.astype(float)  # Columnas restantes (intensidades)
@@ -2018,7 +2037,7 @@ def espectro_acotado(datos, pca_op,nor_op,op_der,derivada):
             titulo_plot_segunda_derivada(nor_op,op_der)
 
 
-        
+    
         
     else: 
         return df_acotado , raman_acotado # creo que no hace falta retornarn nada ya que si una funcion le llama seria solamente para graficarla y retorna tiene quw retornar tambien su raman_shift acotado
@@ -2136,10 +2155,128 @@ def grafico_tipo(datos,raman_shift,nor_op,metodo,op_der,derivada):
         titulo_plot_primera_derivada(metodo,op_der)
     elif derivada == 2:
         titulo_plot_segunda_derivada(metodo,op_der)
+    elif derivada == 3:
+        titulo_plot_correcion_base(nor_op,op_der)
+
+
+# def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
+    
+#     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
+
+
+#     #print("ENTRO EN EL ESPECTRO ACOTADO")
+#     #print(datos)
+
+#     df_aux = datos.to_numpy()
+        
+#     print("ENTRO EN EL ESPECTRO ACOTADO222")
+#     print(df_aux)
+#     print(df_aux.shape)
+    
+#     cabecera_np = df.iloc[0,:].to_numpy()   # la primera fila contiene los encabezados 
+#     cabecera_np = cabecera_np[1:]
+#     #print("la cabeceras son:")
+#     #print(cabecera_np)
+#     #print(cabecera_np.shape)
+    
+    
+#     intensidades_np = df_aux[: , :] # apartamos las intensidades
+#     #print("intensidades_np son:")
+#     #print(intensidades_np)
+#     #print(intensidades_np.shape)
+    
+#     #raman = raman_shift.to_numpy().astype(float)
+#     raman =  df.iloc[:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift) ESTE ES DEL ORIGINAL
+#     raman = raman[1:]
+#     intensidades =  intensidades_np[:, 1:].astype(float)  # Columnas restantes (intensidades)
+#     # print("RAMAN:")
+#     # print(raman)
+#     # print(raman.shape)
+#     # print("INTENSIDADES:")
+#     # print(intensidades)
+#     # print(intensidades.shape)
+#     # Filtrado del rango de las intensidades
+#     min_rango = int(input("Rango minimo: "))  # Cambia según lo que necesites
+#     max_rango = int(input("Rango maximo: "))  # Cambia según lo que necesites
+    
+    
+#     print("Procesando los datos")
+#     print("Por favor espere un momento...")
+    
+#     indices_acotados = (raman >= min_rango) & (raman <= max_rango) #retorna false o true para los que estan en el rango
+#     #print("Indices acotados")
+#     #print(indices_acotados)
+#     #print(indices_acotados.shape)
+    
+#     raman_acotado = raman[indices_acotados]
+#     intensidades_acotadas = intensidades[indices_acotados,:]
+
+    
+        
+#     # # # Imprimir resultados
+#     # print("Raman Shift Acotado:")
+#     # print(raman_acotado)
+#     # print("\nIntensidades Acotadas:")
+#     # print(intensidades_acotadas)
+        
+    
+#     # Crear un DataFrame a partir de las dos variables
+#     df_acotado = pd.DataFrame(
+#     data=np.column_stack([raman_acotado, intensidades_acotadas]),
+#     columns=["Raman Shift"] + list(cabecera_np[1:])  # Encabezados para el DataFrame
+#     )
+
+#     # Mostrar el DataFrame resultante
+#     print("df_acotado")
+#     # df_acotado = pd.DataFrame(df_acotado)
+#     print(df_acotado)
+
+
+   
+#     # Graficar los espectros
+#     plt.figure(figsize=(10, 6))
+    
+#     #print("entro en el graficador")
+#     #DESCOMENTAR EL CODIGO DE ABAJO ESE ES MIO, EL DE ARRIBA ES CHATGPT  
+         
+#     leyendas = set()  # almacenamos los tipos que enocntramos y la funcion set() nos ayuda a quer no se repitan
+#     pos_y=0
+#     for col in df_acotado.columns :
+#         if col == mostrar_tipo:
+#             for tipo in asignacion_colores:
+#                 if tipo == col :
+#                     color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
+#                     if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
+#                         if tipo in leyendas:
+#                             #print("error 1")
+#                             plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.6, linewidth = 0.1,label=col) 
+#                             '''raman_shift:LE PASAMOS TODAS LAS INTENSIDADES , df2[col]= LE PASAMOS TODAS LAS COLUMNAS CON EL MISMO TIPO'''
+#                             break
+#                         else:
+#                             #print("error 2")
+#                             #print(raman)
+#                             #print(df_acotado[col])
+#                             plt.plot(raman_acotado , df_acotado[col], color=color_actual, alpha=0.6, linewidth = 0.1) 
+#                             leyendas.add(tipo) 
+#                     pos_y+=1 
+           
+#     print("llego a graficar pero falta el plot")
+#     if op_der == 0:
+#         titulo_plot_tipo_acotado(metodo,mostrar_tipo,min_rango,max_rango,opcion) #el 0 es por el m_suavi que no esta implementado aun
+#     if derivada == 1:
+#         titulo_plot_primera_derivada(opcion,op_der)
+#     elif derivada == 2:
+#         titulo_plot_segunda_derivada(opcion,op_der)
+#     elif derivada == 3:  
+#         titulo_plot_correcion_base(opcion,op_der)
 
 
 
-def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
+
+
+
+
+def grafico_acotado_tipo(datos,raman_shift_corregido,metodo,opcion,op_der,derivada):
     
     mostrar_tipo = input("Ingrese el tipo que deseas visualizar: ")
 
@@ -2148,12 +2285,15 @@ def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
     #print(datos)
 
     df_aux = datos.to_numpy()
-        
-    print("ENTRO EN EL ESPECTRO ACOTADO222")
-    print(df_aux)
-    print(df_aux.shape)
     
-    cabecera_np = df.iloc[0,:].to_numpy()   # la primera fila contiene los encabezados
+    # print("RAMAN SHIFT CORREGIDO")
+    # print(raman_shift_corregido)
+        
+    # print("ENTRO EN EL ESPECTRO ACOTADO222")
+    # print(df_aux)
+    # print(df_aux.shape)
+    
+    cabecera_np = df.iloc[0,:].to_numpy()   # la primera fila contiene los encabezados 
     cabecera_np = cabecera_np[1:]
     #print("la cabeceras son:")
     #print(cabecera_np)
@@ -2161,17 +2301,17 @@ def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
     
     
     intensidades_np = df_aux[: , :] # apartamos las intensidades
-    #print("intensidades_np son:")
-    #print(intensidades_np)
-    #print(intensidades_np.shape)
+    # print("intensidades_np son:")
+    # print(intensidades_np)
+    # #print(intensidades_np.shape)
     
-    
-    raman =  df.iloc[:, 0].to_numpy().astype(float)  # Primera columna (Raman Shift)
-    raman = raman[1:]
-    intensidades =  intensidades_np[:, 1:].astype(float)  # Columnas restantes (intensidades)
+    #raman = raman_shift.to_numpy().astype(float)
+    raman =  raman_shift_corregido.to_numpy().astype(float)  # Primera columna (Raman Shift) ESTE ES DEL ORIGINAL
+    #raman = raman[1:]
+    intensidades =  intensidades_np.astype(float)  # Columnas restantes (intensidades)
     # print("RAMAN:")
     # print(raman)
-    # print(raman.shape)
+    # # print(raman.shape)
     # print("INTENSIDADES:")
     # print(intensidades)
     # print(intensidades.shape)
@@ -2184,9 +2324,9 @@ def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
     print("Por favor espere un momento...")
     
     indices_acotados = (raman >= min_rango) & (raman <= max_rango) #retorna false o true para los que estan en el rango
-    #print("Indices acotados")
-    #print(indices_acotados)
-    #print(indices_acotados.shape)
+    # print("Indices acotados")
+    # print(indices_acotados)
+    # print(indices_acotados.shape)
     
     raman_acotado = raman[indices_acotados]
     intensidades_acotadas = intensidades[indices_acotados,:]
@@ -2203,13 +2343,13 @@ def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
     # Crear un DataFrame a partir de las dos variables
     df_acotado = pd.DataFrame(
     data=np.column_stack([raman_acotado, intensidades_acotadas]),
-    columns=["Raman Shift"] + list(cabecera_np[1:])  # Encabezados para el DataFrame
+    columns=["Raman Shift"] + list(cabecera_np[:])  # Encabezados para el DataFrame
     )
 
-    # Mostrar el DataFrame resultante
-    print("df_acotado")
-    # df_acotado = pd.DataFrame(df_acotado)
-    print(df_acotado)
+    # # Mostrar el DataFrame resultante
+    # print("df_acotado")
+    # # df_acotado = pd.DataFrame(df_acotado)
+    # print(df_acotado)
 
 
    
@@ -2247,6 +2387,15 @@ def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
         titulo_plot_primera_derivada(opcion,op_der)
     elif derivada == 2:
         titulo_plot_segunda_derivada(opcion,op_der)
+    elif derivada == 3:  
+        titulo_plot_correcion_base(opcion,op_der)
+
+
+
+
+
+
+
 
 
 
@@ -2370,56 +2519,116 @@ def segunda_derivada(datos):
 
 
 # # # POR EL METODO DE REGRESION LINEAL
-def correcion_LineaB(dato):
-    print("NORMALIZADO-F")
-    print(dato)
-    cabecera_aux = dato.columns
-    np_corregido = dato.to_numpy()
-    df_corregido = pd.DataFrame(np_corregido)
 
-    pendientes = {}
+
+def correcion_LineaB(normalizado_f):
+    print("NORMALIZADO-F")
+    print(normalizado_f)
+
+    # Obtener los índices de las filas válidas
+    indices_validos = normalizado_f.dropna().index
+
+    # Filtrar raman_shift por los índices válidos
+    raman_shift_filtrado = raman_shift.loc[indices_validos].reset_index(drop=True)
+
+    # Filtrar normalizado_f por los índices válidos
+    normalizado_f_filtrado = normalizado_f.loc[indices_validos].reset_index(drop=True)
+
+ 
+        #print("NORMALIZADO-F")
+        #print(normalizado_f)
+    cabecera_aux = normalizado_f_filtrado.columns
+        #print("XDDDDDDDDDD")
+        #print(cabecera_aux)
+    np_corregido = normalizado_f_filtrado.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
+        #print("DF_CORREGIDO")
+        #print(np_corregido)
+        #print("DF_CORREGIDO")
+    df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
+        #print(df_corregido)
+        
+        
+      
+    pendientes = {}   # Crear un diccionario para almacenar las pendientes
     intersecciones = {}
     y_ajustados = {}
+    #dic_prueba = {}
 
-    # Definir Raman Shift
-    raman_shift = df_corregido.iloc[:, 0]
-    raman_shift = pd.to_numeric(raman_shift, errors='coerce').dropna()  # Asegurarse de que sea numérico y sin NaN
+    pos = 0  
+        # Asignar la primera columna como Raman shift
+        #raman_shift = df_corregido.iloc[:, 0]  # Primera columna
+        #print("Raman shift")
+        #print(raman_shift)
+        #print("Cant filas = ", len(raman_shift))
 
+        #y_ajustados = pd.DataFrame(raman_shift)
+        #print(y_ajustados)
+
+        #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
+        #print("RAMAN SHIFT")
+        #print(raman_shift)
+        
+        # Iterar sobre las demás columnas
     for col in df_corregido.columns:
-        intensidades = df_corregido[col]
-        intensidades = pd.to_numeric(intensidades, errors='coerce').dropna()
-
-        # Crear una máscara para limpiar ambos arrays
-        mask = ~np.isnan(raman_shift) & ~np.isnan(intensidades) & ~np.isinf(raman_shift) & ~np.isinf(intensidades)
-        raman_shift_clean = raman_shift[mask]
-        intensidades_clean = intensidades[mask]
-
-        # # Validar si los datos son suficientes para np.polyfit
-        # if len(raman_shift_clean) < 2 or len(intensidades_clean) < 2:
-        #     print(f"Datos insuficientes para realizar el ajuste en la columna {col}.")
-        #     continue
-
-        # Ajustar polinomio de grado 1
-        try:
-            coef = np.polyfit(raman_shift_clean, intensidades_clean, 1)
-        except np.linalg.LinAlgError as e:
-            print(f"Error en np.polyfit para la columna {col}: {e}")
-            coef = [0, 0]  # Coeficientes por defecto en caso de error
-
-        pendiente = coef[0]
-        interseccion = coef[1]
-        pendientes[col] = pendiente
-        intersecciones[col] = interseccion
-
-        # Calcular y ajustado
-        y_ajustado = pendiente * raman_shift_clean + interseccion
-        y_ajustados[col] = intensidades_clean - y_ajustado
-
+            intensidades = df_corregido[col]  # Extraer la columna actual
+            intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
+            #print(intensidades)
+            # print(cont)                        
+            # Calcularmos la pendiente 
+            coef = np.polyfit(raman_shift_filtrado, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
+            # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
+            pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
+            interseccion = coef[1] # La interseccion (b) esta en el indice 1 
+            # Guardamos la pendiente y intersecciones en el diccionario
+            pendientes[col] = pendiente
+            intersecciones[col] = interseccion
+            #print(raman_shift[pos])
+            #print("xD")
+            y_ajustado = []
+            for pos, intensidad in enumerate(intensidades):
+                y = pendiente * raman_shift_filtrado[pos] + interseccion  
+                #print()
+                #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
+                y_ajustado.append(y)
+                #dic_prueba.append(y)
+            y_ajustados[col] = intensidades - y_ajustado
+            #dic_prueba[col] = y_ajustado
+            #print(intensidades, "-", dic_prueba[col] , "=", y_ajustados[col])
+            #print("XDDDDDDDDDDDD")
+            #print(y_ajustado)
+            # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
+            #     pos = 0
+            #     #print("entro")
+                
+  
+            # else:
+            #     pos += 1 
+            #     #print("emtro2")
+                
+                
     df_y_ajustados = pd.DataFrame(y_ajustados)
+        #df_y_ajustados.index.name = "Raman Shift"  
+        #print(len(df_y_ajustados.columns))
+        #print(len(cabecera))
     df_y_ajustados.columns = cabecera_aux
     print("LLEGO HASTA ACA")
     print(df_y_ajustados)
-    return df_y_ajustados , raman_shift
+
+    return df_y_ajustados, raman_shift_filtrado
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # def correcion_shirley(normalizado, pca_op) :
 #     print("FALTA IMPLEMENTEAR")
