@@ -238,6 +238,8 @@ print(raman_shift)
 
 tipos = df.iloc[0, 1:] # EXTRAEMOS LA PRIMERA FILA MENOS DE LA PRIMERA COLUMNA
 #print(tipos)
+types=tipos.tolist()
+
 cant_tipos = tipos.nunique() # PARA EL EJEMPLO DE LIMPIO.CSV CANT_TIPOS TENDRA VALOR 4 YA QUE HAY 4 TIPOS (collagen,lipids,glycogen,DNA)
 #print(cant_tipos)
 tipos_nombres = df.iloc[0, 1:].unique() # OBTENEMOS LOS NOMBRES DE LOS TIPOS
@@ -824,7 +826,7 @@ def main():
                             main() 
         elif opcion == '11':
                     while True:  # Bucle para mantener al usuario en el submenú
-                      metodo = 9          
+                      metodo = 11          
                       print("1. Generar grafico PCA")
                       print("2. Volver")
                       metodo_grafico = int(input("Opcion: "))               
@@ -840,14 +842,17 @@ def main():
                                   continue 
                               dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
                               dato = dato_suavizado
+                              pca(dato,raman_shift)
                           elif correcion == 2:
                               print("FALTA IMPLEMENTAR CORRECION DE SHIRLEY")
+                              pca(dato,raman_shift)
                           else: 
                               dato,nor_op,m_suavi = menu_correccion()
+                              pca(dato,raman_shift)
                               
-                          if dato is None:  # Manejar la opción "Volver"
-                              continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                          PCA(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
+                          # if dato is None:  # Manejar la opción "Volver"
+                          #     continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                          # PCA(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
                       
                       elif metodo_grafico == 2:
                           main() 
@@ -2792,13 +2797,14 @@ def hca(dato,raman_shift):
 def loading(dato,raman_shift):
     print("IMPLEMENTAR UNA VEZ TERMINADO EL PCA")
 
-def PCA(dato,raman_shift):
+def pca(dato,raman_shift):
     print("Ingrese la cantidad de componentes principales:")
     n_componentes = int(input("n = "))
 
     
-    #print("DATOS:")
-    #print(datos)
+    print("DATOS:")
+    print(dato)
+    
     dato = dato.dropna() #eliminamos las filas con valores NAN
     #datos2 = datos.copy()
     # print("DATOS sin NaN:")
@@ -2817,7 +2823,7 @@ def PCA(dato,raman_shift):
     #datos_np = datos_df.to_numpy() # PASAMOS DE UN DATAFRAME PANDAS A UN ARRAY NUMPY
     #print(datos_np.shape)
     
-    pca = PCA(n_components=2)
+    pca = PCA(n_componentes)
     # Ajustar y transformar los datos
     dato_pca = pca.fit_transform(dato_escalado) # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
     print("DATOS PCA")
@@ -2827,30 +2833,30 @@ def PCA(dato,raman_shift):
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
-    colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in tipo]
+    colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
     plt.figure(figsize=(10, 6))
     plt.scatter(dato_pca[:, 0], dato_pca[:, 1], c=colores_pca_original, alpha=0.7)
     
     
     
-    if opcion == '1':   
-        plt.xlabel('Raman_shift')
-        plt.ylabel('Intensidad')
-        plt.title('PCA NORMALIZADA POR LA MEDIA')
-        plt.grid()
-        plt.show()
-    elif opcion == '2':
-        plt.xlabel('Raman_shift')
-        plt.ylabel('Intensidad')
-        plt.title('PCA NORMALIZADA POR AREA')
-        plt.grid()
-        plt.show()
-    else:
-        plt.xlabel('Raman_shift')
-        plt.ylabel('Intensidad')
-        plt.title('PCA SIN NORMALIZAR')
-        plt.grid()
-        plt.show()        
+    # if opcion == '1':   
+    #     plt.xlabel('Raman_shift')
+    #     plt.ylabel('Intensidad')
+    #     plt.title('PCA NORMALIZADA POR LA MEDIA')
+    #     plt.grid()
+    #     plt.show()
+    # elif opcion == '2':
+    #     plt.xlabel('Raman_shift')
+    #     plt.ylabel('Intensidad')
+    #     plt.title('PCA NORMALIZADA POR AREA')
+    #     plt.grid()
+    #     plt.show()
+    # else:
+    plt.xlabel('Raman_shift')
+    plt.ylabel('Intensidad')
+    plt.title('PCA')
+    plt.grid()
+    plt.show()        
 
 
 
