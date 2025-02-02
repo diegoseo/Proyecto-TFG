@@ -2796,10 +2796,53 @@ def hca(dato,raman_shift):
 
 def loading(dato,raman_shift):
     print("IMPLEMENTAR UNA VEZ TERMINADO EL PCA")
+    
+    
+    
+    
 
 def pca(dato,raman_shift):
-    print("Ingrese la cantidad de componentes principales:")
-    n_componentes = int(input("n = "))
+    
+    print("RAMAN SHIFT")
+    print(raman_shift)
+    print("DATO:")
+    print(dato)
+    print("Datos.shape",dato.shape)
+    
+    num_muestras , num_variables = dato.shape # EL MENOR VALOR ES LA CANTIDAD MAXIMA DE COMPORNENTES PRINCIPALES POSIBLES
+    
+    if num_muestras >= num_variables :
+        max_pc = num_variables
+    else:
+        max_pc = num_muestras
+    
+    
+    #MOSTRAMOS UN MENO DE LAS POSIBLES FORMAS DE MOSTRAR EL PCA
+    print("Como deseas Visualizar los componentes principales")
+    print("1-Elegir 2 Componentes para graficar en 2D")
+    print("2-Elegir 3 Componentes para graficar en 3D")
+    print("3- Scree Plot (Varianza Explicada)")
+    print("4- Heatmap de los componentes principales")
+    print("5-Salir")
+    visualizar_pca = int(input("Opcion = "))
+    
+    
+    
+    #### REVISAR POR QUE NO ANDA
+    print("max_pc = ", max_pc)
+    n_componentes = 0
+    while n_componentes > max_pc or n_componentes <= 0 :
+        print("Ingrese la cantidad de componentes principales:")
+        n_componentes = int(input("n = "))
+        if n_componentes > max_pc or n_componentes <= 0:
+            print("n se encuentra fuera del rango permitido ( ", max_pc , " )")
+            n_componentes = 0
+     
+    #if visualizar_pca == 1:
+    
+    ### ANALIZAR COMO MIERDA HACER LA COMBINACION DE LOS COMPONENTES PRINCIPALES
+     
+    
 
     
     print("DATOS:")
@@ -2817,15 +2860,64 @@ def pca(dato,raman_shift):
     # Escalar los datos originales
     escalado = StandardScaler() #Escalar los datos para que cada columna (intensidades en cada longitud de onda) tenga una media de 0 y una desviación estándar de 1.
     dato_escalado = escalado.fit_transform(datos_df)
-    print("DATOS ESCALADOS")  
+    print("DATOS ESCALADOS (media de 0 y una desviación estándar de 1)")  
     print(dato_escalado)
        
     #datos_np = datos_df.to_numpy() # PASAMOS DE UN DATAFRAME PANDAS A UN ARRAY NUMPY
     #print(datos_np.shape)
     
-    pca = PCA(n_componentes)
+    # Calcular matriz de covarianza
+    cov_matrix = np.cov(dato_escalado, rowvar=False)  # rowvar=False para covarianza entre variables
+    print("MATRIZ DE COVARIANZA")
+    print(cov_matrix)
+    
+
+
+    '''
+    -Eigenvalores: Representan la varianza explicada por cada componente principal.
+    -Eigenvectores: Representan las direcciones principales en las que varían los datos.
+    '''
+
+
+    '''
+    Si sumamos todos los valores originales:
+    Suma total=57.86499347+32.5730085+6.93192097+2.45224919+0.17782787=100.0
+    Suma total=57.86499347+32.5730085+6.93192097+2.45224919+0.17782787=100.0
+    
+    Pero si solo consideramos los dos primeros:
+    Suma parcial=57.86499347+32.5730085=90.43800197
+    Suma parcial=57.86499347+32.5730085=90.43800197
+    
+    Ahora, recalculamos los porcentajes en función de estos dos valores:
+    Nuevo porcentaje PC1=57.8649934790.43800197×100=63.9830516
+    Nuevo porcentaje PC1=90.4380019757.86499347​×100=63.9830516
+    Nuevo porcentaje PC2=32.573008590.43800197×100=36.0169484
+    Nuevo porcentaje PC2=90.4380019732.5730085​×100=36.0169484
+    '''
+
+
+    pca = PCA(n_components=n_componentes)
     # Ajustar y transformar los datos
     dato_pca = pca.fit_transform(dato_escalado) # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
+   
+    # Obtener Eigenvalores (Varianza explicada)
+    eigenvalores = pca.explained_variance_
+    suma_eigenvalores = sum(eigenvalores) # Hallamos su suma solo para despues ver el % de importancia
+    porcentaje_varianza = (eigenvalores / suma_eigenvalores) * 100
+    # Obtener Eigenvectores (Componentes principales)
+    eigenvectores = pca.components_ * -1 # en realidad multiplique por -1 por que quiero cambiar el orden de los signos, No afecta el resultado final
+ 
+    # Mostrar Eigenvalores
+    print("Eigenvalores (Varianza explicada):")
+    print(eigenvalores)
+   
+    # Mostrar Eigenvectores
+    print("\nEigenvectores (Componentes principales):")
+    print(eigenvectores.T)
+    
+    print("Porcentaje de Varianza Explicada por cada componente")
+    print(porcentaje_varianza)
+
     print("DATOS PCA")
     print(dato_pca)
     #print(dato_pca.shape)
