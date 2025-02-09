@@ -5,7 +5,7 @@ Created on Thu Oct 31 11:42:51 2024
 
 @author: diego
 """
-
+#eliminar "EMPESAR de seo" XD
 # main.py
 import os
 import numpy as np
