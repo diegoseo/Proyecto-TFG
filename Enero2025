@@ -2826,8 +2826,12 @@ def pca(dato,raman_shift):
     print("5-Salir")
     visualizar_pca = int(input("Opcion = "))
     
+    componentes_x = []
+    componentes_y = []
+    componentes_z = []
     
     
+
     #### REVISAR POR QUE NO ANDA
     print("max_pc = ", max_pc)
     n_componentes = 0
@@ -2842,6 +2846,7 @@ def pca(dato,raman_shift):
     
     ### ANALIZAR COMO MIERDA HACER LA COMBINACION DE LOS COMPONENTES PRINCIPALES
      
+  
     
 
     
@@ -2922,6 +2927,72 @@ def pca(dato,raman_shift):
     print(dato_pca)
     #print(dato_pca.shape)
 
+    
+      
+    if visualizar_pca == 1:
+        print("INGRESE LOS COMPONENTES PRINCIPALES QUE DESEAS VISUALIZAR EN 2D")
+        while True:
+            pc = input(f"Ingrese un número de Componente Principal para el eje X (1-{n_componentes}) o 'salir' para continuar: ")
+            if pc.lower() == "salir":
+                break
+            if pc.isdigit() and 1 <= int(pc) <= n_componentes:
+                componentes_x.append(int(pc) - 1)
+            else:
+                print("⚠ Número fuera de rango. Intente de nuevo.")
+
+        # Selección de componentes para el eje Y
+        while True:
+            pc = input(f"Ingrese un número de Componente Principal para el eje Y (1-{n_componentes}) o 'salir' para finalizar: ")
+            if pc.lower() == "salir":
+                break
+            if pc.isdigit() and 1 <= int(pc) <= n_componentes:
+                componentes_y.append(int(pc) - 1)
+            else:
+                print("⚠ Número fuera de rango. Intente de nuevo.")
+    elif visualizar_pca == 2:
+        print("INGRESE LOS COMPONENTES PRINCIPALES QUE DESEAS VISUALIZAR EN 3D")
+        while True:
+            pc = input(f"Ingrese un número de Componente Principal para el eje X (1-{n_componentes}) o 'salir' para continuar: ")
+            if pc.lower() == "salir":
+                break
+            if pc.isdigit() and 1 <= int(pc) <= n_componentes:
+                componentes_x.append(int(pc) - 1)
+            else:
+                print("⚠ Número fuera de rango. Intente de nuevo.")
+
+        # Selección de componentes para el eje Y
+        while True:
+            pc = input(f"Ingrese un número de Componente Principal para el eje Y (1-{n_componentes}) o 'salir' para continuar: ")
+            if pc.lower() == "salir":
+                break
+            if pc.isdigit() and 1 <= int(pc) <= n_componentes:
+                componentes_y.append(int(pc) - 1)
+            else:
+                print("⚠ Número fuera de rango. Intente de nuevo.")
+
+        # Selección de componentes para el eje Z
+        while True:
+            pc = input(f"Ingrese un número de Componente Principal para el eje Z (1-{n_componentes}) o 'salir' para finalizar: ")
+            if pc.lower() == "salir":
+                break
+            if pc.isdigit() and 1 <= int(pc) <= n_componentes:
+                componentes_z.append(int(pc) - 1)
+            else:
+                print("⚠ Número fuera de rango. Intente de nuevo.")
+
+    
+    
+    
+    
+    print("x= ",componentes_x)
+    print("y= ",componentes_y)
+    print("z= ",componentes_z)
+    
+    
+    
+    
+    
+    
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
