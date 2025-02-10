@@ -2991,9 +2991,63 @@ def pca(dato,raman_shift):
     
     
     if visualizar_pca == 1:
-        eje_x = dato_pca[:,componentes_x]
+        eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS 
+        eje_y = dato_pca[:,componentes_y]
+        print("Valores para el EJE X")
+        print(eje_x[:5])
+        print("Valores para el EJE Y")
+        print(eje_y[:5])
+        
+        # PREGUNTAR SI ESTE TEME DE LAS OPERACIONES MATEMATICAS SI TIENE SENTIDO O NO Y COMO RESOLVERLO
+        
+        if len(eje_x >= 2) :
+            print("Como deseas combinar los componentes principales en X")
+            print("1. Suma")
+            print("2. Multiplicacion")
+            print("3. Promedio")
+            op_aritmetica_x = int(input("Operacion:"))
+            
+        if len(eje_y >= 2) :
+            print("Como deseas combinar los componentes principales en Y")
+            print("1. Suma")
+            print("2. Multiplicacion")
+            print("3. Promedio")
+            op_aritmetica_y = int(input("Operacion:"))
+            
+    elif visualizar_pca == 2:
+        eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS 
+        eje_y = dato_pca[:,componentes_y]
+        eje_z = dato_pca[:,componentes_z]
+        print("Valores para el EJE X")
+        print(eje_x[:5])
+        print("Valores para el EJE Y")
+        print(eje_y[:5])
+        print("Valores para el EJE Z")
+        print(eje_z[:5])
     
-    print(eje_x)
+        # PREGUNTAR SI ESTE TEME DE LAS OPERACIONES MATEMATICAS SI TIENE SENTIDO O NO Y COMO RESOLVERLO
+        
+        if len(eje_x >= 2) :
+            print("Como deseas combinar los componentes principales en X")
+            print("1. Suma")
+            print("2. Multiplicacion")
+            print("3. Promedio")
+            op_aritmetica_x = int(input("Operacion:"))
+            
+        if len(eje_y >= 2) :
+            print("Como deseas combinar los componentes principales en Y")
+            print("1. Suma")
+            print("2. Multiplicacion")
+            print("3. Promedio")
+            op_aritmetica_y = int(input("Operacion:"))
+    
+        if len(eje_z >= 2) :
+            print("Como deseas combinar los componentes principales en Z")
+            print("1. Suma")
+            print("2. Multiplicacion")
+            print("3. Promedio")
+            op_aritmetica_z = int(input("Operacion:"))
+    
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
