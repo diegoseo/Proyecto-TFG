@@ -2938,7 +2938,7 @@ def pca(dato,raman_shift):
             if pc.isdigit() and 1 <= int(pc) <= n_componentes:
                 componentes_x.append(int(pc) - 1)
             else:
-                print("⚠ Número fuera de rango. Intente de nuevo.")
+                print("Número fuera de rango. Intente de nuevo.")
 
         # Selección de componentes para el eje Y
         while True:
@@ -2948,7 +2948,7 @@ def pca(dato,raman_shift):
             if pc.isdigit() and 1 <= int(pc) <= n_componentes:
                 componentes_y.append(int(pc) - 1)
             else:
-                print("⚠ Número fuera de rango. Intente de nuevo.")
+                print("Número fuera de rango. Intente de nuevo.")
     elif visualizar_pca == 2:
         print("INGRESE LOS COMPONENTES PRINCIPALES QUE DESEAS VISUALIZAR EN 3D")
         while True:
@@ -2958,7 +2958,7 @@ def pca(dato,raman_shift):
             if pc.isdigit() and 1 <= int(pc) <= n_componentes:
                 componentes_x.append(int(pc) - 1)
             else:
-                print("⚠ Número fuera de rango. Intente de nuevo.")
+                print("Número fuera de rango. Intente de nuevo.")
 
         # Selección de componentes para el eje Y
         while True:
@@ -2968,7 +2968,7 @@ def pca(dato,raman_shift):
             if pc.isdigit() and 1 <= int(pc) <= n_componentes:
                 componentes_y.append(int(pc) - 1)
             else:
-                print("⚠ Número fuera de rango. Intente de nuevo.")
+                print("Número fuera de rango. Intente de nuevo.")
 
         # Selección de componentes para el eje Z
         while True:
@@ -2978,7 +2978,7 @@ def pca(dato,raman_shift):
             if pc.isdigit() and 1 <= int(pc) <= n_componentes:
                 componentes_z.append(int(pc) - 1)
             else:
-                print("⚠ Número fuera de rango. Intente de nuevo.")
+                print("Número fuera de rango. Intente de nuevo.")
 
     
     
@@ -2990,9 +2990,10 @@ def pca(dato,raman_shift):
     
     
     
+    if visualizar_pca == 1:
+        eje_x = dato_pca[:,componentes_x]
     
-    
-    
+    print(eje_x)
     
     
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
