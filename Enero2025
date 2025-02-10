@@ -3007,12 +3007,39 @@ def pca(dato,raman_shift):
             print("3. Promedio")
             op_aritmetica_x = int(input("Operacion:"))
             
+            if op_aritmetica_x == 1:
+                suma_x = np.sum(eje_x, axis=1)
+                print("SUMA X")
+                print(suma_x[:5])
+            elif op_aritmetica_x == 2:
+                mult_x = np.prod(eje_x, axis=1)
+                print("MULTIPLICACION X")
+                print(mult_x[:5])
+            elif op_aritmetica_x == 3:
+                prom_x = np.mean(eje_x, axis=1)
+                print("PROMEDIO X")
+                print(prom_x[:5])
+            
         if len(eje_y >= 2) :
             print("Como deseas combinar los componentes principales en Y")
             print("1. Suma")
             print("2. Multiplicacion")
             print("3. Promedio")
             op_aritmetica_y = int(input("Operacion:"))
+            
+            if op_aritmetica_y == 1:
+                suma_y = np.sum(eje_y, axis=1)
+                print("SUMA Y")
+                print(suma_y[:5])
+            elif op_aritmetica_y == 2:
+                mult_y = np.prod(eje_y, axis=1)
+                print("MULTIPLICACION Y")
+                print(mult_y[:5])
+            elif op_aritmetica_y == 3:
+                prom_y = np.mean(eje_y, axis=1)
+                print("PROMEDIO Y")
+                print(prom_y[:5])
+            
             
     elif visualizar_pca == 2:
         eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS 
@@ -3034,12 +3061,38 @@ def pca(dato,raman_shift):
             print("3. Promedio")
             op_aritmetica_x = int(input("Operacion:"))
             
+            if op_aritmetica_x == 1:
+                suma_x = np.sum(eje_x, axis=1)
+                print("SUMA X")
+                print(suma_x[:5])
+            elif op_aritmetica_x == 2:
+                mult_x = np.prod(eje_x, axis=1)
+                print("MULTIPLICACION X")
+                print(mult_x[:5])
+            elif op_aritmetica_x == 3:
+                prom_x = np.mean(eje_x, axis=1)
+                print("PROMEDIO X")
+                print(prom_x[:5])
+            
         if len(eje_y >= 2) :
             print("Como deseas combinar los componentes principales en Y")
             print("1. Suma")
             print("2. Multiplicacion")
             print("3. Promedio")
             op_aritmetica_y = int(input("Operacion:"))
+            
+            if op_aritmetica_y == 1:
+                suma_y = np.sum(eje_y, axis=1)
+                print("SUMA Y")
+                print(suma_y[:5])
+            elif op_aritmetica_y == 2:
+                mult_y = np.prod(eje_y, axis=1)
+                print("MULTIPLICACION Y")
+                print(mult_y[:5])
+            elif op_aritmetica_y == 3:
+                prom_y = np.mean(eje_y, axis=1)
+                print("PROMEDIO Y")
+                print(prom_y[:5])
     
         if len(eje_z >= 2) :
             print("Como deseas combinar los componentes principales en Z")
@@ -3047,6 +3100,26 @@ def pca(dato,raman_shift):
             print("2. Multiplicacion")
             print("3. Promedio")
             op_aritmetica_z = int(input("Operacion:"))
+            
+            if op_aritmetica_z == 1:
+                suma_z = np.sum(eje_z, axis=1)
+                print("SUMA Z")
+                print(suma_z[:5])
+            elif op_aritmetica_z == 2:
+                mult_z = np.prod(eje_z, axis=1)
+                print("MULTIPLICACION Z")
+                print(mult_z[:5])
+            elif op_aritmetica_z == 3:
+                prom_z = np.mean(eje_z, axis=1)
+                print("PROMEDIO Z")
+                print(prom_z[:5])
+    
+        
+    
+    # AHORA QUE TEMGO TODO CALCULADO NECESITO GRAFICARLO Y PARA ESO NECESITO UNIR TODO DENTRO DE UN DATAFRAME 
+    # LOS VALORES DE X ,Y ,Z 
+    
+    
     
     
     
