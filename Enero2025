@@ -28,7 +28,7 @@ import importlib
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import pearsonr, spearmanr
-
+from mpl_toolkits.mplot3d import Axes3D    # PARA GRAFICAR EN 3D
 
 pila = []
 
@@ -2826,12 +2826,14 @@ def pca(dato,raman_shift):
     print("5-Salir")
     visualizar_pca = int(input("Opcion = "))
     
+
     componentes_x = []
     componentes_y = []
     componentes_z = []
     
-    
 
+    
+    
     #### REVISAR POR QUE NO ANDA
     print("max_pc = ", max_pc)
     n_componentes = 0
@@ -2841,13 +2843,14 @@ def pca(dato,raman_shift):
         if n_componentes > max_pc or n_componentes <= 0:
             print("n se encuentra fuera del rango permitido ( ", max_pc , " )")
             n_componentes = 0
+        elif n_componentes == 1:
+            print("N debe ser distinto de 1")
+            n_componentes = 0
      
     #if visualizar_pca == 1:
     
     ### ANALIZAR COMO MIERDA HACER LA COMBINACION DE LOS COMPONENTES PRINCIPALES
      
-  
-    
 
     
     print("DATOS:")
@@ -2991,8 +2994,8 @@ def pca(dato,raman_shift):
     
     
     if visualizar_pca == 1:
-        eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS 
-        eje_y = dato_pca[:,componentes_y]
+        eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS , GUARDA TODAS LAS FILAS PERO SOLO LAS COLUMNAS QUE ESTAN ENUMERADAS DENTRO DEL DICCIONARIO
+        eje_y = dato_pca[:,componentes_y]  # GUARDAMOS DENTRO DE UN DICCIONARIO LOS DATOS SELECCIONADO PARA EL EJE X
         print("Valores para el EJE X")
         print(eje_x[:5])
         print("Valores para el EJE Y")
@@ -3000,7 +3003,7 @@ def pca(dato,raman_shift):
         
         # PREGUNTAR SI ESTE TEME DE LAS OPERACIONES MATEMATICAS SI TIENE SENTIDO O NO Y COMO RESOLVERLO
         
-        if len(eje_x >= 2) :
+        if len(componentes_x) >=2  :
             print("Como deseas combinar los componentes principales en X")
             print("1. Suma")
             print("2. Multiplicacion")
@@ -3008,19 +3011,27 @@ def pca(dato,raman_shift):
             op_aritmetica_x = int(input("Operacion:"))
             
             if op_aritmetica_x == 1:
-                suma_x = np.sum(eje_x, axis=1)
+                #suma_x = np.sum(eje_x, axis=1)
+                col_x = np.sum(eje_x, axis=1)
                 print("SUMA X")
-                print(suma_x[:5])
+                print(col_x[:5])
             elif op_aritmetica_x == 2:
-                mult_x = np.prod(eje_x, axis=1)
+                #mult_x = np.prod(eje_x, axis=1)
+                col_x = np.prod(eje_x, axis=1)
                 print("MULTIPLICACION X")
-                print(mult_x[:5])
+                print(col_x[:5])
             elif op_aritmetica_x == 3:
-                prom_x = np.mean(eje_x, axis=1)
+                #prom_x = np.mean(eje_x, axis=1)
+                col_x = np.mean(eje_x, axis=1)
                 print("PROMEDIO X")
-                print(prom_x[:5])
-            
-        if len(eje_y >= 2) :
+                print(col_x[:5])
+        else :
+             col_x = eje_x
+             op_aritmetica_x = 4 # PUSE  4 PARA QUE ENTRE EN EL ELSE DE LABEL_X POR EJEMPLO
+             print("COL X")
+             print(col_x[:5])
+             
+        if len(componentes_y) >=2  :
             print("Como deseas combinar los componentes principales en Y")
             print("1. Suma")
             print("2. Multiplicacion")
@@ -3028,19 +3039,33 @@ def pca(dato,raman_shift):
             op_aritmetica_y = int(input("Operacion:"))
             
             if op_aritmetica_y == 1:
-                suma_y = np.sum(eje_y, axis=1)
+                #suma_y = np.sum(eje_y, axis=1)
+                col_y = np.sum(eje_y, axis=1)
                 print("SUMA Y")
-                print(suma_y[:5])
+                print(col_y[:5])
+                
             elif op_aritmetica_y == 2:
-                mult_y = np.prod(eje_y, axis=1)
+                #mult_y = np.prod(eje_y, axis=1)
+                col_y = np.prod(eje_y, axis=1)
                 print("MULTIPLICACION Y")
-                print(mult_y[:5])
+                print(col_y[:5])
             elif op_aritmetica_y == 3:
-                prom_y = np.mean(eje_y, axis=1)
+                #prom_y = np.mean(eje_y, axis=1)
+                col_y = np.mean(eje_y, axis=1)
                 print("PROMEDIO Y")
-                print(prom_y[:5])
-            
-            
+                print(col_y[:5])
+        else :
+            col_y = eje_y
+            op_aritmetica_y = 4
+            print("COL Y")
+            print(col_y[:5])
+                     
+           
+        dato_pca = np.column_stack((col_x,col_y)) #FORMAMOS DE VUELTA LA MATRIZ DE COMPONENTES PRINCIPALES PERO EN 2D Y CON LAS OPERACIONES YA  HECHAS
+        print("DATOS PCA FINAL 2D")
+        print(dato_pca)
+        
+        
     elif visualizar_pca == 2:
         eje_x = dato_pca[:,componentes_x]  # YA FUNCIONA, AHORA FALTA HACER LOS CALCULOS MATEMATICOS 
         eje_y = dato_pca[:,componentes_y]
@@ -3054,7 +3079,8 @@ def pca(dato,raman_shift):
     
         # PREGUNTAR SI ESTE TEME DE LAS OPERACIONES MATEMATICAS SI TIENE SENTIDO O NO Y COMO RESOLVERLO
         
-        if len(eje_x >= 2) :
+        if len(componentes_x) >=2 :
+            print("len(eje_x)=",len(eje_x))
             print("Como deseas combinar los componentes principales en X")
             print("1. Suma")
             print("2. Multiplicacion")
@@ -3062,19 +3088,24 @@ def pca(dato,raman_shift):
             op_aritmetica_x = int(input("Operacion:"))
             
             if op_aritmetica_x == 1:
-                suma_x = np.sum(eje_x, axis=1)
+                col_x = np.sum(eje_x, axis=1)
                 print("SUMA X")
-                print(suma_x[:5])
+                print(col_x[:5])
             elif op_aritmetica_x == 2:
-                mult_x = np.prod(eje_x, axis=1)
+                col_x = np.prod(eje_x, axis=1)
                 print("MULTIPLICACION X")
-                print(mult_x[:5])
+                print(col_x[:5])
             elif op_aritmetica_x == 3:
-                prom_x = np.mean(eje_x, axis=1)
+                col_x = np.mean(eje_x, axis=1)
                 print("PROMEDIO X")
-                print(prom_x[:5])
+                print(col_x[:5])
+        else :
+                col_x = eje_x
+                op_aritmetica_x = 4 # puse cualquier numero PARA QUE ENTRE EN EL ELSE DE LABEL YA QUE NO REALIZO NINGUNA OPERACION PERO IGUAL NECESITA TENER UN VALOR
+                print("COL X")
+                print(col_x[:5])
             
-        if len(eje_y >= 2) :
+        if len(componentes_y) >=2  :
             print("Como deseas combinar los componentes principales en Y")
             print("1. Suma")
             print("2. Multiplicacion")
@@ -3082,19 +3113,24 @@ def pca(dato,raman_shift):
             op_aritmetica_y = int(input("Operacion:"))
             
             if op_aritmetica_y == 1:
-                suma_y = np.sum(eje_y, axis=1)
+                col_y = np.sum(eje_y, axis=1)
                 print("SUMA Y")
-                print(suma_y[:5])
+                print(col_y[:5])
             elif op_aritmetica_y == 2:
-                mult_y = np.prod(eje_y, axis=1)
+                col_y = np.prod(eje_y, axis=1)
                 print("MULTIPLICACION Y")
-                print(mult_y[:5])
+                print(col_y[:5])
             elif op_aritmetica_y == 3:
-                prom_y = np.mean(eje_y, axis=1)
+                col_y = np.mean(eje_y, axis=1)
                 print("PROMEDIO Y")
-                print(prom_y[:5])
+                print(col_y[:5])
+        else :
+                col_y = eje_y
+                op_aritmetica_y = 4
+                print("COL Y")
+                print(col_y[:5])
     
-        if len(eje_z >= 2) :
+        if len(componentes_z) >=2  :
             print("Como deseas combinar los componentes principales en Z")
             print("1. Suma")
             print("2. Multiplicacion")
@@ -3102,52 +3138,128 @@ def pca(dato,raman_shift):
             op_aritmetica_z = int(input("Operacion:"))
             
             if op_aritmetica_z == 1:
-                suma_z = np.sum(eje_z, axis=1)
+                col_z = np.sum(eje_z, axis=1)
                 print("SUMA Z")
-                print(suma_z[:5])
+                print(col_z[:5])
             elif op_aritmetica_z == 2:
-                mult_z = np.prod(eje_z, axis=1)
+                col_z = np.prod(eje_z, axis=1)
                 print("MULTIPLICACION Z")
-                print(mult_z[:5])
+                print(col_z[:5])
             elif op_aritmetica_z == 3:
-                prom_z = np.mean(eje_z, axis=1)
+                col_z = np.mean(eje_z, axis=1)
                 print("PROMEDIO Z")
-                print(prom_z[:5])
+                print(col_z[:5])
+        else :
+                col_z = eje_z
+                op_aritmetica_z = 4
+                print("COL Z")
+                print(col_z[:5])
     
-        
+    
+        dato_pca = np.column_stack((col_x,col_y,col_z)) #FORMAMOS DE VUELTA LA MATRIZ DE COMPONENTES PRINCIPALES PERO EN 2D Y CON LAS OPERACIONES YA  HECHAS
+        print("DATOS PCA FINAL 3D")
+        print(dato_pca)
     
     # AHORA QUE TEMGO TODO CALCULADO NECESITO GRAFICARLO Y PARA ESO NECESITO UNIR TODO DENTRO DE UN DATAFRAME 
     # LOS VALORES DE X ,Y ,Z 
     
     
     
-    
-    
     #print("Varianza explicada por cada componente:", pca.explained_variance_ratio_)
-    colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
-    plt.figure(figsize=(10, 6))
-    plt.scatter(dato_pca[:, 0], dato_pca[:, 1], c=colores_pca_original, alpha=0.7)
-    
-    
-    
-    # if opcion == '1':   
-    #     plt.xlabel('Raman_shift')
-    #     plt.ylabel('Intensidad')
-    #     plt.title('PCA NORMALIZADA POR LA MEDIA')
-    #     plt.grid()
-    #     plt.show()
-    # elif opcion == '2':
-    #     plt.xlabel('Raman_shift')
-    #     plt.ylabel('Intensidad')
-    #     plt.title('PCA NORMALIZADA POR AREA')
-    #     plt.grid()
-    #     plt.show()
-    # else:
-    plt.xlabel('Raman_shift')
-    plt.ylabel('Intensidad')
-    plt.title('PCA')
-    plt.grid()
-    plt.show()        
+   
+    if visualizar_pca == 1:
+        
+        #### TODAS ESTAS CONDICIONALES ES LOS PARA QUE EN EL LOS EJER DEL GRAFICO SALGA IGUAL LA OPERACIONES DE LOS PCA QUE INGRESO EL USUARIO
+        
+        if op_aritmetica_x == 1:
+            label_x = "+".join([f"PC{c+1}" for c in componentes_x])
+        elif op_aritmetica_x == 2:
+            label_x = "*".join([f"PC{c+1}" for c in componentes_x]) 
+        elif op_aritmetica_x == 3:  
+            label_x = "+".join([f"PC{c+1}" for c in componentes_x])  # Une los componentes con "+"
+            label_x = f"{label_x} / {len(componentes_x)}"  # Agrega la cantidad total de componentes
+        else:
+            label_x = "".join([f"PC{c+1}" for c in componentes_x])  
+
+        if op_aritmetica_y == 1:
+            label_y = "+".join([f"PC{c+1}" for c in componentes_y])
+        elif op_aritmetica_y == 2:
+            label_y = "*".join([f"PC{c+1}" for c in componentes_y]) 
+        elif op_aritmetica_y == 3:  
+            label_y = "+".join([f"PC{c+1}" for c in componentes_y])  
+            label_y = f"{label_y} / {len(componentes_y)}"  
+
+        else:
+            label_y = "".join([f"PC{c+1}" for c in componentes_y])  
+            
+            
+        colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
+        plt.figure(figsize=(10, 6))
+        plt.scatter(dato_pca[:, 0], dato_pca[:, 1], c=colores_pca_original, alpha=0.7)
+        
+        plt.xlabel(label_x)
+        plt.ylabel(label_y)
+        plt.title('Análisis de Componentes Principales 2D de ' + archivo_nombre) # + por que plt.tittle solo acepta un argumento por lo que hay que concatenar
+        plt.grid()
+        plt.show()  
+    elif visualizar_pca == 2:
+        
+        if op_aritmetica_x == 1:
+            label_x = "+".join([f"PC{c+1}" for c in componentes_x])
+        elif op_aritmetica_x == 2:
+            label_x = "*".join([f"PC{c+1}" for c in componentes_x]) 
+        elif op_aritmetica_x == 3:  
+            label_x = "+".join([f"PC{c+1}" for c in componentes_x])  
+            label_x = f"{label_x} / {len(componentes_x)}"  
+        else:
+            label_x = "".join([f"PC{c+1}" for c in componentes_x])  
+
+        if op_aritmetica_y == 1:
+            label_y = "+".join([f"PC{c+1}" for c in componentes_y])
+        elif op_aritmetica_y == 2:
+            label_y = "*".join([f"PC{c+1}" for c in componentes_y]) 
+        elif op_aritmetica_y == 3:  
+            label_y = "+".join([f"PC{c+1}" for c in componentes_y])  
+            label_y = f"{label_y} / {len(componentes_y)}"  
+        else:
+            label_y = "".join([f"PC{c+1}" for c in componentes_y])  
+            
+        if op_aritmetica_z == 1:
+            label_z = "+".join([f"PC{c+1}" for c in componentes_z])
+        elif op_aritmetica_z == 2:
+            label_z = "*".join([f"PC{c+1}" for c in componentes_z]) 
+        elif op_aritmetica_z == 3:  
+            label_z = "+".join([f"PC{c+1}" for c in componentes_z])  
+            label_z = f"{label_z} / {len(componentes_z)}"  
+        else:
+            label_z = "".join([f"PC{c+1}" for c in componentes_z])  
+            
+                           
+        colores_pca_original = [asignacion_colores.get(type_, 'black') for type_ in types]
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Graficamos por cada columna de dato_pca
+        ax.scatter(dato_pca[:, 0], dato_pca[:, 1], dato_pca[:, 2], c=colores_pca_original, alpha=0.7)
+        
+        # Etiquetamos de los ejes
+        ax.set_xlabel(label_x)
+        ax.set_ylabel(label_y)
+        ax.margins(z=0.2)  # Agrega margen extra en el eje Z
+        ax.set_zlabel(label_z, rotation=95)
+        plt.tight_layout()
+
+        # Título del plot
+        ax.set_title('Análisis de Componentes Principales 3D de ' + archivo_nombre)
+        plt.show()
+
+
+
+
+
+
+
+
 
 
 
