@@ -868,7 +868,8 @@ def main():
                     while True:  # Bucle para mantener al usuario en el submenú
                       metodo = 9          
                       print("1. Generar grafico Dendrograma")
-                      print("2. Volver")
+                      print("2. Ver informe PCA")
+                      print("3. Volver")
                       metodo_grafico = int(input("Opcion: "))               
                       if metodo_grafico == 1:
                           dato,nor_op ,m_suavi = menu_correccion()
@@ -3352,7 +3353,7 @@ def pca(dato, raman_shift):
     print("Cómo deseas visualizar los componentes principales:")
     print("1 - Elegir 2 Componentes para graficar en 2D")
     print("2 - Elegir 3 Componentes para graficar en 3D")
-    print("3 - Salir")
+    print("3- Salir")
     visualizar_pca = int(input("Opción = "))
 
     if visualizar_pca == 3:
@@ -3408,7 +3409,9 @@ def pca(dato, raman_shift):
         eje_y = dato_pca[:, componentes_y] #CARGAMOS LAS COORDENADAS EN X QUE CARGO EL USUARIO
         dato_pca = np.column_stack((eje_x, eje_y)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
 
-
+        eje_z = "No Aporta" # SOLO PARA QUE APAREZCA ESE MENSAJE EN EL ARCHIVO
+        porcentaje_varianza_z = "No Aporta" # SOLO PARA QUE APAREZCA ESE MENSAJE EN EL ARCHIVO
+        componentes_z = "No Aporta" # SOLO PARA QUE APAREZCA ESE MENSAJE EN EL ARCHIVO
         # ESTA PARTE ES SOLO PARA APARTAR SU PORCENTAJE DENTRO DE UNA VARIABLE Y ENVIAR AL GRAFICADOR PARA QUE APAREZCA EN LOS EJES DEL GRAFICO EL %
         porcentaje_varianza_x = porcentaje_varianza[componentes_x]
         print("PORCENTAJE DE VARIANZA X", porcentaje_varianza_x)
@@ -3446,6 +3449,32 @@ def pca(dato, raman_shift):
     # LLAMAMOS A LAS FUNCIONES PARA GRAFICA
     # COMO plot_pca_2d(dato_pca) ES EN 2D TIENE QUE LLAMAR A LA FUNCION generar_elipse
     # COMO plot_pca_3d(dato_pca) ES EN 3D TIENE QUE LLAMAR A LA FUNCION generar_elipsoide
+    with open("informe_pca3.txt", "a", encoding="utf-8") as file:
+        file.write("INFORME SOBRE EL PCA.\n")
+        file.write("-------------------------\n")
+        file.write(f"Ingrese la cantidad de componentes principales (1-{max_pc}): {n_componentes}\n")
+        file.write("Eigenvalores\n")
+        file.write(f"{eigenvalores}")
+        file.write("\nEigenvectores\n")
+        file.write(f"{eigenvectores.T}\n")
+        file.write("Porcentaje de Varianza Explicada por cada componente\n")
+        file.write(f"{porcentaje_varianza}\n")
+        file.write(f"Componente Principal para eje X = {componentes_x[0]+1}\n")
+        file.write(f"Componente Principal para eje Y = {componentes_y[0]+1}\n")
+        if visualizar_pca == 1:
+            file.write("Componente Principal para eje Z = No aporta\n")
+        elif visualizar_pca == 2:
+            file.write(f"Componente Principal para eje Z = {componentes_z[0]+1}\n")
+        file.write(f"Eje X = \n {eje_x}\n")
+        file.write(f"Eje Y = \n {eje_y}\n")
+        file.write(f"Eje Z = \n {eje_z}\n")
+        file.write(f"Porcentajes de Varianza X = {porcentaje_varianza_x[0]}\n")
+        file.write(f"Porcentajes de Varianza Y = {porcentaje_varianza_y[0]}\n")
+        file.write(f"Porcentajes de Varianza Z = {porcentaje_varianza_z[0]}\n")
+        file.write("RESULTADO PCA\n")
+        file.write(f"{dato_pca}")
+
+        
     if visualizar_pca == 1:
         plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y)
     elif visualizar_pca == 2:
@@ -3477,6 +3506,8 @@ def plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes
     print(df_pca)
     
     intervalo_confianza = (float(input("INGRESE EL INTERVALO DE CONFIAZA % = ")))/100
+    with open("informe_pca.txt", "a", encoding="utf-8") as file:
+        file.write(f"\nIntervalo de confianza = {intervalo_confianza}")
     # Crear la figura en Plotly
     fig = go.Figure()
     
@@ -3640,7 +3671,8 @@ def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)',in
         #GENERAR EL .CSV CON TODOS LOS DATOS POSIBLES DE LOS PCA
         #CORREGIR EL DEMDOGRAMA POR QUE SALE MUY FEO
         # tira error al querer normalizar el archivo de LucasNo.csv
-
+        #terminr de cargar el archivo
+        
 
 if __name__ == "__main__":
      main()
