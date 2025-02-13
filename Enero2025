@@ -3344,18 +3344,18 @@ def pca(dato, raman_shift):
     # print("Datos PCA:")
     # print(dato[:5])  # Muestra las primeras 5 filas
 
-    num_muestras, num_variables = dato.shape
+    num_muestras, num_variables = dato.shape #OBTENEMOS LA CANTIDAD DE  FILAS Y COLUMNAS
 
-    max_pc = min(num_muestras, num_variables)
+    max_pc = min(num_muestras, num_variables) #CANTIDAD MAXIMA DE N ES EL MENOR NUMERO
 
 
     print("Cómo deseas visualizar los componentes principales:")
     print("1 - Elegir 2 Componentes para graficar en 2D")
     print("2 - Elegir 3 Componentes para graficar en 3D")
-    print("5 - Salir")
+    print("3 - Salir")
     visualizar_pca = int(input("Opción = "))
 
-    if visualizar_pca == 5:
+    if visualizar_pca == 3:
         return
 
     componentes_x = []
@@ -3368,27 +3368,54 @@ def pca(dato, raman_shift):
             break
         print(f"n debe estar entre 2 y {max_pc}.")
 
-    # Preprocesamiento y PCA
-    dato = dato.dropna()
-    datos_df = dato.transpose()
-    escalado = StandardScaler()
+
+    dato = dato.dropna() #eliminamos las filas con valores NAN
+    datos_df = dato.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
+    escalado = StandardScaler()  #Escalar los datos para que cada columna (intensidades en cada longitud de onda) tenga una media de 0 y una desviación estándar de 1.
     dato_escalado = escalado.fit_transform(datos_df)
 
     pca = PCA(n_components=n_componentes)
-    dato_pca = pca.fit_transform(dato_escalado)
+    dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
     # print("Datos PCA:")
     # print(dato_pca[:5])  
+
+
+    # Obtener Eigenvalores (Varianza explicada)
+    eigenvalores = pca.explained_variance_
+    suma_eigenvalores = sum(eigenvalores) # Hallamos su suma solo para despues ver el % de importancia
+    porcentaje_varianza = (eigenvalores / suma_eigenvalores) * 100
+    # Obtener Eigenvectores (Componentes principales)
+    eigenvectores = pca.components_ * -1 # en realidad multiplique por -1 por que quiero cambiar el orden de los signos, No afecta el resultado final
+ 
+    # Mostrar Eigenvalores
+    print("Eigenvalores (Varianza explicada):")
+    print(eigenvalores)
+   
+    # Mostrar Eigenvectores
+    print("\nEigenvectores (Componentes principales):")
+    print(eigenvectores.T)
+    
+    print("Porcentaje de Varianza Explicada por cada componente")
+    print(porcentaje_varianza)
+
+
+
 
     if visualizar_pca == 1: # lee los datos para el 2D
         componentes_x = [int(input(f"Ingrese el número de PC para X (1-{n_componentes}): ")) - 1]
         componentes_y = [int(input(f"Ingrese el número de PC para Y (1-{n_componentes}): ")) - 1]
-        eje_x = dato_pca[:, componentes_x]
-        eje_y = dato_pca[:, componentes_y]
+        eje_x = dato_pca[:, componentes_x] #CARGAMOS LAS COORDENADAS EN X QUE CARGO EL USUARIO
+        eje_y = dato_pca[:, componentes_y] #CARGAMOS LAS COORDENADAS EN X QUE CARGO EL USUARIO
         dato_pca = np.column_stack((eje_x, eje_y)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
 
-    
-        print("x= ",componentes_x)
-        print("y= ",componentes_y)
+
+        # ESTA PARTE ES SOLO PARA APARTAR SU PORCENTAJE DENTRO DE UNA VARIABLE Y ENVIAR AL GRAFICADOR PARA QUE APAREZCA EN LOS EJES DEL GRAFICO EL %
+        porcentaje_varianza_x = porcentaje_varianza[componentes_x]
+        print("PORCENTAJE DE VARIANZA X", porcentaje_varianza_x)
+        porcentaje_varianza_y = porcentaje_varianza[componentes_y]
+        print("PORCENTAJE DE VARIANZA Y", porcentaje_varianza_y)
+        # print("x= ",componentes_x)
+        # print("y= ",componentes_y)
 
     
 
@@ -3402,19 +3429,31 @@ def pca(dato, raman_shift):
         
         dato_pca = np.column_stack((eje_x, eje_y, eje_z)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
 
-        
+
+
+        # ESTA PARTE ES SOLO PARA APARTAR SU PORCENTAJE DENTRO DE UNA VARIABLE Y ENVIAR AL GRAFICADOR PARA QUE APAREZCA EN LOS EJES DEL GRAFICO EL %
+        porcentaje_varianza_x = porcentaje_varianza[componentes_x]
+        print("PORCENTAJE DE VARIANZA X", porcentaje_varianza_x)
+        porcentaje_varianza_y = porcentaje_varianza[componentes_y]
+        print("PORCENTAJE DE VARIANZA Y", porcentaje_varianza_y)
+        porcentaje_varianza_z = porcentaje_varianza[componentes_z]
+        print("PORCENTAJE DE VARIANZA Z", porcentaje_varianza_z)
     #     print("x= ",componentes_x)
     #     print("y= ",componentes_y)
     #     print("z= ",componentes_z)
         
+    
+    # LLAMAMOS A LAS FUNCIONES PARA GRAFICA
+    # COMO plot_pca_2d(dato_pca) ES EN 2D TIENE QUE LLAMAR A LA FUNCION generar_elipse
+    # COMO plot_pca_3d(dato_pca) ES EN 3D TIENE QUE LLAMAR A LA FUNCION generar_elipsoide
     if visualizar_pca == 1:
-        plot_pca_2d_with_ellipses(dato_pca)
+        plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y)
     elif visualizar_pca == 2:
-        graficar_pca_3d(dato_pca)
+        plot_pca_3d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,porcentaje_varianza_z,componentes_x,componentes_y,componentes_z)
 
 
 
-def plot_pca_2d_with_ellipses(dato_pca):
+def plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y):
     """
     Realiza PCA, grafica en 2D y dibuja elipses de confianza para cada tipo.
     """
@@ -3426,45 +3465,60 @@ def plot_pca_2d_with_ellipses(dato_pca):
     # pca = PCA(n_components=n_componentes)
     # dato_pca = pca.fit_transform(dato_escalado)
     
-    # Convertir a DataFrame
-    df_pca = pd.DataFrame(dato_pca, columns=['PC1', 'PC2'])
+    
+    
+    df_pca = pd.DataFrame(dato_pca, columns=['PC1', 'PC2']) # Convertir a DataFrame
     df_pca['Tipo'] = types  # Agregar tipo de cada punto
     
     
     print("Cantidad de puntos para graficar:", len(df_pca))
     print("Tipos:", df_pca['Tipo'].unique())
-
+    print("DF_PCA")
+    print(df_pca)
     
-    
+    intervalo_confianza = (float(input("INGRESE EL INTERVALO DE CONFIAZA % = ")))/100
     # Crear la figura en Plotly
     fig = go.Figure()
     
     # Agregar puntos de dispersión
-    for tipo in np.unique(types):
-        indices = df_pca['Tipo'] == tipo
+    for tipo in np.unique(types): #OBTENEMOS LOS TIPOS DE LOS DATOS PERO SIN REPETIR COMO COLLAGEN,GLYCOGEN,DNA
+        print("TIPO")
+        print(tipo)
+        indices = df_pca['Tipo'] == tipo #FILTRA DATOS QUE COINCIDE CON TIPO, EJEMPLO: TIPO=LIPIDS Y SI df_pca['Tipo'] NO ES EL MISMO TIPO TIRA FALSO
+        print("INDICES")
+        print(indices)
         fig.add_trace(go.Scatter(
-            x=df_pca.loc[indices, 'PC1'],
-            y=df_pca.loc[indices, 'PC2'],
+            x=df_pca.loc[indices, 'PC1'], # Usa los valores de PC1 del tipo actual. Selecciona solo las filas donde indices es True, es decir, solo los puntos de ese tipo
+            y=df_pca.loc[indices, 'PC2'], #  Usa los valores de PC2 del tipo actual. Selecciona solo las filas donde indices es True, es decir, solo los puntos de ese tipo
             mode='markers',
             marker=dict(size=5, color=asignacion_colores[tipo], opacity=0.7),
-            name=f'Tipo {tipo}'
+            name=f'Tipo {tipo}' # PARA LA LEYENDA
+            
         ))
     
+    
         # Calcular el centro y la covarianza del grupo
-        datos_tipo = df_pca.loc[indices, ['PC1', 'PC2']].to_numpy()
-        centro = np.mean(datos_tipo, axis=0)
-        cov = np.cov(datos_tipo.T)
+        datos_tipo = df_pca.loc[indices, ['PC1', 'PC2']].to_numpy() # CONVERTIMOS LOS DATOS DEL TIPO ACTUAL A NUMPY
+        print("DATOS_TIPO")
+        print(datos_tipo[:5])
+        centro = np.mean(datos_tipo, axis=0) # CALCULAMOS LA MEDIA DE PC1 Y PC2 OSEA SERIA EL CENTRO DEL GRUPO 
+        print("CENTRO",centro) 
+        cov = np.cov(datos_tipo.T) #CALCULA LA MATRIZ DE COVARIANZA PARA TENER LA FORMA Y ORIENTACION DEL ELIPSE
+        #print("DATOS_TIPO_T (transpuesta)")
+        #print(datos_tipo.T[:5])
+        print("COV: ubicar estas coordenadas en el grafico para saber el limite del tamanio de la elipse") # cov es covarianza
+        print(cov)
         
-        # Generar la elipse de confianza
-        if datos_tipo.shape[0] > 2:  # Asegurar que haya suficientes puntos
-            elipse = generar_elipse(centro, cov, color=asignacion_colores[tipo])
+        
+        if datos_tipo.shape[0] > 2:  # nos aseguramos de que haya suficientes puntos, tiene ser  un minimo de 2, por logica no puede ser 1 ya que como vas a halla el promedio de un solo numero, La media de un solo punto sigue siendo el mismo punto
+            elipse = generar_elipse(centro, cov, color=asignacion_colores[tipo], intervalo_confianza = intervalo_confianza)
             fig.add_trace(elipse)
     
     # Configurar los ejes y el título
     fig.update_layout(
         title=f'Análisis de Componentes Principales 2D de {archivo_nombre}',
-        xaxis_title='PC1',
-        yaxis_title='PC2',
+        xaxis_title= f'PC{componentes_x[0]+1} {porcentaje_varianza_x[0]:.2f}%',
+        yaxis_title= f'PC{componentes_y[0]+1} {porcentaje_varianza_y[0]:.2f}%',
         margin=dict(l=0, r=0, b=0, t=40)
     )
     
@@ -3472,21 +3526,23 @@ def plot_pca_2d_with_ellipses(dato_pca):
     fig.show(renderer="svg")
 
 
-def graficar_pca_3d(dato_pca):
+# RECIBE MUCHOS PARAMETROS SOLO POR QUE QUIERO QUE SALGA LINDO EL NOMBRE DE LOS EJES
+def plot_pca_3d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,porcentaje_varianza_z,componentes_x,componentes_y,componentes_z):
 
     df_pca = pd.DataFrame(dato_pca, columns=['PC1', 'PC2', 'PC3'])
     df_pca['Tipo'] = types
 
     # print("Cantidad de puntos para graficar:", len(df_pca))
     # print("Tipos:", df_pca['Tipo'].unique())
+    
+    intervalo_confianza = (float(input("INGRESE EL INTERVALO DE CONFIAZA % = ")))/100
 
-
-    fig = go.Figure()
+    fig = go.Figure() #Usas Plotly
 
     for tipo in np.unique(types):
         indices = df_pca['Tipo'] == tipo
         fig.add_trace(go.Scatter3d(
-            x=df_pca.loc[indices, 'PC1'],
+            x=df_pca.loc[indices, 'PC1'], # Usa los valores de PC1 del tipo actual. Selecciona solo las filas donde indices es True, es decir, solo los puntos de ese tipo
             y=df_pca.loc[indices, 'PC2'],
             z=df_pca.loc[indices, 'PC3'],
             mode='markers',
@@ -3499,16 +3555,16 @@ def graficar_pca_3d(dato_pca):
         if datos_tipo.shape[0] > 3:
             centro = np.mean(datos_tipo, axis=0)
             cov = np.cov(datos_tipo.T)
-            elipsoide = generar_elipsoide(centro, cov, asignacion_colores[tipo])
+            elipsoide = generar_elipsoide(centro, cov, asignacion_colores[tipo],intervalo_confianza = intervalo_confianza)
             fig.add_trace(elipsoide)
 
-    # Configuración de la gráfica
+
     fig.update_layout(
         title=f'Análisis de Componentes Principales 3D de {archivo_nombre}',
         scene=dict(
-            xaxis_title='PC1',
-            yaxis_title='PC2',
-            zaxis_title='PC3'
+            xaxis_title= f'PC{componentes_x[0]+1} {porcentaje_varianza_x[0]:.2f}%',# PARA LA ETIQUETAS
+            yaxis_title= f'PC{componentes_y[0]+1} {porcentaje_varianza_y[0]:.2f}%',
+            zaxis_title= f'PC{componentes_z[0]+1} {porcentaje_varianza_z[0]:.2f}%',
         ),
         margin=dict(l=0, r=0, b=0, t=40)
     )
@@ -3516,12 +3572,13 @@ def graficar_pca_3d(dato_pca):
     fig.show(renderer="browser") 
 
 
-def generar_elipsoide(centro, cov, color='rgba(150,150,150,0.3)'):
+def generar_elipsoide(centro, cov, color='rgba(150,150,150,0.3)',intervalo_confianza = 0.95):
     
-    #Genera un elipsoide de confianza basado en la media y covarianza del grupo.
+    print("INTERVALO CONFIANZA")
+    print(intervalo_confianza)
     
     U, S, _ = np.linalg.svd(cov)
-    radii = np.sqrt(chi2.ppf(0.999, df=3) * S) # 0.999 para que encierre lo mas que pueda todas las muestras dentro del elipsoide
+    radii = np.sqrt(chi2.ppf(intervalo_confianza, df=3) * S) # 0.999 para que encierre lo mas que pueda todas las muestras dentro del elipsoide
 
     u = np.linspace(0, 2 * np.pi, 30)
     v = np.linspace(0, np.pi, 30)
@@ -3538,35 +3595,51 @@ def generar_elipsoide(centro, cov, color='rgba(150,150,150,0.3)'):
 
 
 
-
-def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)'):
-    """Genera un trazo de Plotly con una elipse de confianza basada en la covarianza."""
+# num_puntos=100: Número de puntos para dibujar la elipse.
+# color='rgba(150,150,150,0.3)': Color de la elipse (por defecto, gris semitransparente).
+def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)',intervalo_confianza = 0.95):
+    
+    print("INTERVALO CONFIANZA")
+    print(intervalo_confianza)
+        
+    #Descompone en valores singulares (SVD) la matriz de covarianza cov:
+    #         U: Matriz de rotación (eigenvectores).
+    #         S: Valores singulares (eigenvalores, escalas de la elipse).
+    #         _: No se usa la tercera matriz de la descomposición.
+    #¿Por qué SVD?
+    #     U nos da la orientación de la elipse.
+    #     S nos da las escalas (los radios) de la elipse.
+    
+    # Determina hasta dónde se extiende la elipse en cada dirección para cubrir el 95% (o el porcentaje elegido) de los datos.
     U, S, _ = np.linalg.svd(cov)
-    radii = np.sqrt(chi2.ppf(0.95, df=2) * S)  # Intervalo de confianza del 95%, ESTE TIENE QUE METER EL USUARIO 95%
+    radii = np.sqrt(chi2.ppf(intervalo_confianza, df=2) * S)  # Intervalo de confianza del 95%, ESTE TIENE QUE METER EL USUARIO 95%
     
     theta = np.linspace(0, 2 * np.pi, num_puntos)
     x = np.cos(theta)
     y = np.sin(theta)
     
-    # Transformar coordenadas para adaptarlas a la covarianza
+    #     np.array([x, y]).T → Crea una matriz de (num_puntos, 2) con las coordenadas originales.
+    # np.diag(radii) → Escala los puntos en las direcciones correctas.
+    # @ U.T → Rota la elipse usando la matriz de eigenvectores.
+    # + centro → Mueve la elipse al centro adecuado.
+    
     elipse = np.array([x, y]).T @ np.diag(radii) @ U.T + centro
     
     return go.Scatter(
-        x=elipse[:, 0],
-        y=elipse[:, 1],
-        mode='lines',
-        line=dict(color=color, width=2),
+        x=elipse[:, 0], # Coordenadas X de la elipse.
+        y=elipse[:, 1], # Coordenadas Y de la elipse.
+        mode='lines', #Dibuja líneas en lugar de puntos.
+        line=dict(color=color, width=2), # Define el color y grosor de la línea.
         showlegend=False
     )
 
 
-        # TAREA PARA LA OFI
+        # TAREA 
         #BUSCAR LA FORMA DE QUE GRAFIQUE DENTRO DEL SPYDER EL 3D
-        # poner el porcentaje de confianza  alado de los ejes
         #CORREGIR EL TEMA DEL AREA QUE ESTA MULTIPLICANDO POR -1
         #GENERAR EL .CSV CON TODOS LOS DATOS POSIBLES DE LOS PCA
         #CORREGIR EL DEMDOGRAMA POR QUE SALE MUY FEO
-
+        # tira error al querer normalizar el archivo de LucasNo.csv
 
 
 if __name__ == "__main__":
