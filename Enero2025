@@ -56,15 +56,48 @@ archivo_nombre = input("Ingrese el nombre del archivo: ")
 
  
 
-# Función para detectar el delimitador automáticamente por que los archivos pueden estar ceparados por , o ; etc
+# # Función para detectar el delimitador automáticamente por que los archivos pueden estar ceparados por , o ; etc
+# def identificar_delimitador(archivo):
+#     with open(archivo, 'r') as file:
+#         muestra_csv = file.read(4096)  # Lee una muestra de 4096 bytes
+#         #print("LA MUESTRA DEL CSV ES:")
+#         #print(muestra_csv)
+#         caracter = csv.Sniffer()
+#         delimitador = caracter.sniff(muestra_csv).delimiter
+#     return delimitador
+
+
+
 def identificar_delimitador(archivo):
-    with open(archivo, 'r') as file:
-        muestra_csv = file.read(4096)  # Lee una muestra de 4096 bytes
-        #print("LA MUESTRA DEL CSV ES:")
-        #print(muestra_csv)
-        caracter = csv.Sniffer()
-        delimitador = caracter.sniff(muestra_csv).delimiter
-    return delimitador
+    """Detecta el delimitador en un archivo de texto automáticamente."""
+    with open(archivo, 'r', encoding="utf-8", newline='') as file:
+        muestra_csv = file.read(4096)  # Leer una muestra del archivo
+
+        # Si el archivo está vacío, retornar None
+        if not muestra_csv:
+            return None
+
+        # Intentar detectar delimitador con csv.Sniffer
+        try:
+            caracter = csv.Sniffer()
+            delimitador = caracter.sniff(muestra_csv).delimiter
+            return delimitador
+        except csv.Error:
+            # Si Sniffer falla, probar manualmente con delimitadores comunes
+            delimitadores_comunes = [",", ";", "\t", "|", " "]
+            for delim in delimitadores_comunes:
+                if delim in muestra_csv:
+                    return delim  # Retorna el primer delimitador encontrado
+            return None  # Si no detecta ningún delimitador
+
+    delim = archivo
+    
+    if delim:
+        print(f"El delimitador detectado es: '{repr(delim)}'")  # repr() muestra caracteres invisibles como \t
+    else:
+        print("No se pudo detectar un delimitador válido.")
+    
+    
 
 
 
@@ -224,9 +257,8 @@ def mostrar_menu():
      print("9. CORRECCION BASE LINEAL")
      print("10. CORRECION SHIRLEY")
      print("11. PCA")
-     print("12. GRAFICO DE LOADINGS")
-     print("13. GRAFICO HCA")
-     print("14. Salir")
+     print("12. GRAFICO HCA")
+     print("13. Salir")
       
 def sub_menu():
     print("Como deseas ver el espectro")
@@ -852,7 +884,7 @@ def main():
                                   continue 
                               dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
                               dato = dato_suavizado
-                              pca(dato,raman_shift)
+                              pca(dato,raman_shift) 
                           elif correcion == 2:
                               print("FALTA IMPLEMENTAR CORRECION DE SHIRLEY")
                               pca(dato,raman_shift)
@@ -865,22 +897,8 @@ def main():
                           # PCA(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
                       elif metodo_grafico == 2:
                           main() 
-                          
-        elif opcion == '12':
-                    while True:  # Bucle para mantener al usuario en el submenú
-                      metodo = 9          
-                      print("1. Generar grafico Dendrograma")
-                      print("2. Volver")
-                      metodo_grafico = int(input("Opcion: "))               
-                      if metodo_grafico == 1:
-                          dato,nor_op ,m_suavi = menu_correccion()
-                          if dato is None:  # Manejar la opción "Volver"
-                              continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                          loading(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
-                      elif metodo_grafico == 2:
-                          main() 
-                          
-        elif opcion == '13':  #PARA EL HCA DA LAS OPCIONES DE NORMALIZAR,SUAVIZAR,DERIVAR PERO NO LA DE CORREGIR QUE ESTARIA FALTANDO
+    
+        elif opcion == '12':  #PARA EL HCA DA LAS OPCIONES DE NORMALIZAR,SUAVIZAR,DERIVAR PERO NO LA DE CORREGIR QUE ESTARIA FALTANDO
                       while True:  # Bucle para mantener al usuario en el submenú
                         metodo = 9          
                         print("1. Generar grafico Dendrograma")
@@ -894,7 +912,7 @@ def main():
                         elif metodo_grafico == 2:
                             main() 
                       
-        elif opcion == '14':
+        elif opcion == '13':
             print("Saliendo del programa...")
             sys.exit()  # Termina completamente el programa
         else:
@@ -3403,16 +3421,27 @@ def pca(dato, raman_shift):
 
     max_pc = min(num_muestras, num_variables) #CANTIDAD MAXIMA DE N ES EL MENOR NUMERO
 
-
+    aux = 0
     print("Cómo deseas visualizar los componentes principales:")
     print("1 - Elegir 2 Componentes para graficar en 2D")
     print("2 - Elegir 3 Componentes para graficar en 3D")
-    print("3- Salir")
+    print("3.  Grafico de Loanding")
+    print("4- Salir")
     visualizar_pca = int(input("Opción = "))
 
-    if visualizar_pca == 3:
+    if visualizar_pca == 4:
         return
-
+    elif visualizar_pca == 3:
+        aux = 1 # su unica funcion es cambiar el valor de visualizar_pca a 3 cuando esta dentro de las condicionales de visualizar_pca = a y 1 o 2 cuando es llamado por la opcion loanding 
+        print("Cuantos Componentes principales deseas visualizar?")
+        print("1. Dos PCA")
+        print("2. Tres PCA")
+        cant_pca = int(input("Cantidad Pca = "))
+        if cant_pca == 1:
+            visualizar_pca = 1
+        elif cant_pca == 2:
+            visualizar_pca = 2
+        
     componentes_x = []
     componentes_y = []
     componentes_z = []
@@ -3429,10 +3458,18 @@ def pca(dato, raman_shift):
     escalado = StandardScaler()  #Escalar los datos para que cada columna (intensidades en cada longitud de onda) tenga una media de 0 y una desviación estándar de 1.
     dato_escalado = escalado.fit_transform(datos_df)
 
+    print("dato escalado dentro de la funcio de pca")
+    print(dato_escalado.shape)
+
+
     pca = PCA(n_components=n_componentes)
     dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
-    # print("Datos PCA:")
-    # print(dato_pca[:5])  
+    # El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
+    #y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
+    print("Datos_PCA xd:")
+    print(dato_pca[:5]) 
+    print("pca.components_PCAAA")
+    print(pca.components_)
 
 
     # Obtener Eigenvalores (Varianza explicada)
@@ -3473,7 +3510,12 @@ def pca(dato, raman_shift):
         print("PORCENTAJE DE VARIANZA Y", porcentaje_varianza_y)
         # print("x= ",componentes_x)
         # print("y= ",componentes_y)
-
+        if aux == 1:
+            visualizar_pca = 3 # pongo 3 para que se vaya a la funcion de grafica loanding una vez obtenido los datos
+            componente_seleccionado = [componentes_x[0] , componentes_y[0]]
+            
+        print("DATO PCA")
+        print(dato_pca)
     
 
     elif visualizar_pca == 2: # lee los datos para el 3D
@@ -3485,8 +3527,13 @@ def pca(dato, raman_shift):
         eje_z = dato_pca[:, componentes_z]
         
         dato_pca = np.column_stack((eje_x, eje_y, eje_z)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
-
-
+        
+        print("DATO PCA")
+        print(dato_pca)
+        if aux == 1:
+            visualizar_pca = 3 # pongo 3 para que se vaya a la funcion de grafica loanding una vez obtenido los datos
+            componente_seleccionado = [componentes_x[0] , componentes_y[0] , componentes_z[0]]
+    
 
         # ESTA PARTE ES SOLO PARA APARTAR SU PORCENTAJE DENTRO DE UNA VARIABLE Y ENVIAR AL GRAFICADOR PARA QUE APAREZCA EN LOS EJES DEL GRAFICO EL %
         porcentaje_varianza_x = porcentaje_varianza[componentes_x]
@@ -3544,7 +3591,8 @@ def pca(dato, raman_shift):
         plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y)
     elif visualizar_pca == 2:
         plot_pca_3d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,porcentaje_varianza_z,componentes_x,componentes_y,componentes_z)
-
+    elif visualizar_pca == 3:
+        grafico_loading(pca, raman_shift, componente_seleccionado)
 
 
 def plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y):
@@ -3721,14 +3769,75 @@ def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)',in
     )
 
 
-        # TAREA 
-        #BUSCAR LA FORMA DE QUE GRAFIQUE DENTRO DEL SPYDER EL 3D
-        #CORREGIR EL TEMA DEL AREA QUE ESTA MULTIPLICANDO POR -1
-        #GENERAR EL .CSV CON TODOS LOS DATOS POSIBLES DE LOS PCA
-        #CORREGIR EL DEMDOGRAMA POR QUE SALE MUY FEO
-        # tira error al querer normalizar el archivo de LucasNo.csv
-        #terminr de cargar el archivo
-        #CREO QUE EL GRAFICO MIS ARCHIVOS .CSV QUE GENERO NO FUNCIONA EN ORANGE POR QUE LA CELDA 0,0 NO DICE RAMANSHITF
+
+
+
+
+def grafico_loading(pca, raman_shift, op_pca):
+    print("selected_components=",op_pca)
+    print("PCA dentro de la función de loading")
+    print(pca)
+
+    plt.figure(figsize=(10, 6))
+
+    # if not hasattr(pca, 'components_'):
+    #     raise ValueError("El objeto PCA proporcionado no tiene componentes. Asegúrate de pasar el modelo PCA y no los datos transformados.")
+
+
+
+
+    #pca = PCA(n_components=n_componentes)
+    #dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
+    ## El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
+    ##y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
+    loadings = pca.components_  # Obtener los loadings
+    print("pca.components_")
+    print(pca.components_)
+    print("LOADING")
+    print(loadings)
+    print("LOADING.shape")
+    print(loadings.shape)
+    n_componentes = loadings.shape[0]  # Número de componentes principales
+    print(" n_components=", n_componentes)
+    # Asegurar que `selected_components` sea una lista de enteros
+    # if isinstance(selected_components, int):  
+    #     selected_components = [selected_components]  # Convertir a lista si es un solo número
+
+    # if not isinstance(selected_components, list):
+    #     raise ValueError("Los componentes seleccionados deben ser una lista de índices.")
+
+    for i in op_pca:  
+        if not isinstance(i, int):  
+            raise ValueError(f"El índice de componente debe ser un entero, pero se recibió {type(i)}.")
+        if i >= n_componentes:
+            print(f"Advertencia: PC {i+1} no existe en los datos de PCA.")
+            continue
+
+        print("Dimensión de raman_shift:", raman_shift.shape)
+        print("Dimensión de PCA components:", loadings.shape)
+        print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
+        print(loadings[i, :])
+        plt.plot(raman_shift, loadings[i, :], label=f'PC {i+1}')
+
+    plt.xlabel('Raman Shift (cm⁻¹)')
+    plt.ylabel('Loading')
+    plt.title('Loading Plot para PCA y Raman Shift')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
+    #TAREA
+    #HACER CODIGO DE SHIRLEY
+    #CORREGIR EL DEDROGRAMA
+    #CORREGIR TODOS LOS ERRORES QUE TIRA AL MOVER ATRAS
+    #CORREGIR EL TEMA DEL AREA QUE ESTA MULTIPLICANDO POR -1
+    #CORREGIR EL DEMDOGRAMA POR QUE SALE MUY FEO
+    # tira error al querer normalizar el archivo de LucasNo.csv
+    #CREO QUE EL GRAFICO MIS ARCHIVOS .CSV QUE GENERO NO FUNCIONA EN ORANGE POR QUE LA CELDA 0,0 NO DICE RAMANSHITF
+
+
+
 
 if __name__ == "__main__":
      main()
