@@ -33,7 +33,7 @@ from scipy.stats import pearsonr, spearmanr
 from mpl_toolkits.mplot3d import Axes3D    # PARA GRAFICAR EN 3D
 import webbrowser
 from scipy.stats import chi2 # PARA GRAFICAR LOS ELIPSOIDES
-
+import matplotlib.ticker as ticker # PARA QUE EL EJE X MUESTRE EN ALGUN INTERVALO Y NO SALGA ENCIMADO (SE USO EN LOS GRAFICOS DE LOADINGS)
 #from mayavi import mlab
 
 
@@ -863,8 +863,61 @@ def main():
                             descargar_csv_acotado_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                         elif metodo_grafico == 9:
                             main() 
-       # elif opcion == '10':
-                    #shirley_correction(raman_shift, intensity)
+        elif opcion == '10':
+                     while True:  # Bucle para mantener al usuario en el submenú
+                       metodo = 10         
+                       sub_menu()
+                       metodo_grafico = int(input("Opcion: "))               
+                       if metodo_grafico == 1:
+                           dato,nor_op ,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
+                           mostrar_espectros(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,4)
+                       elif metodo_grafico == 2:
+                           dato,nor_op,m_suavi= menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           espectro_acotado(dato_suavizado,raman_shift_corregido,0,nor_op,m_suavi,4)
+                       elif metodo_grafico == 3:
+                           dato,nor_op,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           grafico_tipo(dato_suavizado,raman_shift_corregido,nor_op,metodo,m_suavi,4)
+                       elif metodo_grafico == 4:
+                           dato,nor_op,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           grafico_acotado_tipo(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,4)
+                       elif metodo_grafico == 5:
+                               dato,nor_op,m_suavi = menu_correccion()
+                               if dato is None:  # Manejar la opción "Volver"
+                                   continue 
+                               dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                               descargar_csv(10, dato_suavizado,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE CORRECCION LINEAL
+                       elif metodo_grafico == 6:
+                           dato,nor_op,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           descargar_csv_acotado(dato_suavizado,10,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE LA CORRECCION BASE LINEAL                          
+                       elif metodo_grafico == 7:
+                           dato,nor_op,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           descargar_csv_tipo(dato_suavizado,10,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                       elif metodo_grafico == 8:
+                           dato,nor_op,m_suavi = menu_correccion()
+                           if dato is None:  # Manejar la opción "Volver"
+                               continue 
+                           dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
+                           descargar_csv_acotado_tipo(dato_suavizado,10,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
+                       elif metodo_grafico == 9:
+                           main() 
         
         elif opcion == '11':
                     while True:  # Bucle para mantener al usuario en el submenú
@@ -1160,6 +1213,12 @@ def descargar_csv(normalizado,dato,raman_shift_actual):
     elif normalizado == 8:
         df_aux.to_csv('output_segunda_derivada.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_segunda_derivada.csv")
+    elif normalizado == 9:
+        df_aux.to_csv('output_correcionBase.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_correcionBase.csv")
+    elif normalizado == 10:
+        df_aux.to_csv('output_correcionShirley.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_correcionShirley.csv")
 
 
 
@@ -1231,7 +1290,10 @@ def descargar_csv_acotado(datos, opcion,raman_shift_actual):   # ESTA PARTE SE P
     elif opcion == 9:
         df_acotado.to_csv('output_acotado_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_corregido.csv")
-                            
+    elif opcion == 10:
+        df_acotado.to_csv('output_acotado_Shirley.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_Shirley.csv")
+                                    
         
         
         
@@ -1283,6 +1345,10 @@ def descargar_csv_tipo(datos,opcion,raman_shift_actual):
     elif opcion == 9:
         datos_filtrados.to_csv('output_tipo_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_corregido.csv")
+    elif opcion == 10:
+        datos_filtrados.to_csv('output_tipo_shirley.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_tipo_shirley.csv")
+
 
 
 
@@ -1374,6 +1440,9 @@ def descargar_csv_acotado_tipo(datos,opcion,raman_shift_actual):
     elif opcion == 9:
         datos_acotado_tipo.to_csv('output_acotado_tipo_corregido.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_corregido.csv")
+    elif opcion == 10:
+        datos_acotado_tipo.to_csv('output_acotado_tipo_corregidoShirley.csv', index=False, header=True)# Guardarmos el DataFrame en un archivo CSV
+        print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_acotado_tipo_corregidoShirley.csv")
 
 
 
@@ -1419,6 +1488,8 @@ def mostrar_espectros(datos,raman_shift,metodo,nor_op,op_der,derivada): # LA VAR
         titulo_plot_segunda_derivada(nor_op,op_der)
     elif derivada == 3:  # PARA QUE VAYA AL PLOT DE CORRECION DE LINEA BASE OPCION 9
         titulo_plot_correcion_base(nor_op,op_der)
+    elif derivada == 4:
+        titulo_plot_correcion_shirley(nor_op,op_der)
 
 
 
@@ -2202,6 +2273,72 @@ def titulo_plot_correcion_base(nor_op,metodo_suavizado):
         
 
 
+def titulo_plot_correcion_shirley(nor_op,metodo_suavizado):
+    print("entro aca")
+    if nor_op == 1:
+        if metodo_suavizado == 1:
+            print("correccopn xDDDD")
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por la media ')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Sin Suavizar y Normalizado por la media ')
+            plt.show()
+    elif nor_op  == 2:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por Area')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley  del archivo {bd_name} Sin Suavizar y Normalizado por Area')
+            plt.show()
+    else:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y sin Normalizar ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Suavizado por MEDIA MOVIL y sin Normalizar')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion de Shirley del archivo {bd_name} Sin Suavizar y sin Normalizar')
+            plt.show()
 
 def grafico_tipo(datos,raman_shift,nor_op,metodo,op_der,derivada):
 
@@ -2244,6 +2381,8 @@ def grafico_tipo(datos,raman_shift,nor_op,metodo,op_der,derivada):
         titulo_plot_segunda_derivada(metodo,op_der)
     elif derivada == 3:
         titulo_plot_correcion_base(nor_op,op_der)
+    elif derivada == 4:
+        titulo_plot_correcion_shirley(nor_op,op_der)
 
 
 # def grafico_acotado_tipo(datos,raman_shift,metodo,opcion,op_der,derivada):
@@ -2476,6 +2615,8 @@ def grafico_acotado_tipo(datos,raman_shift_corregido,metodo,opcion,op_der,deriva
         titulo_plot_segunda_derivada(opcion,op_der)
     elif derivada == 3:  
         titulo_plot_correcion_base(opcion,op_der)
+    elif derivada == 4:
+        titulo_plot_correcion_shirley(opcion,op_der)
 
 
 
@@ -2605,58 +2746,8 @@ def segunda_derivada(datos):
 
 
 
-def shirley_correction(raman_shift, intensity):
-    """
-    Aplica la corrección de Shirley para un espectro.
-    Parameters:
-        raman_shift (array-like): Valores del eje X (Raman Shift).
-        intensity (array-like): Intensidades del espectro (eje Y).
-    Returns:
-        corrected_intensity (array-like): Intensidades corregidas.
-    """
-#     if len(raman_shift) != len(intensity):
-#         raise ValueError(f"Dimensiones no coinciden: {len(raman_shift)} vs {len(intensity)}")
-#     corrected_intensity = intensity.copy()
-#     start = corrected_intensity[0]
-#     end = corrected_intensity[-1]
-#     for _ in range(100):  # Máximo 100 iteraciones
-#         background = start + (end - start) * np.cumsum(corrected_intensity) / np.sum(corrected_intensity)
-#         corrected_intensity = intensity - background
-#         corrected_intensity[corrected_intensity < 0] = 0  # Evitar valores negativos
-#     return corrected_intensity
-# # Aplicar corrección de Shirley y almacenar datos corregidos
-# corrected_spectra = {}
-# for category, cols in categories.items():
-#     for col in cols:
-#         intensity = df[col].values
-        
-#         # Ajustar longitud si es necesario
-#         if len(intensity) < num_points:
-#             print(f"⚠️ Advertencia: La columna {col} tiene menos datos ({len(intensity)}). Se rellenará con ceros.")
-#             intensity = np.pad(intensity, (0, num_points - len(intensity)), constant_values=0)
-#         elif len(intensity) > num_points:
-#             print(f"⚠️ Advertencia: La columna {col} tiene más datos ({len(intensity)}). Se recortará.")
-#             intensity = intensity[:num_points]
-#         corrected_spectra[col] = shirley_correction(raman_shift, intensity)
-# # Convertir a DataFrame
-# df_corrected = pd.DataFrame(corrected_spectra)
-# df_corrected.insert(0, 'Ramanshift', raman_shift)
-# # Asignar colores dinámicamente usando Matplotlib
-# unique_categories = list(categories.keys())
-# color_map = plt.colormaps.get_cmap("tab10")
-# category_colors = {category: color_map(i / max(1, len(unique_categories) - 1)) for i, category in enumerate(unique_categories)}
-# # Graficar con colores por tipo detectado
-# plt.figure(figsize=(14, 10))
-# for category, cols in categories.items():
-#     for col in cols:
-#         plt.plot(df_corrected['Ramanshift'], df_corrected[col], alpha=0.6, 
-#                  label=category if col == cols[0] else "", color=category_colors[category])
-# plt.title("Espectros Raman Corregidos (Shirley)", fontsize=16)
-# plt.xlabel("Raman Shift (cm⁻¹)", fontsize=14)
-# plt.ylabel("Intensidad Corregida", fontsize=14)
-# plt.legend()
-# plt.grid(True)
-# plt.show()
+def correcion_Shirley(normalizado_f,raman_shift, tol=1e-5, max_iter=100, debug=False):
+    print("FALTA IMPLEMENTAR LA FUCION, LOS MENU Y OPCIONES DE DESCARGAS YA ESTAN TODOS IMPLEMTADO, SOLO FALTA EL DF CORREGIDO POR SHIRLEY PARA RETORNAR A LA FUNCION QUE GRAFICA")
 
 
 
@@ -2782,6 +2873,8 @@ def correcion_LineaB(normalizado_f):
 # Spearman: Para medir relaciones monótonas entre vectores continuos.
 # Jaccard: Para medir similitudes/diferencias en datos binarios o categóricos.
 
+import plotly.figure_factory as ff
+import scipy.cluster.hierarchy as sch
 
 def hca(dato,raman_shift):
     print("Datos:")
@@ -2805,33 +2898,49 @@ def hca(dato,raman_shift):
         if m_dis == 1:
             nombre_plot= "Euclidiana"
             distancia = pdist(datos.T, metric='euclidean')  # Transponer porque queremos calcular entre columnas
-            
+            print("DISTANCIA")
+            print(distancia)
+            df_distancias = pd.DataFrame(squareform(distancia), index=datos.T.index, columns=datos.T.index)
+            # 📌 Guardar la matriz de distancias en un archivo de texto
+            ruta_archivo = "matriz_distancias.txt"
+            df_distancias.to_csv(ruta_archivo, sep='\t', index=True)
             # # Convertir a matriz cuadrada (opcional)
             # distancia_cuadrada = squareform(distancia_euclidiana)
             
         elif m_dis == 2:
             nombre_plot= "Manhattan"
             distancia = pdist(datos.T, metric='cityblock')  # Transponer porque queremos calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
         elif m_dis == 3:
             nombre_plot= "Coseno"
             distancia = pdist(datos.T, metric='cosine')  # Transponer para calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
         elif m_dis == 4:
             nombre_plot= "Chebyshev"
             distancia = pdist(datos.T, metric='chebyshev')  # Transponer para calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
         elif m_dis == 5:
             nombre_plot= "Pearson"
             correlacion_pearson = datos.corr(method='pearson') # Calcular la matriz de correlación de Pearson
             distancia_pearson = 1 - correlacion_pearson # Convertir correlación en distancia: d = 1 - r
             distancia = squareform(distancia_pearson)  # Convertir la matriz de distancias en formato condensado
+            print("DISTANCIA")
+            print(distancia)
         elif m_dis == 6:  
             nombre_plot= "Spearman"
             correlacion_spearman = datos.corr(method='spearman')  # Calcular la matriz de correlación de Spearman
             distancia_spearman = 1 - correlacion_spearman # Convertir correlación en distancia: d = 1 - r
             distancia = squareform(distancia_spearman) # Convertir la matriz de distancias en formato condensado
+            print("DISTANCIA")
+            print(distancia)
         elif m_dis == 7:
             nombre_plot= "Jaccard"
             distancia = pdist(datos.T, metric='jaccard')  # Transponer para calcular entre columnas
-                     
+            print("DISTANCIA")
+            print(distancia)      
             
         while True:  # Submenú para el método de enlace
             print("\nCual método de enlace entre Clústeres deseas utilizar:")
@@ -2843,43 +2952,92 @@ def hca(dato,raman_shift):
             print("6. Salir")
             m_enlace = int(input("Opción: "))
             if m_enlace == 1:
-                nombre_enlace = "Ward"
-                dendrograma = linkage(distancia, method='ward')
+                nombre_enlace = "ward"
+                dendrograma = sch.linkage(distancia, method='ward')
+                print("Dendrograma")
+                print(dendrograma)
+               
+                #  Convertirmos la matriz de linkage a un DataFrame
+                df_linkage = pd.DataFrame(dendrograma, columns=["Cluster 1", "Cluster 2", "Distancia", "Elementos fusionados"])              
+                # Guardamos la matriz de linkage en un archivo de texto
+                ruta_archivo = "matriz_linkage.txt"
+                df_linkage.to_csv(ruta_archivo, sep='\t', index=False)
+
             elif m_enlace == 2:
-                nombre_enlace = "Single"
-                dendrograma = linkage(distancia, method='single') 
+                nombre_enlace = "single"
+                dendrograma = sch.linkage(distancia, method='single') 
+                print("Dendrograma")
+                print(dendrograma)
             elif m_enlace == 3:
-                nombre_enlace = "Complete"
-                dendrograma = linkage(distancia, method='complete') 
+                nombre_enlace = "complete"
+                dendrograma = sch.linkage(distancia, method='complete') 
+                print("Dendrograma")
+                print(dendrograma)
             elif m_enlace == 4:
-                nombre_enlace = "Average"
-                dendrograma = linkage(distancia, method='average')
+                nombre_enlace = "average"
+                dendrograma = sch.linkage(distancia, method='average')
+                print("Dendrograma")
+                print(dendrograma)
             elif m_enlace == 5:
                 break
             else:
                 return
-            
-                
+
+            # Usar truncate_mode='level' para agrupar clusters pequeños.
+
+            # El eje X en tu dendrograma representa las muestras o clusters fusionado
+            # Los números indican cuántas muestras se han fusionado en cada cluster. ejemplo= (17) significa que en ese punto se han fusionado 17 muestras en un solo cluster.
+            #  La altura en el eje Y sigue representando la distancia entre los clusters.
             plt.figure(figsize=(16, 8))
-            dendrogram(dendrograma)
+            sch.dendrogram(dendrograma, truncate_mode='level', p=4)  # Solo muestra los 10 niveles superiores
+            #dendrogram(dendrograma)
             plt.title('Dendrograma usando {nombre_enlace} linkage con distancia de {nombre_plot} (HCA)'.format(
-                    nombre_enlace=nombre_enlace, 
-                    nombre_plot=nombre_plot
-                    ))
+                nombre_enlace=nombre_enlace,     
+                nombre_plot=nombre_plot
+                ))
             plt.xlabel('Muestras')
             plt.ylabel('Distancia')
-            plt.show()
+            #   COMENTAR TODO ESTO PARA NO VER EN EL NAVEGADOR
+            # 🔹 Guardar la imagen
+            ruta_imagen = "dendrograma.png"
+            plt.savefig(ruta_imagen, dpi=300, bbox_inches='tight')
             
+            # 🔹 Abrir la imagen en el navegador automáticamente
+            webbrowser.open(ruta_imagen)
+            
+            # También mostrarlo en pantalla si deseas
+            plt.show()
+               
+
+            
+    # # **Corrección en la generación del dendrograma interactivo**
+    # fig = ff.create_dendrogram(datos.T, linkagefun=lambda x: sch.linkage(x, method=nombre_enlace))
+
+    # # Ajustar el tamaño y agregar título
+    # fig.update_layout(
+    #     width=1000, height=600,
+    #     title=f"Dendrograma Interactivo ({nombre_enlace} linkage - {nombre_plot} distancia)",
+    #     xaxis=dict(title="Muestras"),
+    #     yaxis=dict(title="Distancia"),
+    # )
+
+    # # Mostrar el gráfico interactivo
+    # fig.show()
+                
+    #         # plt.figure(figsize=(16, 8))
+    #         # dendrogram(dendrograma, leaf_rotation=45, leaf_font_size=8)  # Reduce tamaño de fuente
+    #         # plt.title('Dendrograma usando {nombre_enlace} linkage con distancia de {nombre_plot} (HCA)'.format(
+    #         #         nombre_enlace=nombre_enlace, 
+    #         #         nombre_plot=nombre_plot
+    #         #         ))
+    #         # plt.xlabel('Muestras')
+    #         # plt.ylabel('Distancia')
+    #         # plt.show()
+            
+    #         # Crear el modelo de linkage
 
 
 
-
-def loading(dato,raman_shift):
-    print("IMPLEMENTAR UNA VEZ TERMINADO EL PCA")
-    
-    
-    
-    
 
 # def pca(dato,raman_shift):
     
@@ -3790,7 +3948,7 @@ def grafico_loading(pca, raman_shift, op_pca):
     #dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
     ## El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
     ##y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
-    loadings = pca.components_  # Obtener los loadings
+    loadings = pca.components_  # Obtener los loadings aca es donde hace los calculos de los pessos
     print("pca.components_")
     print(pca.components_)
     print("LOADING")
@@ -3806,6 +3964,10 @@ def grafico_loading(pca, raman_shift, op_pca):
     # if not isinstance(selected_components, list):
     #     raise ValueError("Los componentes seleccionados deben ser una lista de índices.")
 
+
+    #PARA LA OPCION DE DESCARGAR UN .CSV
+    df_loadings = pd.DataFrame({"Raman_Shift": raman_shift}) #CREAMOS UN DF Y ASIGNAMOS EL RAMANSHIFT COMO PRIMERA COLUMNA
+
     for i in op_pca:  
         if not isinstance(i, int):  
             raise ValueError(f"El índice de componente debe ser un entero, pero se recibió {type(i)}.")
@@ -3818,6 +3980,15 @@ def grafico_loading(pca, raman_shift, op_pca):
         print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
         print(loadings[i, :])
         plt.plot(raman_shift, loadings[i, :], label=f'PC {i+1}')
+       
+        #PARA LA OPCION DE DESCARGAR UN .CSV
+        df_loadings[f'PC{i+1}'] = loadings[i, :] #LUEGO ASIGANOMS LOS VALORES DE LOANDING AL df_loadings
+    
+    
+    # para que en el eje x muestre los valores cada 250 por que osino sale muy encimado
+    # Ajustar el intervalo del eje X a cada 500 cm⁻¹
+    ax = plt.gca()  # Obtener el objeto de los ejes
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(250)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
 
     plt.xlabel('Raman Shift (cm⁻¹)')
     plt.ylabel('Loading')
@@ -3825,8 +3996,19 @@ def grafico_loading(pca, raman_shift, op_pca):
     plt.legend()
     plt.grid()
     plt.show()
-
-
+   
+    
+    print("Descargar csv de loading:")
+    print("1. Si")
+    print("2. No")
+    des_loand = int(input("Opcion: "))
+    if des_loand == 1:
+        df_loadings.to_csv("loadings.csv", index=False)
+        print("Descargando...")
+        time.sleep(1)
+    elif des_loand == 2:
+        print("Salir..")
+        
     #TAREA
     #HACER CODIGO DE SHIRLEY
     #CORREGIR EL DEDROGRAMA
