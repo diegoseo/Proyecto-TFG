@@ -1554,6 +1554,9 @@ def segunda_derivada(normalizado, pca_op):
 
 # POR EL METODO DE REGRESION LINEAL
 def correcion_LineaB(normalizado, pca_op):
+    
+
+        
         if pca_op == 0 or pca_op == 5:
             print("NORMALIZAR POR:")
             print("1-Media")
@@ -1616,6 +1619,10 @@ def correcion_LineaB(normalizado, pca_op):
         else:
             normalizado_f = normalizado_correccion #este es para cuando sea la funcion derivada sea llamado por la funcion del PCA
             #print("aca va lo del PCA")
+        
+        print("Pppp_presntar py")
+        print(normalizado_f)
+        
         
         #print("NORMALIZADO-F")
         #print(normalizado_f)
@@ -1707,6 +1714,9 @@ def correcion_LineaB(normalizado, pca_op):
         
         #   CORROBORAR LOS RESULTADOS 
         # SI TODO ESTA BIEN CREAR EL DATAFRAME Y CON LOS RESULTADOS Y VOLVER A UNIR LA CABECERA
+        print("P_presentar py")
+        print(df_y_ajustados)
+        
         if pca_op == 0 and pca_op != 5:
             if opcion_s == 1:
                 mostrar_espectros(df_y_ajustados,raman_shift, 10, opcion, metodo_suavizado)
