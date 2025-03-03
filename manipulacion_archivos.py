@@ -11,24 +11,16 @@ pila = []
 pila_df = [] # SE UTILIZARA PARA ALMACENAR LOS DF FINAL
 
 
-# Variable global para almacenar el nombre del archivo
-archivo_nombre = None
-
-def nombre_archivo(num):
-    archivo_nombre = input(f"Ingrese el nombre del archivo {num} : ")
+def nombre_archivo(archivo_nombre):
     return archivo_nombre
 
-def cargar_archivo(cant_archivo):
-    num = 1
-    while num <= cant_archivo:
-        global archivo_nombre
-        archivo_nombre = nombre_archivo(num)
+def cargar_archivo(nombre_archivo):
         existe = False # VERIFICAMOS QUE EL ARCHIVO EXISTA
         while existe == False:   
-            if archivo_existe(archivo_nombre):  
+            if archivo_existe(nombre_archivo):  
                 print("Encontrado!.")
                 time.sleep(1)
-                bd_name = archivo_nombre #Este archivo contiene los datos espectroscópicos que serán leídos
+                bd_name = nombre_archivo#Este archivo contiene los datos espectroscópicos que serán leídos
                 delimitador = identificar_delimitador(bd_name)
                 print("EL DELIMITADOR ES: ", delimitador)
                 df = pd.read_csv(bd_name, delimiter = delimitador , header=None)
@@ -47,17 +39,16 @@ def cargar_archivo(cant_archivo):
                     print("NO SE HIZO LA TRANSPUESTA")
             else:
                 print("El archivo no existe.")
-                archivo_nombre = input("Ingrese el nombre del archivo: ")
+                nombre_archivo = input("Ingrese el nombre del archivo: ")
                 
-            df = igualar_dimensiones_filas(df)
-            print("DF DESPUES DEL CORTE")
-            print(df)
-            df = del_sufijos(df)
+        df = igualar_dimensiones_filas(df)
+        print("DF DESPUES DEL CORTE")
+        print(df)
+        df = del_sufijos(df)
             
-        pila_df.append(df.copy())  # ACA ES DONDE ALMACENAMOS TODOS LOS DF DE CADA ARCHIVO LEIDO
+        #pila_df.append(df.copy())  # ACA ES DONDE ALMACENAMOS TODOS LOS DF DE CADA ARCHIVO LEIDO
 
-        num=num+1
-    return df # ASI FUNCIONA BIEN CUANDO ES SOLO UN ARCHIVO PERO CUANDO SEAN VARIOS ARCHIVOS NO DEBE DE RETORNAR NADA AUN
+        return df # ASI FUNCIONA BIEN CUANDO ES SOLO UN ARCHIVO PERO CUANDO SEAN VARIOS ARCHIVOS NO DEBE DE RETORNAR NADA AUN
 
 
 
