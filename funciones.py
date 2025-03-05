@@ -380,8 +380,8 @@ def mostrar_espectros(archivo_nombre,datos,raman_shift,asignacion_colores,metodo
          titulo.titulo_plot_primera_derivada(archivo_nombre,nor_op,op_der)
     elif derivada == 2:
          titulo.titulo_plot_segunda_derivada(archivo_nombre,nor_op,op_der)
-    # elif derivada == 3:  # PARA QUE VAYA AL PLOT DE CORRECION DE LINEA BASE OPCION 9
-    #     titulo_plot_correcion_base(nor_op,op_der)
+    elif derivada == 3:  # PARA QUE VAYA AL PLOT DE CORRECION DE LINEA BASE OPCION 9
+         titulo.titulo_plot_correcion_base(archivo_nombre,nor_op,op_der)
     # elif derivada == 4:
     #     titulo_plot_correcion_shirley(nor_op,op_der)
 
@@ -491,6 +491,8 @@ def espectro_acotado(archivo_nombre,asignacion_colores,df,datos,raman_shift_corr
             titulo.titulo_plot_primera_derivada(archivo_nombre,nor_op,op_der)
         elif derivada == 2:
             titulo.titulo_plot_segunda_derivada(archivo_nombre,nor_op,op_der)
+        elif derivada == 3:  
+            titulo.titulo_plot_correcion_base(archivo_nombre,nor_op,op_der)
 
 
     
@@ -538,8 +540,8 @@ def grafico_tipo(archivo_nombre,asignacion_colores,datos,raman_shift,nor_op,meto
         titulo.titulo_plot_primera_derivada(archivo_nombre,metodo,op_der)
     elif derivada == 2:
         titulo.titulo_plot_segunda_derivada(archivo_nombre,metodo,op_der)
-    # elif derivada == 3:
-    #     titulo_plot_correcion_base(nor_op,op_der)
+    elif derivada == 3:
+         titulo.titulo_plot_correcion_base(archivo_nombre,nor_op,op_der)
     # elif derivada == 4:
     #     titulo_plot_correcion_shirley(nor_op,op_der)
 
@@ -658,8 +660,8 @@ def grafico_acotado_tipo(archivo_nombre,asignacion_colores,df,datos,raman_shift_
         titulo.titulo_plot_primera_derivada(archivo_nombre,opcion,op_der)
     elif derivada == 2:
         titulo.titulo_plot_segunda_derivada(archivo_nombre,opcion,op_der)
-    # elif derivada == 3:  
-    #     titulo_plot_correcion_base(opcion,op_der)
+    elif derivada == 3:  
+        titulo.titulo_plot_correcion_base(archivo_nombre,opcion,op_der)
     # elif derivada == 4:
     #     titulo_plot_correcion_shirley(opcion,op_der)
 
@@ -929,4 +931,237 @@ def suavizado_menu_derivadas(df,raman_shift):
                 print("Opción no válida. Inténtalo de nuevo.")
                 continue
             
+
+
+# ##ESTE CODIGO FUNCIONA PARA LAS OPCIONES 9,10 PARA LAS CORRECIONES
+def menu_correccion(df,raman_shift):
+    print("entrooooooooooooo")
+    while True:  # Ciclo principal para manejar "Volver"
+        print("NORMALIZAR POR:")
+        print("1- Media")
+        print("2- Área")
+        print("3- Sin normalizar")
+        print("4- Volver")
+        
+ 
+        opcion = int(input("Selecciona una opción: "))
+
+
+        if opcion == 1:
+            suavizar = normalizado_media(df)
+        elif opcion == 2:
+            suavizar = normalizado_area(df,raman_shift)
+        elif opcion == 3:
+            suavizar = datos_sin_normalizar(df)
+        elif opcion == 4:
+            return None, None, None
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
+            continue
+
+        opcion_s = 0
+        while True:  # Submenú 
+             if opcion_s == 3:
+                 break
+             while True:
+                print("DESEA SUAVIZAR")
+                print("1. Sí")
+                print("2. No")
+                print("3. Volver")
+    
+                opcion_s = int(input("Opción: "))
+    
+                if opcion_s == 1:
+                    while True:  # Submenú de métodos de suavizado
+                        print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+                        print("1- Suavizado por Saviztky-Golay")
+                        print("2- Suavizado por Filtro Gaussiano")
+                        print("3- Suavizado por Media Móvil")
+                        print("4- Volver")
+                        
+    
+                        metodo_suavizado = int(input("Opción: "))
+                        
+    
+                        if metodo_suavizado == 1:
+                            suavizar = suavizado_saviztky_golay(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 2:
+                            suavizar = suavizado_filtroGausiano(df,suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 3:
+                            suavizar = suavizado_mediamovil(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                    # Ir al menú de derivadas después del suavizado
+                    while True:  # Submenú para derivadas
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+    
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            derivada = primera_derivada(suavizar)
+                            print("Primera derivada aplicada.")
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 2:
+                            derivada = segunda_derivada(suavizar)
+                            print("Segunda derivada aplicada.")
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 3:
+                            print("No se aplicó derivada.")
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 4:
+                            print("Volviendo al menú '¿Desea suavizar?'.")
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 2:
+                    metodo_suavizado = 5  # Valor para indicar que no se aplicó suavizado
+                    
+                    # Ir directamente al menú de derivadas
+                    while True:
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+                        
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            derivada = primera_derivada(suavizar)
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 2:
+                            derivada = segunda_derivada(suavizar)
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 3:
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar
+                            return derivada, opcion, metodo_suavizado
+                        elif opcion_d == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 3:
+                    break  # Regresa al menú principal
+                else:
+                    print("Opción no válida. Inténtalo de nuevo.")
+                    continue
+                
+
+
+
+
+
+
+# # # POR EL METODO DE REGRESION LINEAL
+def correcion_LineaB(normalizado_f,raman_shift):
+    print("NORMALIZADO-F")
+    print(normalizado_f)
+
+    # Obtener los índices de las filas válidas
+    indices_validos = normalizado_f.dropna().index
+
+    # Filtrar raman_shift por los índices válidos
+    raman_shift_filtrado = raman_shift.loc[indices_validos].reset_index(drop=True)
+
+    # Filtrar normalizado_f por los índices válidos
+    normalizado_f_filtrado = normalizado_f.loc[indices_validos].reset_index(drop=True)
+
+ 
+        #print("NORMALIZADO-F")
+        #print(normalizado_f)
+    cabecera_aux = normalizado_f_filtrado.columns
+        #print("XDDDDDDDDDD")
+        #print(cabecera_aux)
+    np_corregido = normalizado_f_filtrado.to_numpy() # pasamos a numpy para borrar la cabecera de tipos
+        #print("DF_CORREGIDO")
+        #print(np_corregido)
+        #print("DF_CORREGIDO")
+    df_corregido = pd.DataFrame(np_corregido) # pasamos a panda para tener de vuelta el DF original pero sin cabecera
+        #print(df_corregido)
+        
+        
+      
+    pendientes = {}   # Crear un diccionario para almacenar las pendientes
+    intersecciones = {}
+    y_ajustados = {}
+    #dic_prueba = {}
+
+    pos = 0  
+        # Asignar la primera columna como Raman shift
+        #raman_shift = df_corregido.iloc[:, 0]  # Primera columna
+        #print("Raman shift")
+        #print(raman_shift)
+        #print("Cant filas = ", len(raman_shift))
+
+        #y_ajustados = pd.DataFrame(raman_shift)
+        #print(y_ajustados)
+
+        #raman_shift = pd.to_numeric(raman_shift, errors='coerce')      # Aseguramos que Raman Shift sea numérico
+        #print("RAMAN SHIFT")
+        #print(raman_shift)
+        
+        # Iterar sobre las demás columnas
+    for col in df_corregido.columns:
+            intensidades = df_corregido[col]  # Extraer la columna actual
+            intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
+            #print(intensidades)
+            # print(cont)                        
+            # Calcularmos la pendiente 
+            coef = np.polyfit(raman_shift_filtrado, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
+            # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
+            pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
+            interseccion = coef[1] # La interseccion (b) esta en el indice 1 
+            # Guardamos la pendiente y intersecciones en el diccionario
+            pendientes[col] = pendiente
+            intersecciones[col] = interseccion
+            #print(raman_shift[pos])
+            #print("xD")
+            y_ajustado = []
+            for pos, intensidad in enumerate(intensidades):
+                y = pendiente * raman_shift_filtrado[pos] + interseccion  
+                #print()
+                #print(pendiente, "*",raman_shift[pos] , "+", interseccion , "=", y_ajustado, intensidades)
+                y_ajustado.append(y)
+                #dic_prueba.append(y)
+            y_ajustados[col] = intensidades - y_ajustado
+            #dic_prueba[col] = y_ajustado
+            #print(intensidades, "-", dic_prueba[col] , "=", y_ajustados[col])
+            #print("XDDDDDDDDDDDD")
+            #print(y_ajustado)
+            # if pos == len(raman_shift)-1: # la funcion len() sirve para saber la cantidad de filas
+            #     pos = 0
+            #     #print("entro")
+                
+  
+            # else:
+            #     pos += 1 
+            #     #print("emtro2")
+                
+                
+    df_y_ajustados = pd.DataFrame(y_ajustados)
+        #df_y_ajustados.index.name = "Raman Shift"  
+        #print(len(df_y_ajustados.columns))
+        #print(len(cabecera))
+    df_y_ajustados.columns = cabecera_aux
+    print("LLEGO HASTA ACA")
+    print(df_y_ajustados)
+
+    return df_y_ajustados, raman_shift_filtrado
+
+
+
+
+
 

@@ -607,3 +607,74 @@ def titulo_plot_segunda_derivada(archivo_nombre,opcion,metodo_suavizado):
          
 
 
+
+def titulo_plot_correcion_base(archivo_nombre,nor_op,metodo_suavizado):
+    bd_name = archivo_nombre
+    print("entro aca")
+    print("NOR_op=",nor_op)
+    print("Metodo_suavizado=",metodo_suavizado)
+    if nor_op == 1:
+        if metodo_suavizado == 1:
+            print("correccopn xDDDD")
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por la media ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por la media ')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Sin Suavizar y Normalizado por la media ')
+            plt.show()
+    elif nor_op  == 2:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base del archivo {bd_name} Suavizado por Saviztky_golay y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y Normalizado por Area ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y Normalizado por Area')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Sin Suavizar y Normalizado por Area')
+            plt.show()
+    else:
+        if metodo_suavizado == 1:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por Saviztky_golay y sin Normalizar')
+            plt.show()
+        elif metodo_suavizado == 2:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por FILTRO GAUSIANO y sin Normalizar ')
+            plt.show()
+        elif metodo_suavizado == 3:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Suavizado por MEDIA MOVIL y sin Normalizar')
+            plt.show()
+        else:
+            plt.xlabel('Longitud de onda / Frecuencia')
+            plt.ylabel('Intensidad')
+            plt.title(f'Correccion Linea base  del archivo {bd_name} Sin Suavizar y sin Normalizar')
+            plt.show()
+        

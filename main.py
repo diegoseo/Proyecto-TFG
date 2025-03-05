@@ -11,7 +11,7 @@ from manipulacion_archivos import nombre_archivo , cargar_archivo
 import sys  # Para usar sys.exit()
 #from funciones import * # NO SE RECOMIENDA IMPORTAR TODO DE UNA CON EL * 
 from funciones import mostrar_espectros, datos_sin_normalizar, mostrar_leyendas,guardar_archivo, espectro_acotado,grafico_tipo,grafico_acotado_tipo,descargar_csv,descargar_csv_acotado,descargar_csv_tipo,descargar_csv_acotado_tipo # SE LLAMA DE A UNO A LAS FUNCIONES PARA NO TENER QUE HACER CADA RATO funcion.raman_shift
-from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas
+from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -540,60 +540,61 @@ def main(df,archivo_nombre):
                           main(df,archivo_nombre)     
         elif opcion == '9':
                       print("entro 9")
-                      # while True:  # Bucle para mantener al usuario en el submenú
-                      #   metodo = 9          
-                      #   sub_menu()
-                      #   metodo_grafico = int(input("Opcion: "))               
-                      #   if metodo_grafico == 1:
-                      #       dato,nor_op ,m_suavi = menu_correccion()
-                      #       if dato is None:  # Manejar la opción "Volver"
-                      #           continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
-                      #       mostrar_espectros(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,3)
-                      #   elif metodo_grafico == 2:
-                      #       dato,nor_op,m_suavi= menu_correccion()
-                      #       if dato is None:  # Manejar la opción "Volver"
-                      #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
-                      #       espectro_acotado(dato_suavizado,raman_shift_corregido,0,nor_op,m_suavi,3)
-                      #   elif metodo_grafico == 3:
-                      #       dato,nor_op,m_suavi = menu_correccion()
-                      #       if dato is None:  # Manejar la opción "Volver"
-                      #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
-                      #       grafico_tipo(dato_suavizado,raman_shift_corregido,nor_op,metodo,m_suavi,3)
-                      #   elif metodo_grafico == 4:
-                      #       dato,nor_op,m_suavi = menu_correccion()
-                      #       if dato is None:  # Manejar la opción "Volver"
-                      #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
-                      #       grafico_acotado_tipo(dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,3)
+                      while True:  # Bucle para mantener al usuario en el submenú
+                         metodo = 9          
+                         sub_menu()
+                         metodo_grafico = int(input("Opcion: "))               
+                         if metodo_grafico == 1:
+                             dato,nor_op ,m_suavi = menu_correccion(df,raman_shift)
+                             if dato is None:  # Manejar la opción "Volver"
+                                 continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                             dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
+                             print("ahora entrara en mostrar espectros")
+                             mostrar_espectros(archivo_nombre,dato_suavizado,raman_shift_corregido,asignacion_colores,metodo,nor_op,m_suavi,3)
+                         elif metodo_grafico == 2:
+                             dato,nor_op,m_suavi= menu_correccion(df,raman_shift)
+                             if dato is None:  # Manejar la opción "Volver"
+                                 continue 
+                             dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
+                             espectro_acotado(archivo_nombre,asignacion_colores,df,dato_suavizado,raman_shift_corregido,0,nor_op,m_suavi,3)
+                         elif metodo_grafico == 3:
+                             dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
+                             if dato is None:  # Manejar la opción "Volver"
+                                 continue 
+                             dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
+                             grafico_tipo(archivo_nombre,asignacion_colores,dato_suavizado,raman_shift_corregido,nor_op,metodo,m_suavi,3)
+                         elif metodo_grafico == 4:
+                             dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
+                             if dato is None:  # Manejar la opción "Volver"
+                                 continue 
+                             dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
+                             grafico_acotado_tipo(archivo_nombre,asignacion_colores,df,dato_suavizado,raman_shift_corregido,metodo,nor_op,m_suavi,3)
                       #   elif metodo_grafico == 5:
-                      #           dato,nor_op,m_suavi = menu_correccion()
+                      #           dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
                       #           if dato is None:  # Manejar la opción "Volver"
                       #               continue 
-                      #           dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                      #           dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
                       #           descargar_csv(9, dato_suavizado,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE CORRECCION LINEAL
                       #   elif metodo_grafico == 6:
-                      #       dato,nor_op,m_suavi = menu_correccion()
+                      #       dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
                       #       if dato is None:  # Manejar la opción "Volver"
                       #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
                       #       descargar_csv_acotado(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE LA CORRECCION BASE LINEAL                          
                       #   elif metodo_grafico == 7:
-                      #       dato,nor_op,m_suavi = menu_correccion()
+                      #       dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
                       #       if dato is None:  # Manejar la opción "Volver"
                       #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
                       #       descargar_csv_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       #   elif metodo_grafico == 8:
-                      #       dato,nor_op,m_suavi = menu_correccion()
+                      #       dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
                       #       if dato is None:  # Manejar la opción "Volver"
                       #           continue 
-                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato)
+                      #       dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
                       #       descargar_csv_acotado_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
-                      #   elif metodo_grafico == 9:
-                      #       main(df,archivo_nombre) 
+                         elif metodo_grafico == 9:
+                            main(df,archivo_nombre) 
         elif opcion == '10':
                       print("entro 10")
                       # while True:  # Bucle para mantener al usuario en el submenú
