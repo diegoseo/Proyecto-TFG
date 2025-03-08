@@ -11,7 +11,7 @@ from manipulacion_archivos import nombre_archivo , cargar_archivo
 import sys  # Para usar sys.exit()
 #from funciones import * # NO SE RECOMIENDA IMPORTAR TODO DE UNA CON EL * 
 from funciones import mostrar_espectros, datos_sin_normalizar, mostrar_leyendas,guardar_archivo, espectro_acotado,grafico_tipo,grafico_acotado_tipo,descargar_csv,descargar_csv_acotado,descargar_csv_tipo,descargar_csv_acotado_tipo # SE LLAMA DE A UNO A LAS FUNCIONES PARA NO TENER QUE HACER CADA RATO funcion.raman_shift
-from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB , pca
+from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB , pca , hca
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -669,11 +669,9 @@ def main(df,archivo_nombre):
                     correcion = int(input("Opcion: "))
                     if correcion == 1:
                         dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
-                        if dato is None:  # Manejar la opción "Volver"
-                            continue 
-                            dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
-                            dato = dato_suavizado
-                            pca(dato,raman_shift,archivo_nombre,asignacion_colores,types) 
+                        dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
+                        dato = dato_suavizado
+                        pca(dato,raman_shift,archivo_nombre,asignacion_colores,types) 
                     elif correcion == 2:
                             print("FALTA IMPLEMENTAR CORRECION DE SHIRLEY")
                             pca(dato,raman_shift,archivo_nombre,asignacion_colores,types)
@@ -689,28 +687,25 @@ def main(df,archivo_nombre):
     
         elif opcion == '12':  #PARA EL HCA DA LAS OPCIONES DE NORMALIZAR,SUAVIZAR,DERIVAR PERO NO LA DE CORREGIR QUE ESTARIA FALTANDO
             print("entro 12")
-        #               while True:  # Bucle para mantener al usuario en el submenú
-        #                 metodo = 9          
-        #                 print("1. Generar grafico Dendrograma")
-        #                 print("2. Volver")
-        #                 metodo_grafico = int(input("Opcion: "))               
-        #                 if metodo_grafico == 1:
-        #                     dato,nor_op ,m_suavi = menu_correccion()
-        #                     if dato is None:  # Manejar la opción "Volver"
-        #                         continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-        #                     hca(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
-        #                 elif metodo_grafico == 2:
-        #                     main(df,archivo_nombre) 
+            while True:  # Bucle para mantener al usuario en el submenú
+                        metodo = 9          
+                        print("1. Generar grafico Dendrograma")
+                        print("2. Volver")
+                        metodo_grafico = int(input("Opcion: "))               
+                        if metodo_grafico == 1:
+                            dato,nor_op ,m_suavi = menu_correccion(df,raman_shift)
+                            if dato is None:  # Manejar la opción "Volver"
+                                continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
+                            hca(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
+                        elif metodo_grafico == 2:
+                            main(df,archivo_nombre) 
         elif opcion == "13":
-            print("entro 13")
-        #     python = sys.executable  # Obtiene la ruta del ejecutable de Python
-        #     os.execl(python, python, *sys.argv)  # Reinicia el script                          
+            menu_principal()                      
         elif opcion == '14':
-            print("entro 14")
-        #     print("Saliendo del programa...")
-        #     sys.exit()  # Termina completamente el programa
-        # else:
-        #     print("Opción no válida. Inténtalo de nuevo.")
+            print("Saliendo del programa...")
+            sys.exit()  # Termina completamente el programa
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
 
     
     

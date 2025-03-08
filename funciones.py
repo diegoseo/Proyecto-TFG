@@ -3,14 +3,19 @@
 #import main
 import titulo
 import matplotlib.pyplot as plt
+import webbrowser
 import pandas as pd
 import numpy as np
+import time
 import plotly.graph_objects as go#permite mover la gráfica, hacer zoom y visualizar mejor las relaciones entre los componentes
+import scipy.cluster.hierarchy as sch
+import matplotlib.ticker as ticker # PARA QUE EL EJE X MUESTRE EN ALGUN INTERVALO Y NO SALGA ENCIMADO (SE USO EN LOS GRAFICOS DE LOADINGS)
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
 from scipy.ndimage import gaussian_filter # PARA EL FILTRO GAUSSIANO
 from sklearn.decomposition import PCA
 from scipy.stats import chi2 # PARA GRAFICAR LOS ELIPSOIDES
+from scipy.spatial.distance import pdist, squareform
 
 
 # MOSTRAMOS LA LEYENDA PARA CADA TIPO
@@ -1361,8 +1366,8 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
         plot_pca_2d(archivo_nombre,asignacion_colores,types,dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y)
     elif visualizar_pca == 2:
         plot_pca_3d(archivo_nombre,asignacion_colores,types,dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,porcentaje_varianza_z,componentes_x,componentes_y,componentes_z)
-    # elif visualizar_pca == 3:
-    #     grafico_loading(pca, raman_shift, componente_seleccionado)
+    elif visualizar_pca == 3:
+        grafico_loading(pca, raman_shift, componente_seleccionado)
 
 
 def plot_pca_2d(archivo_nombre,asignacion_colores,types,dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes_x,componentes_y):
@@ -1565,3 +1570,248 @@ def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)',in
     )
 
 
+
+
+def grafico_loading(pca, raman_shift, op_pca):
+    print("selected_components=",op_pca)
+    print("PCA dentro de la función de loading")
+    print(pca)
+
+    plt.figure(figsize=(10, 6))
+
+    # if not hasattr(pca, 'components_'):
+    #     raise ValueError("El objeto PCA proporcionado no tiene componentes. Asegúrate de pasar el modelo PCA y no los datos transformados.")
+
+
+
+
+    #pca = PCA(n_components=n_componentes)
+    #dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
+    ## El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
+    ##y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
+    loadings = pca.components_  # Obtener los loadings aca es donde hace los calculos de los pessos
+    print("pca.components_")
+    print(pca.components_)
+    print("LOADING")
+    print(loadings)
+    print("LOADING.shape")
+    print(loadings.shape)
+    n_componentes = loadings.shape[0]  # Número de componentes principales
+    print(" n_components=", n_componentes)
+    # Asegurar que `selected_components` sea una lista de enteros
+    # if isinstance(selected_components, int):  
+    #     selected_components = [selected_components]  # Convertir a lista si es un solo número
+
+    # if not isinstance(selected_components, list):
+    #     raise ValueError("Los componentes seleccionados deben ser una lista de índices.")
+
+
+    #PARA LA OPCION DE DESCARGAR UN .CSV
+    df_loadings = pd.DataFrame({"Raman_Shift": raman_shift}) #CREAMOS UN DF Y ASIGNAMOS EL RAMANSHIFT COMO PRIMERA COLUMNA
+
+    for i in op_pca:  
+        if not isinstance(i, int):  
+            raise ValueError(f"El índice de componente debe ser un entero, pero se recibió {type(i)}.")
+        if i >= n_componentes:
+            print(f"Advertencia: PC {i+1} no existe en los datos de PCA.")
+            continue
+
+        print("Dimensión de raman_shift:", raman_shift.shape)
+        print("Dimensión de PCA components:", loadings.shape)
+        print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
+        print(loadings[i, :])
+        plt.plot(raman_shift, loadings[i, :], label=f'PC {i+1}')
+       
+        #PARA LA OPCION DE DESCARGAR UN .CSV
+        df_loadings[f'PC{i+1}'] = loadings[i, :] #LUEGO ASIGANOMS LOS VALORES DE LOANDING AL df_loadings
+    
+    
+    # para que en el eje x muestre los valores cada 250 por que osino sale muy encimado
+    # Ajustar el intervalo del eje X a cada 500 cm⁻¹
+    ax = plt.gca()  # Obtener el objeto de los ejes
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(200)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
+
+    ay = plt.gca()  # Obtener el objeto de los ejes
+    ay.yaxis.set_major_locator(ticker.MultipleLocator(0.1)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
+
+
+    plt.xlabel('Raman Shift (cm⁻¹)')
+    plt.ylabel('Loading')
+    plt.title('Loading Plot para PCA y Raman Shift')
+    plt.legend()
+    plt.grid()
+    plt.show()
+   
+    
+    print("Descargar csv de loading:")
+    print("1. Si")
+    print("2. No")
+    des_loand = int(input("Opcion: "))
+    if des_loand == 1:
+        df_loadings.to_csv("loadings.csv", index=False)
+        print("Descargando...")
+        time.sleep(1)
+    elif des_loand == 2:
+        print("Salir..")
+        
+    #TAREA
+    #HACER CODIGO DE SHIRLEY
+    #CORREGIR EL DEDROGRAMA
+    #CORREGIR TODOS LOS ERRORES QUE TIRA AL MOVER ATRAS
+    #CORREGIR EL TEMA DEL AREA QUE ESTA MULTIPLICANDO POR -1
+    #CORREGIR EL DEMDOGRAMA POR QUE SALE MUY FEO
+    # tira error al querer normalizar el archivo de LucasNo.csv
+    #CREO QUE EL GRAFICO MIS ARCHIVOS .CSV QUE GENERO NO FUNCIONA EN ORANGE POR QUE LA CELDA 0,0 NO DICE RAMANSHITF
+
+
+
+
+
+
+def hca(dato,raman_shift):
+    print("Datos:")
+    print(dato)
+    print("Raman_shift")
+    print(raman_shift)
+    datos = dato.dropna()  # Eliminamos filas con NaN ya que el algoritmo de linkage no lee esos tipos de datos
+    print("Datos despues de eliminar NAN:")
+    print(datos)
+    while True:  # Bucle principal del menú
+        print("\n--- Menú Principal ---")
+        print("Cual método de distancias deseas utilizar:")
+        print("1. Euclidiana")
+        print("2. Manhattan")
+        print("3. Coseno")
+        print("4. Chebyshev")
+        print("5. Correlación Pearson")
+        print("6. Correlación Spearman")
+        print("7. Jaccard") #foto que tome de la notebook de Edher
+        m_dis = int(input("Opción: "))
+        if m_dis == 1:
+            nombre_plot= "Euclidiana"
+            distancia = pdist(datos.T, metric='euclidean')  # Transponer porque queremos calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
+            df_distancias = pd.DataFrame(squareform(distancia), index=datos.T.index, columns=datos.T.index)
+            # 📌 Guardar la matriz de distancias en un archivo de texto
+            ruta_archivo = "matriz_distancias.txt"
+            df_distancias.to_csv(ruta_archivo, sep='\t', index=True)
+            # # Convertir a matriz cuadrada (opcional)
+            # distancia_cuadrada = squareform(distancia_euclidiana)
+            
+        elif m_dis == 2:
+            nombre_plot= "Manhattan"
+            distancia = pdist(datos.T, metric='cityblock')  # Transponer porque queremos calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
+        elif m_dis == 3:
+            nombre_plot= "Coseno"
+            distancia = pdist(datos.T, metric='cosine')  # Transponer para calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
+        elif m_dis == 4:
+            nombre_plot= "Chebyshev"
+            distancia = pdist(datos.T, metric='chebyshev')  # Transponer para calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)
+        elif m_dis == 5:
+            nombre_plot= "Pearson"
+            correlacion_pearson = datos.corr(method='pearson') # Calcular la matriz de correlación de Pearson
+            distancia_pearson = 1 - correlacion_pearson # Convertir correlación en distancia: d = 1 - r
+            distancia = squareform(distancia_pearson)  # Convertir la matriz de distancias en formato condensado
+            print("DISTANCIA")
+            print(distancia)
+        elif m_dis == 6:  
+            nombre_plot= "Spearman"
+            correlacion_spearman = datos.corr(method='spearman')  # Calcular la matriz de correlación de Spearman
+            distancia_spearman = 1 - correlacion_spearman # Convertir correlación en distancia: d = 1 - r
+            distancia = squareform(distancia_spearman) # Convertir la matriz de distancias en formato condensado
+            print("DISTANCIA")
+            print(distancia)
+        elif m_dis == 7:
+            nombre_plot= "Jaccard"
+            distancia = pdist(datos.T, metric='jaccard')  # Transponer para calcular entre columnas
+            print("DISTANCIA")
+            print(distancia)      
+            
+        while True:  # Submenú para el método de enlace
+            if m_dis == 1 or m_dis == 2:
+                print("\nCual método de enlace entre Clústeres deseas utilizar:")
+                print("1. Ward")
+                print("2. Single Linkage")
+                print("3. Complete Linkage")
+                print("4. Average Linkage")
+                print("5. Volver")  # Volver al menú de distancia
+                print("6. Salir")
+                m_enlace = int(input("Opción: "))
+            elif m_dis == 3 or m_dis == 4 or m_dis == 5 or m_dis == 6 or m_dis == 7:
+                print("\nCual método de enlace entre Clústeres deseas utilizar:")
+                print("1. Single Linkage")
+                print("2. Complete Linkage")
+                print("3. Average Linkage")
+                print("4. Volver")  # Volver al menú de distancia
+                print("5. Salir")
+                m_enlace = int(input("Opción: ")) + 1  # SUMO 1 PARA QUEN SE VAYA EN EL IF CORRECTO 
+        
+            if m_enlace == 1:
+                nombre_enlace = "ward"
+                dendrograma = sch.linkage(distancia, method='ward')
+                print("Dendrograma")
+                print(dendrograma)
+               
+                #  Convertirmos la matriz de linkage a un DataFrame
+                df_linkage = pd.DataFrame(dendrograma, columns=["Cluster 1", "Cluster 2", "Distancia", "Elementos fusionados"])              
+                # Guardamos la matriz de linkage en un archivo de texto
+                ruta_archivo = "matriz_linkage.txt"
+                df_linkage.to_csv(ruta_archivo, sep='\t', index=False)
+
+            elif m_enlace == 2:
+                print("Entro en single")
+                nombre_enlace = "single"
+                dendrograma = sch.linkage(distancia, method='single') 
+                print("Dendrograma")
+                print(dendrograma)
+            elif m_enlace == 3:
+                nombre_enlace = "complete"
+                dendrograma = sch.linkage(distancia, method='complete') 
+                print("Dendrograma")
+                print(dendrograma)
+            elif m_enlace == 4:
+                nombre_enlace = "average"
+                dendrograma = sch.linkage(distancia, method='average')
+                print("Dendrograma")
+                print(dendrograma)
+            elif m_enlace == 5:
+                break
+            else:
+                return
+
+
+            # Números sin paréntesis (Ejemplo: 361) Representan una muestra individual dentro del dataset.
+            # Números con paréntesis (Ejemplo: (36))  Indican un clúster que ya agrupa múltiples muestras, 36 en este caso
+            # por ejemplo al sumar todo el eje x de Limpio.csv deberia de dar 731 ,(361) vale solo 1
+            # Usar truncate_mode='level' para agrupar clusters pequeños.
+            # El eje Y muestra la "distancia" o disimilitud entre los clústeres.
+            # El eje X en tu dendrograma representa las muestras o clusters fusionado
+            # Los números indican cuántas muestras se han fusionado en cada cluster. ejemplo= (17) significa que en ese punto se han fusionado 17 muestras en un solo cluster.
+            #  La altura en el eje Y sigue representando la distancia entre los clusters.
+            plt.figure(figsize=(16, 8))
+            sch.dendrogram(dendrograma, truncate_mode='level', p=4)  # Solo muestra los 10 niveles superiores
+            #dendrogram(dendrograma)
+            plt.title('Dendrograma usando {nombre_enlace} linkage con distancia de {nombre_plot} (HCA)'.format(
+                nombre_enlace=nombre_enlace,     
+                nombre_plot=nombre_plot
+                ))
+            plt.xlabel('Muestras')
+            plt.ylabel('Distancia')
+            #   COMENTAR TODO ESTO PARA NO VER EN EL NAVEGADOR
+            # 🔹 Guardar la imagen
+            ruta_imagen = "dendrograma.png"
+            plt.savefig(ruta_imagen, dpi=300, bbox_inches='tight')
+            
+            # 🔹 Abrir la imagen en el navegador automáticamente
+            webbrowser.open(ruta_imagen)
+            
+            # También mostrarlo en pantalla si deseas
+            plt.show()
+               
