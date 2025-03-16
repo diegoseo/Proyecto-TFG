@@ -1,2 +1,0 @@
-
-Intervalo de confianza = 0.97

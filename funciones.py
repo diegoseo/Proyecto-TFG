@@ -368,12 +368,12 @@ def mostrar_espectros(archivo_nombre,datos,raman_shift,asignacion_colores,metodo
                 color_actual= asignacion_colores[tipo] #ACA YA ENCONTRAMOS EL COLOR CORRESPONDIENTE A ESE TIPO   
                 if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
                     if tipo in leyendas_tipos:
-                        print("primer plot")
+                        #print("primer plot")
                         plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1,label=col)   
                         #plt.xticks(np.arange(min(raman_shift[1:].astype(float)), max(raman_shift[1:].astype(float)), step=300))
                         break
                     else:
-                        print("segundo plot")
+                        #print("segundo plot")
                         plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1) 
                         #plt.xticks(np.arange(min(raman_shift[1:].astype(float)), max(raman_shift[1:].astype(float)), step=300))         
                         leyendas_tipos.add(tipo) 
@@ -761,7 +761,8 @@ def normalizado_area(df,raman_shift):
 
 
 
-# SUAVIZADO POR SAVIZTKY-GOLAY
+# SUAVIZADO POR SAVIZTKY-GOLAY 
+#no genera valores NaN por si mismo
 
 def suavizado_saviztky_golay(dato_suavizar):  #acordarse que se puede suavizar por la media, area y directo
 
@@ -774,13 +775,14 @@ def suavizado_saviztky_golay(dato_suavizar):  #acordarse que se puede suavizar p
     suavizado_pd.columns = dato_suavizar.columns # AGREGAMOS LA CABECERA DE TIPOS
         
   
-    
+    print("Saviztky", suavizado_pd.shape)
+    print("Saviztky", suavizado_pd)
     return suavizado_pd
 
 
 
 # SUAVIZADO POR FILTRO GAUSIANO
-
+# tampoco genera valores NaN
 def suavizado_filtroGausiano(df,dato_suavizar):  #acordarse que se puede suavizar por la media, area y directo
    
     sigma = int(input("INGRESE EL VALOR DE SIGMA: ")) #Un valor mayor de sigma produce un suavizado más fuerte
@@ -808,12 +810,16 @@ def suavizado_filtroGausiano(df,dato_suavizar):  #acordarse que se puede suaviza
     #print(suavizado_gaussiano_pd)
     #print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRrr")
     
+    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd.shape())
+    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd)
+    
     return suavizado_gaussiano_pd
 
 
 
 
 # GENERA VALORES NAM POR LA FORMA EN LA QUE SE CALCULA EL MEDIA MOVIL
+# si puede generar valores NaN
 def suavizado_mediamovil(dato_suavizar):
 
     ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
@@ -825,8 +831,41 @@ def suavizado_mediamovil(dato_suavizar):
     
     suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean() # mean() es para hallar el promedio
     
-   
+
+    print("SUAVIZADO MEDIAMOVIL",suavizado_media_movil.shape)
+    print("SUAVIZADO MEDIAMOVIL",suavizado_media_movil)
+
+    
     return suavizado_media_movil
+    
+    
+   # print(suavizado_media_movil)
+
+
+# GENERA VALORES NAM POR LA FORMA EN LA QUE SE CALCULA EL MEDIA MOVIL
+# si puede generar valores NaN
+def suavizado_mediamovil_paraPCA(dato_suavizar , raman_shift):
+
+    ventana = int(input("INGRESE EL VALOR DE LA VENTANA: "))
+    normalizado = dato_suavizar
+
+      
+    suavizado_media_movil = pd.DataFrame()
+    
+    
+    suavizado_media_movil = normalizado.rolling(window=ventana, center=True).mean() # mean() es para hallar el promedio
+    
+    # Eliminar las filas donde hay NaN en el suavizado
+    mask = ~suavizado_media_movil.isna().any(axis=1)  # Crea una máscara para las filas sin NaN
+    suavizado_media_movil = suavizado_media_movil[mask]  # Filtrar los datos suavizados
+    raman_shift_sinNaN = raman_shift[mask]  # Aplicar el mismo filtro a raman_shift
+
+    print("SUAVIZADO MEDIAMOVIL",suavizado_media_movil.shape)
+    print("SUAVIZADO MEDIAMOVIL",suavizado_media_movil)
+    print("Raman shift sin NAN", raman_shift_sinNaN)
+    print(raman_shift_sinNaN)
+    
+    return suavizado_media_movil , raman_shift_sinNaN
     
     
    # print(suavizado_media_movil)
@@ -834,46 +873,63 @@ def suavizado_mediamovil(dato_suavizar):
 
 
 
-
-def primera_derivada(datos):
+def primera_derivada(datos,op,raman): # SI op es 0 es por que no viene del PCA, si es diferente a 0 es por que viene del PCA y debe de retornar los valores sin NaN
             
+    if op == 0 :
+        df_derivada = datos.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
+        print("xXXXXXXXxxXXXX")
+        print(df_derivada)
+        
+        # Calcular la primera derivada
+        df_derivada_diff = df_derivada.diff()
+        
+        # Imprimir la primera derivada
+        #print("Primera Derivada:")
+        #print(df_derivada_diff)
+        
+        
+        print("PRIMERA DERIVADA = ", df_derivada_diff.shape)
+        print("PRIMERA DERIVADA = ", df_derivada_diff)
+        return df_derivada_diff
     
-    df_derivada = datos.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
-    #print("xXXXXXXXxxXXXX")
-    #print(df_derivada)
-    
-    # Calcular la primera derivada
-    df_derivada_diff = df_derivada.diff()
-    
-    # Imprimir la primera derivada
-    #print("Primera Derivada:")
-    #print(df_derivada_diff)
-    
+    else:
+        df_derivada = datos.apply(pd.to_numeric, errors='coerce')  # Convertir a numérico
+        df_derivada_diff = df_derivada.diff()  # Calcular la primera derivada
 
-    return df_derivada_diff
+        # Crear una máscara para identificar las filas sin NaN
+        mask = ~df_derivada_diff.isna().any(axis=1)
+    
+        # Aplicar la máscara para eliminar filas con NaN en la derivada
+        df_derivada_diff = df_derivada_diff[mask]  
+        raman_shift_sinNaN = raman[mask]  # Ajustar raman_shift
+    
+        return df_derivada_diff, raman_shift_sinNaN
+
+
     #para la llamada del PCA
 
 
 
-def segunda_derivada(datos):
+def segunda_derivada(datos,op,raman):
     
-    df_derivada = datos.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
-    #print("xXXXXXXXxxXXXX")
-    #print(df_derivada)
-    
-    # Calcular la primera derivada
-    df_derivada_diff = df_derivada.diff()
-    #print("primera derivada")
-    #print(df_derivada_diff)
-    # Calculamos la segunda derivada
-    df_derivada_diff = df_derivada_diff.diff()
-    #print("segunda derivada")
-    #print(df_derivada_diff)
-    # Imprimir la primera derivada
-    #print("Primera Derivada:")
-    #print(df_derivada_diff)
-    return df_derivada_diff
-                        
+    if op == 0 :
+        df_derivada = datos.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
+        df_derivada_diff = df_derivada.diff()
+        df_derivada_diff = df_derivada_diff.diff()
+        print("SEGUNDA DERIVADA = ", df_derivada_diff.shape)
+        print("SEGUNDA DERIVADA = ", df_derivada_diff)
+        return df_derivada_diff
+    else:
+        df_derivada = datos.apply(pd.to_numeric, errors='coerce') # PASAMOS A NUMERICO SI ES NECESARIO
+        df_derivada_diff = df_derivada.diff()
+        df_derivada_diff = df_derivada_diff.diff()
+        # Crear una máscara para identificar las filas sin NaN
+        mask = ~df_derivada_diff.isna().any(axis=1)  
+        # Aplicar la máscara para eliminar filas con NaN en la derivada
+        df_derivada_diff = df_derivada_diff[mask]  
+        raman_shift_sinNaN = raman[mask]  # Ajustar raman_shift 
+        return df_derivada_diff, raman_shift_sinNaN
+              
 
 
 
@@ -1014,11 +1070,11 @@ def menu_correccion(df,raman_shift):
                         opcion_d = int(input("Opción: "))
     
                         if opcion_d == 1:
-                            derivada = primera_derivada(suavizar)
+                            derivada = primera_derivada(suavizar,0,raman_shift)
                             print("Primera derivada aplicada.")
                             return derivada, opcion, metodo_suavizado
                         elif opcion_d == 2:
-                            derivada = segunda_derivada(suavizar)
+                            derivada = segunda_derivada(suavizar,0,raman_shift)
                             print("Segunda derivada aplicada.")
                             return derivada, opcion, metodo_suavizado
                         elif opcion_d == 3:
@@ -1045,10 +1101,10 @@ def menu_correccion(df,raman_shift):
                         opcion_d = int(input("Opción: "))
     
                         if opcion_d == 1:
-                            derivada = primera_derivada(suavizar)
+                            derivada = primera_derivada(suavizar,0,raman_shift)
                             return derivada, opcion, metodo_suavizado
                         elif opcion_d == 2:
-                            derivada = segunda_derivada(suavizar)
+                            derivada = segunda_derivada(suavizar,0,raman_shift)
                             return derivada, opcion, metodo_suavizado
                         elif opcion_d == 3:
                             derivada = suavizar  # Devolver el resultado suavizado sin derivar
@@ -1068,6 +1124,153 @@ def menu_correccion(df,raman_shift):
 
 
 
+# ##ESTE CODIGO FUNCIONA PARA LAS OPCIONES 9,10 PARA LAS CORRECIONES
+def menu_correccion_pca(df,raman_shift):
+    print("entrooooooooooooo")
+    while True:  # Ciclo principal para manejar "Volver"
+        print("NORMALIZAR POR:")
+        print("1- Media")
+        print("2- Área")
+        print("3- Sin normalizar")
+        print("4- Volver")
+        
+ 
+        opcion = int(input("Selecciona una opción: "))
+
+
+        if opcion == 1:
+            suavizar = normalizado_media(df)
+        elif opcion == 2:
+            suavizar = normalizado_area(df,raman_shift)
+        elif opcion == 3:
+            suavizar = datos_sin_normalizar(df)
+        elif opcion == 4:
+            return None, None, None
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
+            continue
+
+        opcion_s = 0
+        while True:  # Submenú 
+             if opcion_s == 3:
+                 break
+             while True:
+                print("DESEA SUAVIZAR")
+                print("1. Sí")
+                print("2. No")
+                print("3. Volver")
+    
+                opcion_s = int(input("Opción: "))
+    
+                if opcion_s == 1:
+                    while True:  # Submenú de métodos de suavizado
+                        print("\n--- POR CUAL METODO DESEAS SUAVIZAR ---")
+                        print("1- Suavizado por Saviztky-Golay")
+                        print("2- Suavizado por Filtro Gaussiano")
+                        print("3- Suavizado por Media Móvil")
+                        print("4- Volver")
+                        
+    
+                        metodo_suavizado = int(input("Opción: "))
+                        
+    
+                        if metodo_suavizado == 1:
+                            suavizar = suavizado_saviztky_golay(suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 2:
+                            suavizar = suavizado_filtroGausiano(df,suavizar)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 3:
+                            suavizar , raman_shift_sinNaN = suavizado_mediamovil_paraPCA(suavizar,raman_shift)
+                            break  # Lleva al menú de derivadas
+                        elif metodo_suavizado == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                    # Ir al menú de derivadas después del suavizado
+                    while True:  # Submenú para derivadas
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+    
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            if metodo_suavizado != 3:
+                                derivada , raman_actual = primera_derivada(suavizar,1,raman_shift)
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                derivada , raman_actual = primera_derivada(suavizar,1,raman_shift_sinNaN)
+                                return derivada, opcion, metodo_suavizado , raman_actual
+                        elif opcion_d == 2:
+                            if metodo_suavizado != 3:
+                                derivada , raman_actual = segunda_derivada(suavizar,1,raman_shift)
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                derivada , raman_actual = segunda_derivada(suavizar,1,raman_shift_sinNaN)
+                                return derivada, opcion, metodo_suavizado , raman_actual
+                        elif opcion_d == 3:
+                            print("No se aplicó derivada.")
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar                      
+                            if metodo_suavizado != 3:
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                return derivada, opcion, metodo_suavizado , raman_shift_sinNaN
+                        elif opcion_d == 4:
+                            print("Volviendo al menú '¿Desea suavizar?'.")
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 2:
+                    metodo_suavizado = 5  # Valor para indicar que no se aplicó suavizado
+                    
+                    # Ir directamente al menú de derivadas
+                    while True:
+                        print("\n--- DESEA DERIVAR ---")
+                        print("1- Derivar por Primera Derivada")
+                        print("2- Derivar por Segunda Derivada")
+                        print("3- No Derivar")
+                        print("4- Volver")
+                        
+                        opcion_d = int(input("Opción: "))
+    
+                        if opcion_d == 1:
+                            if metodo_suavizado != 3:
+                                derivada , raman_actual = primera_derivada(suavizar,1,raman_shift)
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                derivada , raman_actual = primera_derivada(suavizar,1,raman_shift_sinNaN)
+                                return derivada, opcion, metodo_suavizado , raman_actual
+                        elif opcion_d == 2:
+                            if metodo_suavizado != 3:
+                                derivada , raman_actual = segunda_derivada(suavizar,1,raman_shift)
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                derivada , raman_actual = segunda_derivada(suavizar,1,raman_shift_sinNaN)
+                                return derivada, opcion, metodo_suavizado , raman_actual
+                        elif opcion_d == 3:
+                            derivada = suavizar  # Devolver el resultado suavizado sin derivar
+                            if metodo_suavizado != 3:
+                                return derivada, opcion, metodo_suavizado , raman_shift
+                            else:
+                                return derivada, opcion, metodo_suavizado , raman_shift_sinNaN
+                        elif opcion_d == 4:
+                            break  # Regresa al menú 
+                        else:
+                            print("Opción no válida. Inténtalo de nuevo.")
+    
+                elif opcion_s == 3:
+                    break  # Regresa al menú principal
+                else:
+                    print("Opción no válida. Inténtalo de nuevo.")
+                    continue
+                
+
+
 
 
 # # # POR EL METODO DE REGRESION LINEAL
@@ -1077,12 +1280,16 @@ def correcion_LineaB(normalizado_f,raman_shift):
 
     # Obtener los índices de las filas válidas
     indices_validos = normalizado_f.dropna().index
-
+    print("INDICES VALIDOS")
+    print(indices_validos)
     # Filtrar raman_shift por los índices válidos
     raman_shift_filtrado = raman_shift.loc[indices_validos].reset_index(drop=True)
-
+    print("RAMAN SHIFT FILTRADO")
+    print(raman_shift_filtrado)
     # Filtrar normalizado_f por los índices válidos
     normalizado_f_filtrado = normalizado_f.loc[indices_validos].reset_index(drop=True)
+    print("NORMALIZADO F FILTRADO")
+    print(normalizado_f_filtrado)
 
  
         #print("NORMALIZADO-F")
@@ -1119,14 +1326,21 @@ def correcion_LineaB(normalizado_f,raman_shift):
         #print(raman_shift)
         
         # Iterar sobre las demás columnas
+    print("AHORA ENTRARA EN EL FOR")
     for col in df_corregido.columns:
             intensidades = df_corregido[col]  # Extraer la columna actual
             intensidades = pd.to_numeric(intensidades, errors='coerce') #ASEGURAMOS QUE LAS INTENSIDADES SEAN NUMERICOS           
-            #print(intensidades)
+            raman_shift_filtrado = raman_shift_filtrado.astype(str).str.replace(",", ".")  # Asegurar que usa '.' como separador decimal
+            raman_shift_filtrado = pd.to_numeric(raman_shift_filtrado, errors="coerce")  # Convertir a float
+            print("Tipos en raman_shift_filtrado:", raman_shift_filtrado.dtype)
+            print("Tipos en intensidades:", intensidades.dtype)
+            print("INTENSIDADES")
+            print(intensidades)
             # print(cont)                        
             # Calcularmos la pendiente 
             coef = np.polyfit(raman_shift_filtrado, intensidades, 1)  # Grado 1 para línea recta , coef = coeficiente de Y=mx+b , coef[0] es la pendiente m, y coef[1] es la intersección b.
             # SE PONE DE GRADO 1 POR QUE QUEREMOS AJUSTAR UN POLINOMIO DE LA FORMA Y=MX+B 
+            print("PRIMERA INTERACION CON EL POLYFIT")
             pendiente = coef[0]  # La pendiente (m) está en el índice 0 de los coeficientes
             interseccion = coef[1] # La interseccion (b) esta en el indice 1 
             # Guardamos la pendiente y intersecciones en el diccionario
@@ -1177,7 +1391,7 @@ def correcion_LineaB(normalizado_f,raman_shift):
 def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
 
     print("Datos PCA:")
-    print(dato[:5])  # Muestra las primeras 5 filas
+    print(dato.shape)  
 
     num_muestras, num_variables = dato.shape #OBTENEMOS LA CANTIDAD DE  FILAS Y COLUMNAS
 
@@ -1215,6 +1429,7 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
         print(f"n debe estar entre 2 y {max_pc}.")
 
 
+
     dato = dato.dropna() #eliminamos las filas con valores NAN
     datos_df = dato.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
     
@@ -1227,6 +1442,10 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
     escalado = StandardScaler()  #Escalar los datos para que cada columna (intensidades en cada longitud de onda) tenga una media de 0 y una desviación estándar de 1.
     dato_escalado = escalado.fit_transform(datos_df)
 
+    print(f"🔹 Número de columnas en dato_escalado: {dato_escalado.shape[1]}")  # Debería ser 234, no 731
+    print(f"🔹 Tamaño de raman_shift: {raman_shift.shape[0]}")  # Debe ser 234
+
+
     # print("dato escalado dentro de la funcio de pca")
     # print(dato_escalado.shape)
 
@@ -1235,17 +1454,23 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
     #centralizador = StandardScaler(with_std=False)  # Solo restamos la media sin escalar por desviación estándar
     #dato_centralizado = centralizador.fit_transform(datos_df)
 
+    # # Ver cuántos valores únicos tiene cada columna
+    # print(dato_escalado.nunique(axis=0))
+    
+    # # Ver cuántas columnas tienen valores NaN
+    # print(dato_escalado.isnull().sum())
 
 
     pca = PCA(n_components=n_componentes) 
     dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza, (cambiar dato_centralizado por dato_escalado si quiero usar el otro metodo)
     # El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
     #y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
-    print("Datos_PCA xd:")
-    print(dato_pca[:5]) 
-    print("pca.components_PCAAA")
-    print(pca.components_)
+    # print("Datos_PCA xd:")
+    # print(dato_pca[:5]) 
+    # print("pca.components_PCAAA")
+    # print(pca.components_)
 
+    print(f"🔹 Dimensiones de loadings (pca.components_): {pca.components_.shape}")  # Debería ser (n_componentes, 731)
 
     # Obtener Eigenvalores (Varianza explicada)
     eigenvalores = pca.explained_variance_
@@ -1254,16 +1479,18 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
     # Obtener Eigenvectores (Componentes principales)
     eigenvectores = pca.components_ * -1 # en realidad multiplique por -1 por que quiero cambiar el orden de los signos, No afecta el resultado final
  
-    # Mostrar Eigenvalores
-    print("Eigenvalores (Varianza explicada):")
-    print(eigenvalores)
-   
-    # Mostrar Eigenvectores
-    print("\nEigenvectores (Componentes principales):")
-    print(eigenvectores.T)
     
-    print("Porcentaje de Varianza Explicada por cada componente")
-    print(porcentaje_varianza)
+     # descomentar para ver los datos de los de abajo
+    # # Mostrar Eigenvalores
+    # print("Eigenvalores (Varianza explicada):")
+    # print(eigenvalores)
+   
+    # # Mostrar Eigenvectores
+    # print("\nEigenvectores (Componentes principales):")
+    # print(eigenvectores.T)
+    
+    # print("Porcentaje de Varianza Explicada por cada componente")
+    # print(porcentaje_varianza)
 
 
 
@@ -1272,7 +1499,7 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
         componentes_x = [int(input(f"Ingrese el número de PC para X (1-{n_componentes}): ")) - 1]
         componentes_y = [int(input(f"Ingrese el número de PC para Y (1-{n_componentes}): ")) - 1]
         eje_x = dato_pca[:, componentes_x] #CARGAMOS LAS COORDENADAS EN X QUE CARGO EL USUARIO
-        eje_y = dato_pca[:, componentes_y] #CARGAMOS LAS COORDENADAS EN X QUE CARGO EL USUARIO
+        eje_y = dato_pca[:, componentes_y] #CARGAMOS LAS COORDENADAS EN Y QUE CARGO EL USUARIO
         dato_pca = np.column_stack((eje_x, eje_y)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
 
         eje_z = "No Aporta" # SOLO PARA QUE APAREZCA ESE MENSAJE EN EL ARCHIVO
@@ -1280,18 +1507,20 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
         componentes_z = "No Aporta" # SOLO PARA QUE APAREZCA ESE MENSAJE EN EL ARCHIVO
         # ESTA PARTE ES SOLO PARA APARTAR SU PORCENTAJE DENTRO DE UNA VARIABLE Y ENVIAR AL GRAFICADOR PARA QUE APAREZCA EN LOS EJES DEL GRAFICO EL %
         porcentaje_varianza_x = porcentaje_varianza[componentes_x]
-        print("PORCENTAJE DE VARIANZA X", porcentaje_varianza_x)
+        #print("PORCENTAJE DE VARIANZA X", porcentaje_varianza_x)
         porcentaje_varianza_y = porcentaje_varianza[componentes_y]
-        print("PORCENTAJE DE VARIANZA Y", porcentaje_varianza_y)
+        #print("PORCENTAJE DE VARIANZA Y", porcentaje_varianza_y)
         # print("x= ",componentes_x)
         # print("y= ",componentes_y)
         if aux == 1:
             visualizar_pca = 3 # pongo 3 para que se vaya a la funcion de grafica loanding una vez obtenido los datos
             componente_seleccionado = [componentes_x[0] , componentes_y[0]]
             
+            
         print("DATO PCA")
         print(dato_pca)
-    
+        print(dato_pca.shape)
+
 
     elif visualizar_pca == 2: # lee los datos para el 3D
         componentes_x = [int(input(f"Ingrese el número de PC para X (1-{n_componentes}): ")) - 1]
@@ -1303,8 +1532,8 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
         
         dato_pca = np.column_stack((eje_x, eje_y, eje_z)) #GUARDAMOS DENTRO DE LA VARIABLE LA UNION DE LOS PC SELECCIONADOS
         
-        print("DATO PCA")
-        print(dato_pca)
+        # print("DATO PCA")
+        # print(dato_pca)
         if aux == 1:
             visualizar_pca = 3 # pongo 3 para que se vaya a la funcion de grafica loanding una vez obtenido los datos
             componente_seleccionado = [componentes_x[0] , componentes_y[0] , componentes_z[0]]
@@ -1322,10 +1551,17 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
     #     print("z= ",componentes_z)
         
     
-    print("Deseas generar un informe del PCA?")
+    print("Deseas generar un informe del loadings")
     print("1. Generar Informe")
     print("2. No")
     informe = int(input("Opcion: "))
+    
+    print(f"🔹 Dimensiones antes de PCA: {dato_escalado.shape}")  # Debe ser (233, 731)
+    print(f"🔹 Dimensiones después de PCA: {dato_pca.shape}")  # Debe ser (233, n_componentes)
+    print(f"🔹 Dimensión de raman_shift: {raman_shift.shape}")  # Debe ser (731,)
+    print(f"🔹 Dimensión de loadings: {pca.components_.shape}")  # Debe ser (n_componentes, 731)
+
+    
     
     if informe == 1:
         nombre_archivo = input("Ingrese el nombre del archivo: ")
@@ -1573,10 +1809,13 @@ def generar_elipse(centro, cov, num_puntos=100, color='rgba(150,150,150,0.3)',in
 
 
 def grafico_loading(pca, raman_shift, op_pca):
-    print("selected_components=",op_pca)
-    print("PCA dentro de la función de loading")
-    print(pca)
-
+    
+    print("ENTRO EN GRAFICO DE LOADING")
+    # print("selected_components=",op_pca)
+    # print("PCA dentro de la función de loading")
+    # print(pca)
+    # print("Raman shift =",raman_shift.shape)
+    # print(raman_shift)
     plt.figure(figsize=(10, 6))
 
     # if not hasattr(pca, 'components_'):
@@ -1590,14 +1829,19 @@ def grafico_loading(pca, raman_shift, op_pca):
     ## El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
     ##y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
     loadings = pca.components_  # Obtener los loadings aca es donde hace los calculos de los pessos
-    print("pca.components_")
-    print(pca.components_)
-    print("LOADING")
-    print(loadings)
-    print("LOADING.shape")
-    print(loadings.shape)
+    print("DESPUES DE CALCULAR LOS PESO DE LOADING")
+    # print("pca.components_")
+    # print(pca.components_)
+    # print("LOADING")
+    # print(loadings)
+    # print("LOADING.shape")
+    # print(loadings.shape)
     n_componentes = loadings.shape[0]  # Número de componentes principales
-    print(" n_components=", n_componentes)
+    # print(" n_components=", n_componentes)
+    # print(f"Shape de loadings: {loadings.shape}")  # (n_components, n_features)
+    # print(f"Tamaño de raman_shift: {len(raman_shift)}")
+
+
     # Asegurar que `selected_components` sea una lista de enteros
     # if isinstance(selected_components, int):  
     #     selected_components = [selected_components]  # Convertir a lista si es un solo número
@@ -1610,21 +1854,28 @@ def grafico_loading(pca, raman_shift, op_pca):
     df_loadings = pd.DataFrame({"Raman_Shift": raman_shift}) #CREAMOS UN DF Y ASIGNAMOS EL RAMANSHIFT COMO PRIMERA COLUMNA
 
     for i in op_pca:  
+        print("ENTRO EN EL FOR DE LOADIN")
         if not isinstance(i, int):  
             raise ValueError(f"El índice de componente debe ser un entero, pero se recibió {type(i)}.")
         if i >= n_componentes:
             print(f"Advertencia: PC {i+1} no existe en los datos de PCA.")
             continue
 
-        print("Dimensión de raman_shift:", raman_shift.shape)
-        print("Dimensión de PCA components:", loadings.shape)
-        print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
-        print(loadings[i, :])
+        # print("Dimensión de raman_shift:", raman_shift.shape)
+        # print("Dimensión de PCA components:", loadings.shape)
+        # print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
+        # #print(loadings[i, :])
+        # print(f"Tamaño de raman_shift: {len(raman_shift)}")
+        # print(f"Tamaño de loadings[i, :]: {loadings[i, :].shape}")
+
+        #print("Raman shift")
+        #print(raman_shift)
+
         plt.plot(raman_shift, loadings[i, :], label=f'PC {i+1}')
        
         #PARA LA OPCION DE DESCARGAR UN .CSV
         df_loadings[f'PC{i+1}'] = loadings[i, :] #LUEGO ASIGANOMS LOS VALORES DE LOANDING AL df_loadings
-    
+        print("iteraccion: ",i)
     
     # para que en el eje x muestre los valores cada 250 por que osino sale muy encimado
     # Ajustar el intervalo del eje X a cada 500 cm⁻¹

@@ -102,8 +102,6 @@ def identificar_delimitador(archivo):
     
 
 
-
-
 def detectar_labels(df): #Detecta si los labels están en la fila o en la columna para ver si hacemos la transpuesta  o no
 
     # Verificar la primera fila (si contiene strings)

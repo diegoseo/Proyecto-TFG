@@ -11,7 +11,7 @@ from manipulacion_archivos import nombre_archivo , cargar_archivo
 import sys  # Para usar sys.exit()
 #from funciones import * # NO SE RECOMIENDA IMPORTAR TODO DE UNA CON EL * 
 from funciones import mostrar_espectros, datos_sin_normalizar, mostrar_leyendas,guardar_archivo, espectro_acotado,grafico_tipo,grafico_acotado_tipo,descargar_csv,descargar_csv_acotado,descargar_csv_tipo,descargar_csv_acotado_tipo # SE LLAMA DE A UNO A LAS FUNCIONES PARA NO TENER QUE HACER CADA RATO funcion.raman_shift
-from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB , pca , hca
+from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB , pca , hca , menu_correccion_pca
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -64,6 +64,7 @@ def menu_principal():
                print(df)
                # LEER UN ARCHIVO Y GUARDAMOS PARA EL DATA FUSION
                guardar_archivo(df)
+               num = num + 1
                
                
                
@@ -374,7 +375,7 @@ def main(df,archivo_nombre):
                       dato,nor_op = suavizado_menu(df,raman_shift)
                       if dato is None:  # Manejar la opción "Volver"
                           continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                      dato_suavizado = suavizado_mediamovil(dato)
+                      dato_suavizado= suavizado_mediamovil(dato)
                       mostrar_espectros(archivo_nombre,dato_suavizado,raman_shift,asignacion_colores,metodo,nor_op,0,0)
                   elif metodo_grafico == 2:
                       dato,nor_op = suavizado_menu(df,raman_shift)
@@ -416,13 +417,13 @@ def main(df,archivo_nombre):
                       dato,nor_op = suavizado_menu(df,raman_shift)
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
-                      dato_suavizado = suavizado_mediamovil(dato)
+                      dato_suavizado= suavizado_mediamovil(dato)
                       descargar_csv_tipo(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 8:
                       dato,nor_op = suavizado_menu(df,raman_shift)
                       if dato is None:  # Manejar la opción "Volver"
                           continue 
-                      dato_suavizado = suavizado_mediamovil(dato)
+                      dato_suavizado  = suavizado_mediamovil(dato)
                       descargar_csv_acotado_tipo(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 9:
                       main(df,archivo_nombre)                   
@@ -436,49 +437,49 @@ def main(df,archivo_nombre):
                           dato,nor_op ,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           mostrar_espectros(archivo_nombre,dato_suavizado,raman_shift,asignacion_colores,metodo,nor_op,m_suavi,1)
                       elif metodo_grafico == 2:
                           dato,nor_op,m_suavi= suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           espectro_acotado(archivo_nombre,asignacion_colores,df,dato_suavizado,0,0,nor_op,m_suavi,1)
                       elif metodo_grafico == 3:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           grafico_tipo(archivo_nombre,asignacion_colores,dato_suavizado,raman_shift,metodo,nor_op,m_suavi,1) # copiar asi para la segunda derivada
                       elif metodo_grafico == 4:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           grafico_acotado_tipo(archivo_nombre,asignacion_colores,df,dato_suavizado,raman_shift,metodo,nor_op,m_suavi,1)
                       elif metodo_grafico == 5:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           descargar_csv(df,7, dato_suavizado,raman_shift) # 7 PARA SABER QUE VIENE DE LA PRIMERA DERIVADA
                       elif metodo_grafico == 6:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           descargar_csv_acotado(df,dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 7:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           descargar_csv_tipo(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 8:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = primera_derivada(dato)
+                          dato_suavizado = primera_derivada(dato,0,raman_shift)
                           descargar_csv_acotado_tipo(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
                           main(df,archivo_nombre)                     
@@ -492,49 +493,49 @@ def main(df,archivo_nombre):
                           dato,nor_op ,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           mostrar_espectros(archivo_nombre,dato_suavizado,raman_shift,asignacion_colores,metodo,nor_op,m_suavi,2)
                       elif metodo_grafico == 2:
                           dato,nor_op,m_suavi= suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           espectro_acotado(archivo_nombre,asignacion_colores,df,dato_suavizado,0,0,nor_op,m_suavi,2)
                       elif metodo_grafico == 3:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           grafico_tipo(archivo_nombre,asignacion_colores,dato_suavizado,raman_shift,metodo,nor_op,m_suavi,2)
                       elif metodo_grafico == 4:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           grafico_acotado_tipo(archivo_nombre,asignacion_colores,df,dato_suavizado,raman_shift,metodo,nor_op,m_suavi,2)
                       elif metodo_grafico == 5:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           descargar_csv(df,8, dato_suavizado,raman_shift) # 8 PARA SABER QUE VIENE DE LA SEGUNDA DERIVADA
                       elif metodo_grafico == 6:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           descargar_csv_acotado(df,dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 7:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           descargar_csv_tipo(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 8:
                           dato,nor_op,m_suavi = suavizado_menu_derivadas(df,raman_shift)
                           if dato is None:  # Manejar la opción "Volver"
                               continue 
-                          dato_suavizado = segunda_derivada(dato)
+                          dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           descargar_csv_acotado_tipo(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
                           main(df,archivo_nombre)     
@@ -668,16 +669,16 @@ def main(df,archivo_nombre):
                     print("3. No")
                     correcion = int(input("Opcion: "))
                     if correcion == 1:
-                        dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
-                        dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
+                        dato,nor_op,m_suavi, raman_shift_nuevo = menu_correccion_pca(df,raman_shift)
+                        dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift_nuevo)
                         dato = dato_suavizado
-                        pca(dato,raman_shift,archivo_nombre,asignacion_colores,types) 
+                        pca(dato,raman_shift_corregido,archivo_nombre,asignacion_colores,types) 
                     elif correcion == 2:
                             print("FALTA IMPLEMENTAR CORRECION DE SHIRLEY")
                             pca(dato,raman_shift,archivo_nombre,asignacion_colores,types)
                     else: 
-                            dato,nor_op,m_suavi = menu_correccion(df,raman_shift)
-                            pca(dato,raman_shift,archivo_nombre,asignacion_colores,types)
+                            dato,nor_op,m_suavi, raman_shift_nuevo = menu_correccion_pca(df,raman_shift)
+                            pca(dato,raman_shift_nuevo,archivo_nombre,asignacion_colores,types)
                                   
                 elif m_dim == 2:
                         print("ACA SE HARA LA LLAMADA A LOS OTROS METODOS DE REDUCCION DE DIMENSIONES")
