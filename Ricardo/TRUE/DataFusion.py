@@ -16,6 +16,8 @@ from scipy.signal import savgol_filter
 from sklearn.decomposition import PCA
 from numpy import trapz
 from scipy.ndimage import gaussian_filter1d
+import sys
+import time
 
 
 ## Función para detectar qué tipo de delimitador tiene el CSV
@@ -111,7 +113,22 @@ def encabezados(df):
     print(unique_types)
     return unique_types 
 
+def texto_desplazamiento(texto, espacio=6, velocidad=0.1, repeticiones = 5):
+    texto = " " * espacio + texto  # Agrega espacios al inicio
+    for i in range(repeticiones):
+        sys.stdout.write("\r" + texto[i:])  # Sobrescribe la línea
+        sys.stdout.flush()
+        time.sleep(velocidad)
+    
+    sys.stdout.write("\n")  # Salto de línea para evitar sobrescribir
+   
+
+# Ejemplo de uso
+
+
 def menu():
+    print("-" * 50) 
+    texto_desplazamiento("MENU", 10, 0.1)
     print("1. Mostrar espectros originales ")
     
     
