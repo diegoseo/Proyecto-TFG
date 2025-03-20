@@ -9,6 +9,13 @@ Created on Sun Mar 16 11:55:37 2025
 import pandas as pd
 import csv
 import re  # Para manejo de expresiones regulares
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+from scipy.signal import savgol_filter
+from sklearn.decomposition import PCA
+from numpy import trapz
+from scipy.ndimage import gaussian_filter1d
 
 
 ## Función para detectar qué tipo de delimitador tiene el CSV
@@ -61,6 +68,56 @@ def lectura_archivo(archivo):
             return None
     return None
 
+def mostrar_espectros(df): 
+    
+    x_column = df.columns[0]
+    
+    unique_types = encabezados(df) 
+    
+    colors = plt.cm.tab20.colors  # Paleta de colores suficientemente grande
+    color_map = {unique: colors[i % len(colors)] for i, unique in enumerate(unique_types)}
+
+    # Configurar la figura
+    plt.figure(figsize=(14, 10))
+    
+    # Graficar cada tipo una sola vez en la leyenda
+    for unique_type in unique_types:
+        # Filtrar las columnas correspondientes al tipo actual
+        columns = [col for col in df.columns if col.startswith(unique_type)]
+        
+        # Graficar todas las columnas del tipo actual
+        for col in columns:
+            plt.plot(df[x_column], df[col], color=color_map[unique_type], alpha=0.6)
+        
+        # Agregar una entrada en la leyenda solo para el tipo (una vez)
+        plt.plot([], [], label=unique_type, color=color_map[unique_type])  # Dummy plot for legend
+    
+    # Etiquetas y leyendas
+    plt.title("Espectros Raman", fontsize=16)
+    plt.xlabel(f"{x_column} (cm⁻¹)", fontsize=14)  # Se usa el nombre de la primera columna
+    plt.ylabel("Intensidad", fontsize=14)
+    plt.legend(title="Tipos", fontsize=12, loc='upper right', frameon=False)
+    plt.grid(True)
+    
+    # Mostrar la gráfica
+    plt.show()
+    
+def encabezados(df):
+    # Obtener los encabezados únicos
+    unique_headers = df.columns.unique()
+    print("\n🔹 Encabezados únicos:")
+    print(unique_headers)
+    unique_types = set(df.columns[1:])  # Toma todas las columnas excepto la primera
+    print(unique_types)
+    return unique_types 
+
+def menu():
+    print("1. Mostrar espectros originales ")
+    
+    
+    
+    
+    
 
 ## Función principal
 def main():
@@ -69,7 +126,17 @@ def main():
     
     if df is not None:
         print("\n🔹 Primeras filas del archivo CSV:")
-        print(df.head())  # Muestra las primeras filas para verificar
+        print(df.head())
+    while True:
+        menu()
+        opt = int(input("Ingrese opcion: "))    
+        if opt == 1:
+            mostrar_espectros(df)
+        if opt >2:
+            break
+            
+    
+    
 
 if __name__ == "__main__":
     main()
