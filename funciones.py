@@ -878,7 +878,7 @@ def suavizado_filtroGausiano(df,dato_suavizar):  #acordarse que se puede suaviza
     #print(suavizado_gaussiano_pd)
     #print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRrr")
     
-    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd.shape())
+    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd.shape)
     print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd)
     
     return suavizado_gaussiano_pd
