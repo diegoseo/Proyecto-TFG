@@ -29,7 +29,7 @@ def detectar_separador(archivo):
             if sniffer.has_header(muestra):
                 print("✔ Se detectó que el archivo tiene encabezado.")
             separador = sniffer.sniff(muestra).delimiter
-            print(f"🔍 Separador detectado: '{separador}'")
+            #print(f"🔍 Separador detectado: '{separador}'")
             return separador
     except Exception as e:
         print(f"❌ Error al analizar el archivo: {e}")
@@ -53,7 +53,8 @@ def limpiar_encabezados(columnas):
 
 
 ## Función para leer el CSV, detectar separador y limpiar encabezados
-def lectura_archivo(archivo):
+def lectura_archivo():
+    archivo = input("Ingrese la ruta o el nombre del archivo: ")
     separador = detectar_separador(archivo)
     if separador:
         try:
@@ -129,7 +130,10 @@ def texto_desplazamiento(texto, espacio=6, velocidad=0.1, repeticiones = 5):
 def menu():
     print("-" * 50) 
     texto_desplazamiento("MENU", 10, 0.1)
+    #print(f"dataset actual: {dataset}")
+    print("0. leer otro dataset")
     print("1. Mostrar espectros originales ")
+    print("2. Normalizar Espectro")
     
     
     
@@ -138,18 +142,20 @@ def menu():
 
 ## Función principal
 def main():
-    archivo_csv = input("Ingrese la ruta o el nombre del archivo: ")
-    df = lectura_archivo(archivo_csv)
-    
+    df = lectura_archivo()
     if df is not None:
         print("\n🔹 Primeras filas del archivo CSV:")
         print(df.head())
     while True:
         menu()
         opt = int(input("Ingrese opcion: "))    
+        if opt == 0:
+            df=lectura_archivo()
         if opt == 1:
             mostrar_espectros(df)
-        if opt >2:
+        if opt == 2:
+            break;
+        if opt >10:
             break
             
     
