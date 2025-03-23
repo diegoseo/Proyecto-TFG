@@ -34,6 +34,7 @@ from mpl_toolkits.mplot3d import Axes3D    # PARA GRAFICAR EN 3D
 import webbrowser
 from scipy.stats import chi2 # PARA GRAFICAR LOS ELIPSOIDES
 import matplotlib.ticker as ticker # PARA QUE EL EJE X MUESTRE EN ALGUN INTERVALO Y NO SALGA ENCIMADO (SE USO EN LOS GRAFICOS DE LOADINGS)
+import plotly.io as pio
 #from mayavi import mlab
 
 
@@ -133,8 +134,14 @@ while existe == False:
         pila.append(df.copy())
         existe = True
         if detectar_labels(df) == "columna" :
-            print("SE HIZO LA TRASPUESTA")
+            print("SE HIZO LA TRASPUESTA") # si se hizo la transpuesta es por que si o si ha al menos 2 label por lo que eliminaremos uno, el codigo fallara si hay mas de dos label
             df = df.T
+            #  Eliminar la fila con índice 0
+            df = df.drop(index=0)  
+            #  Reiniciar los índices después de la eliminación
+            df = df.reset_index(drop=True)
+            print("eliminacion de label")
+            print(df)
         else:
             print("NO SE HIZO LA TRANSPUESTA")
     else:
@@ -258,7 +265,8 @@ def mostrar_menu():
      print("10. CORRECION SHIRLEY")
      print("11. PCA")
      print("12. GRAFICO HCA")
-     print("13. Salir")
+     print("13. CAMBIAR ARCHIVO")
+     print("14. Salir")
       
 def sub_menu():
     print("Como deseas ver el espectro")
@@ -364,6 +372,28 @@ def normalizado_media():
     #print('normalizacion media')
     #df_media_pca.to_csv("nor_media_df.csv", index=False)
     return  df_media_pca
+
+
+
+
+
+# def normalizado_media():
+#       intensity = df.iloc[1:, 1:].astype(float)  # Convertimos a float para evitar errores
+#       cabecera = df.iloc[[0]].copy()  # Extraer la primera fila como encabezado
+
+#       media = intensity.mean()  # Calculamos la media de cada columna
+#       dato_normalizado = intensity - media  # Restamos la media
+
+#       # Concatenamos la cabecera con los datos normalizados
+#       df_concatenado = pd.concat([cabecera, dato_normalizado], axis=0, ignore_index=True)
+
+#       # Usamos la primera fila como cabecera y eliminamos la fila original
+#       df_concatenado.columns = df_concatenado.iloc[0]  
+#       df_concatenado = df_concatenado[1:].reset_index(drop=True)
+
+#       return df_concatenado
+
+
 
 
 """
@@ -964,8 +994,10 @@ def main():
                             hca(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
                         elif metodo_grafico == 2:
                             main() 
-                      
-        elif opcion == '13':
+        elif opcion == "13":
+            python = sys.executable  # Obtiene la ruta del ejecutable de Python
+            os.execl(python, python, *sys.argv)  # Reinicia el script                          
+        elif opcion == '14':
             print("Saliendo del programa...")
             sys.exit()  # Termina completamente el programa
         else:
@@ -1188,7 +1220,9 @@ def descargar_csv(normalizado,dato,raman_shift_actual):
     df_aux = dato # obtenemos el dataframe              
     raman_shift_aux = raman_shift_actual[:len(df_aux)] #nos aseguramos de que el tengan la misa longitud         
     df_aux.insert(0, '', raman_shift_aux)    # Insertamos la columna raman_shift en la posición 0
-   
+    df_aux.columns = df_aux.iloc[0]  # Asigna la primera fila como nombres de columnas
+    df_aux = df_aux[1:].reset_index(drop=True)  # Elimina la primera fila y reindexa
+    
     if normalizado == 1:
         df.to_csv('output_sin_normalizar.csv', index=False, header=False)
         print("SE HA DESCARGADO EL ARCHIVO CON EL NOMBRE: output_sin_normalizar.csv")
@@ -1450,8 +1484,8 @@ def descargar_csv_acotado_tipo(datos,opcion,raman_shift_actual):
 def mostrar_espectros(datos,raman_shift,metodo,nor_op,op_der,derivada): # LA VARIABLE DERIVADA ES  SOLO PARA SABER SI ES LA 1RA O LA 2DA
     
     
-    #print("ENTRO EN MOSTRAR ESPECTROS")
-    #print(datos)
+    print("ENTRO EN MOSTRAR ESPECTROS")
+    print(datos)
     
     # Graficar los espectros
     if nor_op != 0:
@@ -1473,9 +1507,11 @@ def mostrar_espectros(datos,raman_shift,metodo,nor_op,op_der,derivada): # LA VAR
                 if isinstance(col, str):  #Verifica que el nombre de la columna sea un string
                     if tipo in leyendas_tipos:
                         plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1,label=col)   
+                        #plt.xticks(np.arange(min(raman_shift[1:].astype(float)), max(raman_shift[1:].astype(float)), step=300))
                         break
                     else:
                         plt.plot(raman_shift , datos[col], color=color_actual, alpha=0.5, linewidth = 0.1) 
+                        #plt.xticks(np.arange(min(raman_shift[1:].astype(float)), max(raman_shift[1:].astype(float)), step=300))         
                         leyendas_tipos.add(tipo) 
                 pos_y+=1 
     
@@ -2873,7 +2909,7 @@ def correcion_LineaB(normalizado_f):
 # Spearman: Para medir relaciones monótonas entre vectores continuos.
 # Jaccard: Para medir similitudes/diferencias en datos binarios o categóricos.
 
-import plotly.figure_factory as ff
+#import plotly.figure_factory as ff
 import scipy.cluster.hierarchy as sch
 
 def hca(dato,raman_shift):
@@ -2983,8 +3019,14 @@ def hca(dato,raman_shift):
             else:
                 return
 
-            # Usar truncate_mode='level' para agrupar clusters pequeños.
 
+
+
+            # Números sin paréntesis (Ejemplo: 361) Representan una muestra individual dentro del dataset.
+            # Números con paréntesis (Ejemplo: (36))  Indican un clúster que ya agrupa múltiples muestras, 36 en este caso
+            # por ejemplo al sumar todo el eje x de Limpio.csv deberia de dar 731 ,(361) vale solo 1
+            # Usar truncate_mode='level' para agrupar clusters pequeños.
+            # El eje Y muestra la "distancia" o disimilitud entre los clústeres.
             # El eje X en tu dendrograma representa las muestras o clusters fusionado
             # Los números indican cuántas muestras se han fusionado en cada cluster. ejemplo= (17) significa que en ese punto se han fusionado 17 muestras en un solo cluster.
             #  La altura en el eje Y sigue representando la distancia entre los clusters.
@@ -3572,8 +3614,8 @@ def hca(dato,raman_shift):
 
 def pca(dato, raman_shift):
 
-    # print("Datos PCA:")
-    # print(dato[:5])  # Muestra las primeras 5 filas
+    print("Datos PCA:")
+    print(dato[:5])  # Muestra las primeras 5 filas
 
     num_muestras, num_variables = dato.shape #OBTENEMOS LA CANTIDAD DE  FILAS Y COLUMNAS
 
@@ -3613,15 +3655,28 @@ def pca(dato, raman_shift):
 
     dato = dato.dropna() #eliminamos las filas con valores NAN
     datos_df = dato.transpose() #PASAMOS LA CABECERA DE TIPOS A LA COLUMNA
+    
+    
+    #with_mean=True → Resta la media (centraliza los datos).
+    #with_std=True → Divide por la desviación estándar (escala los datos).
+    #StandardScaler() y StandardScaler(with_std=True) son lo mismo porque el valor por defecto de with_std es True
+    
+    #DESCOMENTAR LO DE ABAJO SI QUIERO CENTRALIZAR Y DIVIDIR POR SU DESVACION ESTANDAR
     escalado = StandardScaler()  #Escalar los datos para que cada columna (intensidades en cada longitud de onda) tenga una media de 0 y una desviación estándar de 1.
     dato_escalado = escalado.fit_transform(datos_df)
 
-    print("dato escalado dentro de la funcio de pca")
-    print(dato_escalado.shape)
+    # print("dato escalado dentro de la funcio de pca")
+    # print(dato_escalado.shape)
 
 
-    pca = PCA(n_components=n_componentes)
-    dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza
+    #SI SOLO QUIERO CENTRALIZAR Y NO DIVIDIR POR LA DESVIACION ESTANDAR (Igual al Orange)
+    #centralizador = StandardScaler(with_std=False)  # Solo restamos la media sin escalar por desviación estándar
+    #dato_centralizado = centralizador.fit_transform(datos_df)
+
+
+
+    pca = PCA(n_components=n_componentes) 
+    dato_pca = pca.fit_transform(dato_escalado)  # fit_transform ya hace el calcilo de los eigenvectores y eigenvalores y matriz de covarianza, (cambiar dato_centralizado por dato_escalado si quiero usar el otro metodo)
     # El pca en pca.fit_transform(dato_escalado) no cambia su valor, sino que almacena internamente los parámetros del PCA (eigenvectores, varianza explicada, etc.) 
     #y es por eso que dentro de la funcion de loading puede hacer el calculo de loadings = pca.components_ y de viene que loadings saclos valores 
     print("Datos_PCA xd:")
@@ -3816,6 +3871,7 @@ def plot_pca_2d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,componentes
     )
     
     # Mostrar la gráfica
+    fig.show(renderer="browser")
     fig.show(renderer="svg")
 
 
@@ -3853,11 +3909,36 @@ def plot_pca_3d(dato_pca,porcentaje_varianza_x,porcentaje_varianza_y,porcentaje_
 
 
     fig.update_layout(
-        title=f'Análisis de Componentes Principales 3D de {archivo_nombre}',
+        legend=dict(
+                font=dict(
+                size=18  # Aumenta el tamaño de la leyenda (puedes probar con 16, 18, etc.)
+                ),
+                title=dict(
+                            text="Tipos de Muestras",  # Título de la leyenda
+                            font=dict(size=16, family="Arial", color="black")  # Configuración del título
+                          ),
+                itemsizing="constant",  # Mantiene el tamaño de los íconos proporcional
+                bordercolor="black",  # Color del borde de la leyenda
+                borderwidth=2,  # Grosor del borde
+                bgcolor="rgba(255,255,255,0.7)"  # Fondo semitransparente para la leyenda
+        ),
+        title=dict(
+                    text=f'<b><u>Análisis de Componentes Principales 3D de {archivo_nombre}</u></b>',  # Negrita y subrayado
+                    x=0.5,  # Centrar el título (0 izquierda, 1 derecha, 0.5 centro)
+                    xanchor="center",  # Asegura que esté alineado al centro
+                    font=dict(
+                    family="Arial",  # Tipo de letra
+                    size=20,  # Tamaño del título
+                    color="black"  # Color del título
+                    )),
         scene=dict(
             xaxis_title= f'PC{componentes_x[0]+1} {porcentaje_varianza_x[0]:.2f}%',# PARA LA ETIQUETAS
             yaxis_title= f'PC{componentes_y[0]+1} {porcentaje_varianza_y[0]:.2f}%',
             zaxis_title= f'PC{componentes_z[0]+1} {porcentaje_varianza_z[0]:.2f}%',
+            # PARA QUE EL CUBO SEA DE COLOR GRIS
+            #xaxis=dict(backgroundcolor="rgb(240, 240, 240)", gridcolor="gray", showbackground=True),
+            #yaxis=dict(backgroundcolor="rgb(240, 240, 240)", gridcolor="gray", showbackground=True),
+            #zaxis=dict(backgroundcolor="rgb(240, 240, 240)", gridcolor="gray", showbackground=True)
         ),
         margin=dict(l=0, r=0, b=0, t=40)
     )
@@ -3988,7 +4069,11 @@ def grafico_loading(pca, raman_shift, op_pca):
     # para que en el eje x muestre los valores cada 250 por que osino sale muy encimado
     # Ajustar el intervalo del eje X a cada 500 cm⁻¹
     ax = plt.gca()  # Obtener el objeto de los ejes
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(250)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(200)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
+
+    ay = plt.gca()  # Obtener el objeto de los ejes
+    ay.yaxis.set_major_locator(ticker.MultipleLocator(0.1)) # PARA QUE SE ENTIENDA EL EJE X Y SALGA EN INTERVALO
+
 
     plt.xlabel('Raman Shift (cm⁻¹)')
     plt.ylabel('Loading')
