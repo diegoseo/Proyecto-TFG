@@ -10,6 +10,7 @@ import time
 import plotly.graph_objects as go#permite mover la gráfica, hacer zoom y visualizar mejor las relaciones entre los componentes
 import scipy.cluster.hierarchy as sch
 import matplotlib.ticker as ticker # PARA QUE EL EJE X MUESTRE EN ALGUN INTERVALO Y NO SALGA ENCIMADO (SE USO EN LOS GRAFICOS DE LOADINGS)
+import matplotlib.colors as mcolors
 from sklearn.preprocessing import StandardScaler # PARA LA NORMALIZACION POR LA MEDIA 
 from scipy.signal import savgol_filter # Para suavizado de Savitzky Golay
 from scipy.ndimage import gaussian_filter # PARA EL FILTRO GAUSSIANO
@@ -17,6 +18,9 @@ from sklearn.decomposition import PCA
 from scipy.stats import chi2 # PARA GRAFICAR LOS ELIPSOIDES
 from scipy.spatial.distance import pdist, squareform
 
+
+diccionario_archivos = []
+diccionario_nombre = []
 
 # MOSTRAMOS LA LEYENDA PARA CADA TIPO
 def mostrar_leyendas(df,diccionario,cant_tipos):
@@ -36,8 +40,72 @@ def mostrar_leyendas(df,diccionario,cant_tipos):
     plt.show()
 
 
-def guardar_archivo(df):
-    print("ACA GUARDAR TODOS LOS DATAFRAME")
+def guardar_archivo(archivo_nombre,df):
+    diccionario_nombre.append(archivo_nombre)
+    diccionario_archivos.append(df)
+    print("VER TODOS LOS ARCHIVOS")
+    print(diccionario_archivos)
+    
+    
+    
+    
+# FUNCION PARA SABER SI LOS RAMAN_SHIFT SON IGUALES O NO
+def comparar_long_ondas(diccionario_archivos,diccionario_nombre, cant_archivos):
+    
+    print("\nANALIZANDO CONTENIDO LOGITUD DE ONDA\n")
+    
+    for num in range(len(diccionario_archivos) - 1):  # Iteramos sobre cada DataFrame
+        long_ondas = diccionario_archivos[num].iloc[1:, 0].values  # Raman_Shift del DF actual (ignorando primera fila)
+
+        for i in range(num + 1, len(diccionario_archivos)):  # Compara con los siguientes DataFrames
+            raman_actual = diccionario_archivos[i].iloc[1:, 0].values  # Raman_Shift del otro DF
+            
+            if long_ondas.shape != raman_actual.shape:
+                print(f"Diferente cantidad de longitudes de onda entre {diccionario_nombre[num]} ({long_ondas.shape[0]}) y {diccionario_nombre[i]} ({raman_actual.shape[0]})")
+                continue  # Salta esta comparación si los tamaños son diferentes
+
+            if np.array_equal(long_ondas, raman_actual):  # Comparación correcta
+                print(f"Longitudes de onda iguales en {diccionario_nombre[num]} y {diccionario_nombre[i]}")
+            else:
+                print(f"Diferencias en las longitudes de onda entre {diccionario_nombre[num]} ({long_ondas.shape[0]}) y {diccionario_nombre[i]} ({raman_actual.shape[0]})")
+
+    
+
+
+
+def comparar_cant_filas(diccionario_archivos,diccionario_nombre, cant_archivos):
+   
+    print("\nANALIZANDO CANTIDAD DE FILAS\n") 
+   
+    for num in range(len(diccionario_archivos) - 1):
+       long_filas = diccionario_archivos[num].shape[0] 
+
+       for i in range(num + 1, len(diccionario_archivos)):  # Compara con los siguientes DataFrames
+           fila_actual = diccionario_archivos[i].shape[0] # Raman_Shift del otro DF
+           
+           if long_filas != fila_actual:
+                print(f"Diferente cantidad de filas entre {diccionario_nombre[num]} ({long_filas}) y {diccionario_nombre[i]} ({fila_actual})")
+           else:
+                print(f"Cantidad de filas iguales en {diccionario_nombre[num]} y {diccionario_nombre[i]}")
+
+
+def comparar_cant_col(diccionario_archivos,diccionario_nombre, cant_archivos):
+       
+    print("\nANALIZANDO CANTIDAD DE COLUMNAS\n") 
+   
+    for num in range(len(diccionario_archivos) - 1):
+       long_col = diccionario_archivos[num].shape[1] 
+
+       for i in range(num + 1, len(diccionario_archivos)):  # Compara con los siguientes DataFrames
+           col_actual = diccionario_archivos[i].shape[1] # Raman_Shift del otro DF
+           
+           if long_col != col_actual:
+                print(f"Diferente cantidad de columnas entre {diccionario_nombre[num]} ({long_col}) y {diccionario_nombre[i]} ({col_actual})")
+           else:
+                print(f"Cantidad de columnas iguales en {diccionario_nombre[num]} y {diccionario_nombre[i]}")
+
+
+
 
 def datos_sin_normalizar(df): #SIRVE PARA ELIMINAR LA COLUMNA DE RAMAN_SHIFT
     
@@ -1392,7 +1460,7 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
 
     print("Datos PCA:")
     print(dato.shape)  
-
+    print(dato)
     num_muestras, num_variables = dato.shape #OBTENEMOS LA CANTIDAD DE  FILAS Y COLUMNAS
 
     max_pc = min(num_muestras, num_variables) #CANTIDAD MAXIMA DE N ES EL MENOR NUMERO
@@ -1861,6 +1929,7 @@ def grafico_loading(pca, raman_shift, op_pca):
             print(f"Advertencia: PC {i+1} no existe en los datos de PCA.")
             continue
 
+
         # print("Dimensión de raman_shift:", raman_shift.shape)
         # print("Dimensión de PCA components:", loadings.shape)
         # print("ramanshift=", raman_shift.shape, "PCA=", loadings[i, :].shape)
@@ -2066,3 +2135,54 @@ def hca(dato,raman_shift):
             # También mostrarlo en pantalla si deseas
             plt.show()
                
+
+
+
+
+def low_level(df):
+    df_base = df[0] # seleccionamos el primer df
+    df_restantes = [df.iloc[:, 1:] for df in df[1:]]   #df[1:] → Toma todos los DataFrames desde el segundo df.iloc[:, 1:] → Selecciona todas las columnas excepto la primera
+    df_fusionado = pd.concat([df_base] + df_restantes, axis=1) #CONCATENAMOS
+    df_fusionado.to_csv("lowfusion.csv", index=False)
+    print("Nuevo DataSet Generado con Exito")
+    return df_fusionado
+
+
+
+
+
+
+def mid_level(df,archivo_nombre):
+    
+    df_base = df[0]  # Primer DataFrame de la lista
+    raman_shift = pd.to_numeric(df_base.iloc[1:, 0], errors="coerce").reset_index(drop=True) # CORROBORAMOS QUE SEA NUMERICO
+    tipos = df_base.iloc[0, 1:] # EXTRAEMOS LA FILA DE LOS TIPOS
+    
+    #print("Valores únicos en tipos: ", tipos.unique())
+    
+    types = tipos.tolist() # COMVERTIMOS A LISTA 
+    
+    tipos_nombres = list(set(types))  # Convierte a conjunto y luego a lista para evitar problemas
+    
+    cmap = plt.cm.Spectral
+    colores = [cmap(i) for i in np.linspace(0, 1, len(tipos_nombres))]
+    asignacion_colores = {tipo: mcolors.to_hex(colores[i]) for i, tipo in enumerate(tipos_nombres)}
+    
+    df_numerico_lista = [df_i.iloc[1:, 1:].apply(pd.to_numeric, errors="coerce") for df_i in df] # convertir todos los DataFrames en `df` a formato numérico
+    
+    #Revisamos si hay valores NaN en algún DataFrame después de la conversión
+    for i, df_num in enumerate(df_numerico_lista):
+        if df_num.isna().sum().sum() > 0:
+            print(f"Advertencia: Se encontraron valores NaN en el DataFrame {i} después de la conversión.")
+    
+    
+    pca(df_numerico_lista[0], raman_shift, archivo_nombre, asignacion_colores, types) # Llamamos a PCA con el primer DataFrame convertido
+
+
+
+
+
+
+
+
+
