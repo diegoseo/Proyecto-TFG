@@ -102,10 +102,7 @@ def mostrar_espectros(df):
     # Mostrar la gráfica
     plt.show()
     
-# =============================================================================
-#     print(df['Ibuprofen'].head(10))
-#     print(type(df['Ibuprofen'].iloc[0]))
-# =============================================================================
+
     
 def encabezados(df):
     # Obtener los encabezados únicos
