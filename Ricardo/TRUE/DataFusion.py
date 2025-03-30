@@ -136,6 +136,32 @@ def minmax(df):
     print("✅ Min-Max aplicado sin necesidad de renombrar columnas.")
     print(df_norm)
     return df_norm
+
+def normalizar_area(df):
+    """
+    Normaliza cada columna (excepto la primera) dividiendo por el área bajo la curva.
+    Se asume que la primera columna es el eje X (e.g. Raman shift).
+    """
+    x_column = df.columns[0]
+    df_norm = df.copy()
+
+    x = df[x_column].values
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+
+        # Calcular área con integración numérica
+        area = np.trapz(y, x)
+
+        if pd.notna(area) and area != 0:
+            df_norm.iloc[:, i] = y / area
+        else:
+            df_norm.iloc[:, i] = 0
+            print(f"⚠ Área nula o inválida en columna {df.columns[i]}")
+
+    print("✅ Normalización por área aplicada.")
+    return df_norm
+    
     
 
 def normalizar(df):
@@ -151,6 +177,8 @@ def normalizar(df):
         print("Volviendo...")
     if opt == 1:
         df = minmax(df)
+    if opt == 2:
+        df = normalizar_area(df)
         
     return df
         
@@ -172,6 +200,7 @@ def menu():
 ## Función principal
 def main():
     df = lectura_archivo()
+    df_original = df
     if df is not None:
         print("\n🔹 Primeras filas del archivo CSV:")
         print(df.head())
