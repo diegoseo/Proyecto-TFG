@@ -102,6 +102,11 @@ def mostrar_espectros(df):
     # Mostrar la gráfica
     plt.show()
     
+# =============================================================================
+#     print(df['Ibuprofen'].head(10))
+#     print(type(df['Ibuprofen'].iloc[0]))
+# =============================================================================
+    
 def encabezados(df):
     # Obtener los encabezados únicos
     unique_headers = df.columns.unique()
@@ -111,27 +116,29 @@ def encabezados(df):
     print(unique_types)
     return unique_types 
 
-# def texto_desplazamiento(texto, espacio=6, velocidad=0.1, repeticiones = 5):
-#     texto = " " * espacio + texto  # Agrega espacios al inicio
-#     for i in range(repeticiones):
-#         sys.stdout.write("\r" + texto[i:])  # Sobrescribe la línea
-#         sys.stdout.flush()
-#         time.sleep(velocidad)
-    
-#     sys.stdout.write("\n")  # Salto de línea para evitar sobrescribir
 def minmax(df):
-    x_column = df.columns[0]
+    x_column_index = 0  # asumimos que la primera columna es X
     df_norm = df.copy()
-    
-    for col in df.columns[1:]:
-        col_min = df[col].min()
-        col_max = df[col].max()
-        if col_max - col_min != 0:
-            df_norm[col] = (df[col] - col_min) / (col_max - col_min)
-        else:
-            df_norm[col] = 0  # O dejar como está si todo es constante
-    print("✅ Normalización Min-Max aplicada.")
-    return df_norm 
+
+    for i in range(len(df.columns)):
+        if i == x_column_index:
+            continue  # no normalizar la columna X
+        try:
+            col_data = pd.to_numeric(df.iloc[:, i], errors='coerce')
+            col_min = col_data.min()
+            col_max = col_data.max()
+            rango = col_max - col_min
+
+            if pd.notna(rango) and rango != 0:
+                df_norm.iloc[:, i] = (col_data - col_min) / rango
+            else:
+                df_norm.iloc[:, i] = 0
+        except Exception as e:
+            print(f"❌ Error al normalizar columna #{i}: {e}")
+
+    print("✅ Min-Max aplicado sin necesidad de renombrar columnas.")
+    print(df_norm)
+    return df_norm
     
 
 def normalizar(df):
@@ -144,10 +151,11 @@ def normalizar(df):
           """)
     opt = int(input("ingrese opcion: "))
     if opt == 0:
-        return df
+        print("Volviendo...")
     if opt == 1:
         df = minmax(df)
         
+    return df
         
     
 
@@ -156,7 +164,7 @@ def menu():
     #texto_desplazamiento("MENU", 10, 0.1)
     print("****MENU****")
     print("0. leer otro dataset")
-    print("1. Mostrar espectros originales ")
+    print("1. Mostrar espectros ")
     print("2. Normalizar Espectro")
     
     
@@ -179,8 +187,7 @@ def main():
             mostrar_espectros(df)
         if opt == 2:
             df = normalizar(df)
-            print(df.head())
-            break;
+            #print(df)
         if opt >10:
             break
             
