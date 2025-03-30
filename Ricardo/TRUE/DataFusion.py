@@ -60,11 +60,8 @@ def lectura_archivo():
         try:
             df = pd.read_csv(archivo, sep=separador)
             print("✔ Archivo leído correctamente.")
-
-            # Limpieza de nombres de columnas
-            df.columns = limpiar_encabezados(df.columns)
+            df.columns = limpiar_encabezados(df.columns) # Limpieza de nombres de columnas
             print("🛠 Encabezados limpios:", df.columns.tolist())
-
             return df
         except Exception as e:
             print(f"❌ Error al leer CSV: {e}")
@@ -114,23 +111,50 @@ def encabezados(df):
     print(unique_types)
     return unique_types 
 
-def texto_desplazamiento(texto, espacio=6, velocidad=0.1, repeticiones = 5):
-    texto = " " * espacio + texto  # Agrega espacios al inicio
-    for i in range(repeticiones):
-        sys.stdout.write("\r" + texto[i:])  # Sobrescribe la línea
-        sys.stdout.flush()
-        time.sleep(velocidad)
+# def texto_desplazamiento(texto, espacio=6, velocidad=0.1, repeticiones = 5):
+#     texto = " " * espacio + texto  # Agrega espacios al inicio
+#     for i in range(repeticiones):
+#         sys.stdout.write("\r" + texto[i:])  # Sobrescribe la línea
+#         sys.stdout.flush()
+#         time.sleep(velocidad)
     
-    sys.stdout.write("\n")  # Salto de línea para evitar sobrescribir
-   
+#     sys.stdout.write("\n")  # Salto de línea para evitar sobrescribir
+def minmax(df):
+    x_column = df.columns[0]
+    df_norm = df.copy()
+    
+    for col in df.columns[1:]:
+        col_min = df[col].min()
+        col_max = df[col].max()
+        if col_max - col_min != 0:
+            df_norm[col] = (df[col] - col_min) / (col_max - col_min)
+        else:
+            df_norm[col] = 0  # O dejar como está si todo es constante
+    print("✅ Normalización Min-Max aplicada.")
+    return df_norm 
+    
 
-# Ejemplo de uso
-
+def normalizar(df):
+    print("""
+          1. Normalizar por Min-Max
+          2. Normalizar por Area
+          3. Normalizar por Z-Score
+          4. Normalizar por media
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 0:
+        return df
+    if opt == 1:
+        df = minmax(df)
+        
+        
+    
 
 def menu():
     print("-" * 50) 
-    texto_desplazamiento("MENU", 10, 0.1)
-    #print(f"dataset actual: {dataset}")
+    #texto_desplazamiento("MENU", 10, 0.1)
+    print("****MENU****")
     print("0. leer otro dataset")
     print("1. Mostrar espectros originales ")
     print("2. Normalizar Espectro")
@@ -154,6 +178,8 @@ def main():
         if opt == 1:
             mostrar_espectros(df)
         if opt == 2:
+            df = normalizar(df)
+            print(df.head())
             break;
         if opt >10:
             break
