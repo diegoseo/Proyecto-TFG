@@ -161,7 +161,27 @@ def normalizar_area(df):
 
     print("✅ Normalización por área aplicada.")
     return df_norm
-    
+def normalizar_zscore(df):
+    """
+    Normaliza cada columna (excepto la primera) usando Z-score:
+    (valor - media) / desviación estándar.
+    """
+    df_norm = df.copy()
+    x_column = df.columns[0]
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        media = y.mean()
+        std = y.std()
+
+        if pd.notna(std) and std != 0:
+            df_norm.iloc[:, i] = (y - media) / std
+        else:
+            df_norm.iloc[:, i] = 0
+            print(f"⚠ Desviación estándar nula en columna {df.columns[i]}")
+
+    print("✅ Normalización Z-score aplicada.")
+    return df_norm   
     
 
 def normalizar(df):
@@ -179,6 +199,10 @@ def normalizar(df):
         df = minmax(df)
     if opt == 2:
         df = normalizar_area(df)
+    if opt == 3: 
+        df = normalizar_zscore(df)
+    if opt == 4:
+        df = normalizar_media(df)
         
     return df
         
@@ -209,11 +233,23 @@ def main():
         opt = int(input("Ingrese opcion: "))    
         if opt == 0:
             df=lectura_archivo()
-        if opt == 1:
-            mostrar_espectros(df)
-        if opt == 2:
+        elif opt == 1:
+            print("""
+                  1. Mostrar dataframe original
+                  2. Mostrar dataframe filtrado 
+                  0. Volver
+                  """)
+            opc_espectros = int(input("Ingrese opcion: "))
+            if opc_espectros == 1:
+                mostrar_espectros(df_original)
+            elif opc_espectros == 2:
+                mostrar_espectros(df)
+        elif opt == 2:
             df = normalizar(df)
             #print(df)
+        elif opt == 3: 
+            df = suavizado(df)
+            
         if opt >10:
             break
             
