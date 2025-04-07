@@ -224,13 +224,17 @@ def normalizar(df):
         print("Volviendo...")
     if opt == 1:
         df = minmax(df)
-    if opt == 2:
+    elif opt == 2:
         df = normalizar_area(df)
-    if opt == 3: 
+    elif opt == 3: 
         df = normalizar_zscore(df)
-    if opt == 4:
+    elif opt == 4:
         df = normalizar_media(df)
-        
+    elif opt==0:
+       print("""
+             volviendo al menu...
+             {}
+             """.format("-" * 32)) 
     return df
 
 
@@ -263,6 +267,28 @@ def savitzky(df, window_length=11, polyorder=2):
     print("✅ Suavizado Savitzky-Golay aplicado.")
     return df_suavizado
 
+def mediamovil(df, window_size=5):
+    """
+    Aplica suavizado por media móvil a todas las columnas excepto la primera.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - window_size: Tamaño de la ventana de promedio (entero impar recomendado).
+
+    Retorna:
+    - df_suavizado: DataFrame con los espectros suavizados.
+    """
+    df_suavizado = df.copy()
+    n_cols = df.shape[1]
+
+    for i in range(1, n_cols):  # Omitimos la primera columna (eje X)
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        # Aplicar media móvil con padding en bordes
+        suavizado = np.convolve(y, np.ones(window_size)/window_size, mode='same')
+        df_suavizado.iloc[:, i] = suavizado
+
+    print("✅ Suavizado por media móvil aplicado.")
+    return df_suavizado
     
 def suavizado(df):
     print("""
@@ -276,10 +302,19 @@ def suavizado(df):
     opt = int(input("ingrese opcion: "))
     if opt == 1:
         df = savitzky(df)
-    #elif opt == 2:
-        #df = mediamovil(df)
-
-        
+    elif opt == 2:
+        df = mediamovil(df)
+    elif opt == 3: 
+        df = filtro_gaussiano(df)
+    elif opt == 4:
+        df = mediana(df)
+    elif opt == 5 :
+        df = interpolacion_suave(df)
+    elif opt==0:
+       print("""
+             volviendo al menu...
+             {}
+             """.format("-" * 32))
     return df
           
           
@@ -289,7 +324,7 @@ def menu():
     print("-" * 50) 
     #texto_desplazamiento("MENU", 10, 0.1)
     print("****MENU****")
-    print("0. leer otro dataset")
+    print("11. leer otro dataset")
     print("1. Mostrar espectros ")
     print("2. Normalizar Espectro")
     print("3. Suavizar Espectro")
@@ -312,7 +347,7 @@ def main():
     while True:
         menu()
         opt = int(input("Ingrese opcion: "))    
-        if opt == 0:
+        if opt == 11:
             df=lectura_archivo()
         elif opt == 1:
             print("""
@@ -330,8 +365,12 @@ def main():
             #print(df)
         elif opt == 3: 
             df = suavizado(df) 
-        elif opt == 0:
-            exit(1)
+        elif opt==0:
+            print("""
+                saliendo del programa...
+                {}
+                """.format("-" * 32))
+            sys.exit()       
             
     
     
