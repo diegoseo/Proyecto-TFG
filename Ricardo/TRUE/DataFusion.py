@@ -22,6 +22,7 @@ import time
 
 
 
+
 ## Función para detectar qué tipo de delimitador tiene el CSV
 def detectar_separador(archivo):
     try:
@@ -267,7 +268,8 @@ def savitzky(df, window_length=11, polyorder=2):
     print("✅ Suavizado Savitzky-Golay aplicado.")
     return df_suavizado
 
-def mediamovil(df, window_size=5):
+def media_movil(df, window_size=5):
+    print("\t\t\tIngrese ventana:")
     """
     Aplica suavizado por media móvil a todas las columnas excepto la primera.
 
@@ -289,7 +291,29 @@ def mediamovil(df, window_size=5):
 
     print("✅ Suavizado por media móvil aplicado.")
     return df_suavizado
-    
+
+
+def filtro_gaussiano(df, sigma=2):
+    """
+    Aplica suavizado gaussiano a todas las columnas del DataFrame excepto la primera.
+
+    Parámetros:
+    - df: DataFrame con espectros. La primera columna es el eje X.
+    - sigma: Desviación estándar de la gaussiana (mayor = más suavizado).
+
+    Retorna:
+    - df_suavizado: DataFrame con los espectros suavizados.
+    """
+    df_suavizado = df.copy()
+    x_column = df.columns[0]
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        df_suavizado.iloc[:, i] = gaussian_filter1d(y, sigma=sigma)
+
+    print("✅ Suavizado Gaussiano aplicado.")
+    return df_suavizado
+
 def suavizado(df):
     print("""
           1. Smoothing por Savitzky-Golay
@@ -303,7 +327,7 @@ def suavizado(df):
     if opt == 1:
         df = savitzky(df)
     elif opt == 2:
-        df = mediamovil(df)
+        df = media_movil(df)
     elif opt == 3: 
         df = filtro_gaussiano(df)
     elif opt == 4:
