@@ -169,7 +169,7 @@ def normalizar_zscore(df):
     (valor - media) / desviación estándar.
     """
     df_norm = df.copy()
-    x_column = df.columns[0]
+    #x_column = df.columns[0]
 
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce')
@@ -185,6 +185,31 @@ def normalizar_zscore(df):
     print("✅ Normalización Z-score aplicada.")
     return df_norm   
     
+def normalizar_media(df):
+    """
+    Normaliza cada columna (excepto la primera) dividiendo por su media.
+
+    Parámetros:
+    - df: DataFrame con espectros. La primera columna es el eje X.
+
+    Retorna:
+    - df_norm: DataFrame normalizado por media.
+    """
+    df_norm = df.copy()
+    x_column = df.columns[0]
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        media = y.mean()
+
+        if pd.notna(media) and media != 0:
+            df_norm.iloc[:, i] = y / media
+        else:
+            df_norm.iloc[:, i] = 0
+            print(f"⚠ Media nula o inválida en columna {df.columns[i]}")
+
+    print("✅ Normalización por media aplicada.")
+    return df_norm
 
 def normalizar(df):
     print("""
