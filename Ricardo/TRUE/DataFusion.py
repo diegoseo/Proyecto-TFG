@@ -20,6 +20,8 @@ import sys
 import time
 
 
+
+
 ## Función para detectar qué tipo de delimitador tiene el CSV
 def detectar_separador(archivo):
     try:
@@ -133,7 +135,7 @@ def minmax(df):
         except Exception as e:
             print(f"❌ Error al normalizar columna #{i}: {e}")
 
-    print("✅ Min-Max aplicado sin necesidad de renombrar columnas.")
+    print("✅ Min-Max aplicado")
     print(df_norm)
     return df_norm
 
@@ -205,8 +207,58 @@ def normalizar(df):
         df = normalizar_media(df)
         
     return df
-        
+
+
+def savitzky(df, window_length=11, polyorder=2):
+    """
+    Aplica suavizado Savitzky-Golay a todas las columnas del DataFrame excepto la primera.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - window_length: Tamaño de ventana (debe ser impar y >= polyorder + 2).
+    - polyorder: Orden del polinomio (típicamente 2 o 3).
+
+    Retorna:
+    - df_suavizado: nuevo DataFrame con los espectros suavizados.
+    """
+    df_suavizado = df.copy()
+    n_cols = df.shape[1]
+
+    for i in range(1, n_cols):  # excluye la primera columna (X)
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        # Ajuste automático si window_length es mayor que los datos
+        win = min(window_length, len(y) - 1 if len(y) % 2 == 0 else len(y))
+        if win % 2 == 0:
+            win -= 1  # asegurarse de que sea impar
+        if win > polyorder:
+            df_suavizado.iloc[:, i] = savgol_filter(y, window_length=win, polyorder=polyorder)
+        else:
+            print(f"⚠ Columna '{df.columns[i]}' no se suavizó (window_length <= polyorder)")
+
+    print("✅ Suavizado Savitzky-Golay aplicado.")
+    return df_suavizado
+
     
+def suavizado(df):
+    print("""
+          1. Smoothing por Savitzky-Golay
+          2. Smoothing por Media Movil 
+          3. Smoothing por Filtro Gaussiano
+          4. Smoothing por Mediana
+          5. Smoothing por Interpolacion suave 
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 1:
+        df = savitzky(df)
+    #elif opt == 2:
+        #df = mediamovil(df)
+
+        
+    return df
+          
+          
+        
 
 def menu():
     print("-" * 50) 
@@ -215,6 +267,10 @@ def menu():
     print("0. leer otro dataset")
     print("1. Mostrar espectros ")
     print("2. Normalizar Espectro")
+    print("3. Suavizar Espectro")
+    print("4. Aplicar PCA al espectro")
+    print("0. Salir del programa")
+    
     
     
     
@@ -248,10 +304,9 @@ def main():
             df = normalizar(df)
             #print(df)
         elif opt == 3: 
-            df = suavizado(df)
-            
-        if opt >10:
-            break
+            df = suavizado(df) 
+        elif opt == 0:
+            exit(1)
             
     
     
