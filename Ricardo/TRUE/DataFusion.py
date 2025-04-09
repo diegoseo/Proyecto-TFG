@@ -252,6 +252,18 @@ def savitzky(df, window_length=11, polyorder=2):
     Retorna:
     - df_suavizado: nuevo DataFrame con los espectros suavizados.
     """
+    window_length = int(input("Ingrese tamaño de la ventana: "))
+    polyorder = int(input("Ingrese orden polinomico: "))
+    while window_length % 2 == 0 or polyorder > window_length - 2:
+        window_length= int(input("""
+                    Por favor ingrese un numero impar en el tamaño
+                    de la ventana
+                    -> """))
+        polyorder = int(input(f"""
+                    Por favor ingrese un numero menor a igual a {window_length-2}
+                    -> """))          
+    
+        
     df_suavizado = df.copy()
     n_cols = df.shape[1]
 
@@ -363,6 +375,11 @@ def spline(df):
     Retorna:
     - df_suavizado: DataFrame con curvas suavizadas por spline.
     """
+    print("""
+                s bajo (≈ 0.1 – 1) → se ajusta más estrictamente a los datos (menos suave).
+                s alto (≈ 2 – 5 o más) → curva más flexible, más suavizada.
+                Un buen valor inicial: s = 1.5
+          """)
     suavizado = float(input("\t\t\tIngrese factor de suavizado (s): "))  # Ej: 1.0 a 5.0
 
     df_suavizado = df.copy()
