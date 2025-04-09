@@ -44,7 +44,7 @@ def menu_principal():
             df = cargar_archivo(archivo_nombre) #CARGARA UN UNICO ARCHIVO Y FUNCIONARA COMO EL CODIGO DE ENERO2025 NORMALMENTE
             print(df)
             # variables_utiles(df,archivo_nombre)
-            main(df,archivo_nombre)
+            main(df,archivo_nombre,0)
         elif opcion == 2:
            num = 1
            cant_archivos = int(input("Ingrese la cantidad de archivos que desea fusionar: "))
@@ -75,7 +75,7 @@ def menu_principal():
                num = num + 1
              
                
-           print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS LONG DE ONDAS")
+           print("\nPREGUNTAR COMO SE TIENE QUE IGUALAR LAS LONG DE ONDAS")
         
            # TERCERO QUE LOS ARCHIVOS TENGAN LA MISMA LONGITUD DE ONDA (RAMAN_SHIFT)
            comparar_long_ondas(diccionario_archivos,diccionario_nombre,cant_archivos) 
@@ -87,17 +87,18 @@ def menu_principal():
            
            print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS COLUMNAS")
            
-           # SEGUNDO PASO CORROBORAR QUE LOS ARCHIVOS TENGNA LA MISMA CANTDAD DE COLUMNAS
+           # SEGUNDO PASO CORROBORAR QUE LOS ARCHIVOS TENGA LA MISMA CANTDAD DE COLUMNAS
            comparar_cant_col(diccionario_archivos,diccionario_nombre, cant_archivos)
            
            
            if m_df == 1:
-               df = low_level(diccionario_archivos)   #VER QUE HACER SI NO TIENEN DIMENSIONES IGUALES O SIEMPRE VAN A SER DE IGUALES DIMENSIONES?
-               
-               main(df,"lowfusion.csv")
+               low_level(diccionario_archivos)   #VER QUE HACER SI NO TIENEN DIMENSIONES IGUALES O SIEMPRE VAN A SER DE IGUALES DIMENSIONES?
+               df = cargar_archivo("lowfusion.csv") # en cargar_archivo tiene el header = none por eso funsiona
+               main(df,"lowfusion.csv",0) # ahora te va a permitir ver todas las funciones del menu principal pero el mid-level solo la opcion 11 por el momento
            elif m_df == 2:
                print("Mid level falta implementar")
-               df = mid_level( diccionario_archivos , archivo_nombre )
+               for i, df in enumerate(diccionario_archivos): #USAMOS ENUMERATE() PARA TENER el índice y el DataFrame
+                   main(df, diccionario_nombre[i], 1)
                
            
                
@@ -162,7 +163,10 @@ def sub_menu():
 '''
 
 
-def main(df,archivo_nombre):
+def main(df,archivo_nombre,datafusion):
+    
+    print("DF DENTRO DEL MAIN")
+    print(df)
          
     raman_shift = df.iloc[1:, 0].reset_index(drop=True)  # EXTRAEMOS TODA LA PRIMERA COLUMNA, reset_index(drop=True) SIRVE PARA QUE EL INDICE COMIENCE EN 0 Y NO EN 1
     print(raman_shift)
@@ -193,9 +197,11 @@ def main(df,archivo_nombre):
     mostrar_leyendas(df,diccionario,cant_tipos)
     
     while True:
-        
-        mostrar_menu()
-        opcion = input("Selecciona una opción: ")
+        if datafusion != 1:
+            mostrar_menu()
+            opcion = input("Selecciona una opción: ")
+        else:
+            opcion = '11' # PARA QUE VAYA DIRECTO A LA OPCION DEL PCA YA QUE VIENE DEL MID-LEVEL
         #print("volvio a salir")
         if opcion == '1':
             print("entro 1")
@@ -221,7 +227,7 @@ def main(df,archivo_nombre):
             elif metodo_grafico == 8:
                  descargar_csv_acotado_tipo(datos_sin_normalizar(df),1,raman_shift) # 1 PARA SABER QUE VIENE SIN NORMALIZAR  
             elif metodo_grafico == 9:
-                 main(df,archivo_nombre)
+                 main(df,archivo_nombre,0)
                 
                 
         elif opcion == '2':
@@ -248,7 +254,7 @@ def main(df,archivo_nombre):
             elif metodo_grafico == 8:
                  descargar_csv_acotado_tipo(normalizado_media(df),2,raman_shift) # 2 PARA SABER QUE VIENE SIN NORMALIZAR 
             elif metodo_grafico == 9:
-                 main(df,archivo_nombre)
+                 main(df,archivo_nombre,0)
                 
                 
         elif opcion == '3': 
@@ -276,7 +282,7 @@ def main(df,archivo_nombre):
                elif metodo_grafico == 8:
                    descargar_csv_acotado_tipo(normalizado_area(df,raman_shift),3,raman_shift) # 3 PARA SABER QUE VIENE SIN NORMALIZAR 
                elif metodo_grafico == 9:
-                   main(df,archivo_nombre)
+                   main(df,archivo_nombre,0)
          
         elif opcion == '4':  
             print("entro 4")
@@ -340,7 +346,7 @@ def main(df,archivo_nombre):
                   dato_suavizado = suavizado_saviztky_golay(dato)
                   descargar_csv_acotado_tipo(dato_suavizado,4,raman_shift) # 4 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                elif metodo_grafico == 9:
-                  main(df,archivo_nombre)
+                  main(df,archivo_nombre,0)
         elif opcion == '5':  
               print("entro 5")
               while True:  # Bucle para mantener al usuario en el submenú
@@ -402,7 +408,7 @@ def main(df,archivo_nombre):
                     dato_suavizado = suavizado_filtroGausiano(df,dato)
                     descargar_csv_acotado_tipo(dato_suavizado,5,raman_shift) # 5 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                  elif metodo_grafico == 9:
-                    main(df,archivo_nombre)    
+                    main(df,archivo_nombre,0)    
         elif opcion == '6':  
                 print("entro 6")
                 while True:  # Bucle para mantener al usuario en el submenú
@@ -464,7 +470,7 @@ def main(df,archivo_nombre):
                       dato_suavizado  = suavizado_mediamovil(dato)
                       descargar_csv_acotado_tipo(dato_suavizado,6,raman_shift) # 6 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                   elif metodo_grafico == 9:
-                      main(df,archivo_nombre)                   
+                      main(df,archivo_nombre,0)                   
         elif opcion == '7':           
                     print("entro 7")
                     while True:  # Bucle para mantener al usuario en el submenú
@@ -520,7 +526,7 @@ def main(df,archivo_nombre):
                           dato_suavizado = primera_derivada(dato,0,raman_shift)
                           descargar_csv_acotado_tipo(dato_suavizado,7,raman_shift) # 7 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
-                          main(df,archivo_nombre)                     
+                          main(df,archivo_nombre,0)                     
         elif opcion == '8':           
                     print("entro 8")
                     while True:  # Bucle para mantener al usuario en el submenú
@@ -576,7 +582,7 @@ def main(df,archivo_nombre):
                           dato_suavizado = segunda_derivada(dato,0,raman_shift)
                           descargar_csv_acotado_tipo(dato_suavizado,8,raman_shift) # 8 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       elif metodo_grafico == 9:
-                          main(df,archivo_nombre)     
+                          main(df,archivo_nombre,0)     
         elif opcion == '9':
                       print("entro 9")
                       while True:  # Bucle para mantener al usuario en el submenú
@@ -633,7 +639,7 @@ def main(df,archivo_nombre):
                              dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift)
                              descargar_csv_acotado_tipo(dato_suavizado,9,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                          elif metodo_grafico == 9:
-                            main(df,archivo_nombre) 
+                            main(df,archivo_nombre,0) 
         elif opcion == '10':
                       print("entro 10")
                       # while True:  # Bucle para mantener al usuario en el submenú
@@ -689,7 +695,7 @@ def main(df,archivo_nombre):
                       #       dato_suavizado ,raman_shift_corregido = correcion_Shirley(dato,raman_shift)
                       #       descargar_csv_acotado_tipo(dato_suavizado,10,raman_shift_corregido) # 9 PARA SABER QUE VIENE DE ACA Y PODER ELEGIR EL NOMBRE DE LA CARPETA DE SALIDA
                       #   elif metodo_grafico == 9:
-                      #       main(df,archivo_nombre) 
+                      #       main(df,archivo_nombre,0) 
         
         elif opcion == '11':
             while True:
@@ -710,18 +716,18 @@ def main(df,archivo_nombre):
                         dato,nor_op,m_suavi, raman_shift_nuevo = menu_correccion_pca(df,raman_shift)
                         dato_suavizado ,raman_shift_corregido = correcion_LineaB(dato,raman_shift_nuevo)
                         dato = dato_suavizado
-                        pca(dato,raman_shift_corregido,archivo_nombre,asignacion_colores,types) 
+                        pca(dato,raman_shift_corregido,archivo_nombre,asignacion_colores,types,datafusion) 
                     elif correcion == 2:
                             print("FALTA IMPLEMENTAR CORRECION DE SHIRLEY")
-                            pca(dato,raman_shift,archivo_nombre,asignacion_colores,types)
+                            pca(dato,raman_shift,archivo_nombre,asignacion_colores,types,datafusion)
                     else: 
                             dato,nor_op,m_suavi, raman_shift_nuevo = menu_correccion_pca(df,raman_shift)
-                            pca(dato,raman_shift_nuevo,archivo_nombre,asignacion_colores,types)
+                            pca(dato,raman_shift_nuevo,archivo_nombre,asignacion_colores,types,datafusion)
                                   
                 elif m_dim == 2:
                         print("ACA SE HARA LA LLAMADA A LOS OTROS METODOS DE REDUCCION DE DIMENSIONES")
                 else:
-                    main(df,archivo_nombre)
+                    main(df,archivo_nombre,0)
     
     
         elif opcion == '12':  #PARA EL HCA DA LAS OPCIONES DE NORMALIZAR,SUAVIZAR,DERIVAR PERO NO LA DE CORREGIR QUE ESTARIA FALTANDO
@@ -737,7 +743,7 @@ def main(df,archivo_nombre):
                                 continue # EVITA QUE CONTINUE LA EJECUCION DE LAS LINEAS RESTANTES Y SALTA AL SIGUIENTE CICLO
                             hca(dato,raman_shift) # RAMAN_SHIFT_CORREGIDO ES POR QUE YA SON ELIMANDOS LOS VALORES NAN
                         elif metodo_grafico == 2:
-                            main(df,archivo_nombre) 
+                            main(df,archivo_nombre,0) 
         elif opcion == "13":
             menu_principal()                      
         elif opcion == '14':

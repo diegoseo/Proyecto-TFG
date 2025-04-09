@@ -21,6 +21,7 @@ from scipy.spatial.distance import pdist, squareform
 
 diccionario_archivos = []
 diccionario_nombre = []
+lista_pc = []
 
 # MOSTRAMOS LA LEYENDA PARA CADA TIPO
 def mostrar_leyendas(df,diccionario,cant_tipos):
@@ -878,7 +879,7 @@ def suavizado_filtroGausiano(df,dato_suavizar):  #acordarse que se puede suaviza
     #print(suavizado_gaussiano_pd)
     #print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRrr")
     
-    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd.shape())
+    print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd.shape)
     print("FILTRO GAUSIANO = ", suavizado_gaussiano_pd)
     
     return suavizado_gaussiano_pd
@@ -1456,7 +1457,7 @@ def correcion_LineaB(normalizado_f,raman_shift):
 
 
 
-def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
+def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types, datafusion): #datafusion = "opcion del data fusion" , si es 1 es por que viene del mid-level a cargar los componentes seleccionados por el usuario
 
     print("Datos PCA:")
     print(dato.shape)  
@@ -1466,12 +1467,26 @@ def pca(dato, raman_shift,archivo_nombre,asignacion_colores,types):
     max_pc = min(num_muestras, num_variables) #CANTIDAD MAXIMA DE N ES EL MENOR NUMERO
 
     aux = 0
-    print("Cómo deseas visualizar los componentes principales:")
-    print("1 - Elegir 2 Componentes para graficar en 2D")
-    print("2 - Elegir 3 Componentes para graficar en 3D")
-    print("3.  Grafico de Loanding")
-    print("4- Salir")
-    visualizar_pca = int(input("Opción = "))
+    if datafusion != 1:
+        print("Cómo deseas visualizar los componentes principales:")
+        print("1 - Elegir 2 Componentes para graficar en 2D")
+        print("2 - Elegir 3 Componentes para graficar en 3D")
+        print("3.  Grafico de Loanding")
+        print("4-  Salir")
+        visualizar_pca = int(input("Opción = "))
+    else: #PARA EL DATAFUSION
+        #POR LO QUE ENTENDI EL RESULTADO DE LOS COMPONENTES PRINCIPALES ES EL MISMO YA SEA UN n=2 O UN n=3
+        componentes_x = []
+        componentes_y = []
+        componentes_z = []
+
+        cant_pca = int(input("Cantidad de componentes principales= "))
+        
+        print(f"Que componentes principales del archivo {archivo_nombre} deseas visualizar:")
+        # PREGUNTAR ACA QUE PASA CUANDO ENTRE LOS ARCHIVOS FUSIONADOS TENEMOS MAS DE 3 COMPONENTES PRINCIPALES
+
+        # NO VA A FUNCIONAR AHORA EL MID-LEVEL POR QUE a visualizar_pca no se le carga un valor
+
 
     if visualizar_pca == 4:
         return
@@ -2140,15 +2155,25 @@ def hca(dato,raman_shift):
 
 
 def low_level(df):
-    df_base = df[0] # seleccionamos el primer df
-    df_restantes = [df.iloc[:, 1:] for df in df[1:]]   #df[1:] → Toma todos los DataFrames desde el segundo df.iloc[:, 1:] → Selecciona todas las columnas excepto la primera
-    df_fusionado = pd.concat([df_base] + df_restantes, axis=1) #CONCATENAMOS
+    df = [df_i.copy() for df_i in df]
+
+    for i in range(len(df)):
+        df[i].columns = df[i].iloc[0]                  # Promover fila 0 como encabezado
+        df[i] = df[i].iloc[1:].reset_index(drop=True)  # Eliminar la fila de encabezados original
+
+    # Mantener la primera columna solo del primer archivo (Raman Shift)
+    df_base = df[0]
+    df_restantes = [df_i.iloc[:, 1:] for df_i in df[1:]]  # Quitar Raman Shift de los demás
+
+    # Concatenar todo
+    df_fusionado = pd.concat([df_base] + df_restantes, axis=1)
+
+    # Guardar sin índice
     df_fusionado.to_csv("lowfusion.csv", index=False)
-    print("Nuevo DataSet Generado con Exito")
-    return df_fusionado
 
-
-
+    print("✅ Fusionado correctamente con nombres reales en la cabecera.")
+    print(df_fusionado)
+    # NO RETORNA NADA POR QUE LO QUE HAGO ES GENERAR EL ARCHIVO CONCATENADO Y EN LA FUSION MAIN LLAMAR AL ARCHIVO DE VUELTA, NO ME GUSTA PERO ASI FUNCIONO
 
 
 
@@ -2177,12 +2202,5 @@ def mid_level(df,archivo_nombre):
     
     
     pca(df_numerico_lista[0], raman_shift, archivo_nombre, asignacion_colores, types) # Llamamos a PCA con el primer DataFrame convertido
-
-
-
-
-
-
-
 
 
