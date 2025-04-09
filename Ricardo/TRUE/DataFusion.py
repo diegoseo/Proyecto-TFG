@@ -268,8 +268,7 @@ def savitzky(df, window_length=11, polyorder=2):
     print("✅ Suavizado Savitzky-Golay aplicado.")
     return df_suavizado
 
-def media_movil(df, window_size=5):
-    print("\t\t\tIngrese ventana:")
+def media_movil(df):
     """
     Aplica suavizado por media móvil a todas las columnas excepto la primera.
 
@@ -280,6 +279,12 @@ def media_movil(df, window_size=5):
     Retorna:
     - df_suavizado: DataFrame con los espectros suavizados.
     """
+    window_size = int(input("\t\t\tIngrese tamaño de ventana:"))
+    while window_size % 2 == 0:
+        windows_size = int(input("""
+                                 Por favor ingrese un numero impar, de preferencia 5, 7 o 9 
+                                 para que el punto central esté bien definido.
+                                 -> """))
     df_suavizado = df.copy()
     n_cols = df.shape[1]
 
@@ -293,17 +298,22 @@ def media_movil(df, window_size=5):
     return df_suavizado
 
 
-def filtro_gaussiano(df, sigma=2):
+def filtro_gaussiano(df):
     """
     Aplica suavizado gaussiano a todas las columnas del DataFrame excepto la primera.
 
     Parámetros:
     - df: DataFrame con espectros. La primera columna es el eje X.
+    Valor de sigma	Resultado en el espectro
+        sigma pequeño (1 o 2)	Suavizado leve (conserva detalles)
+        sigma grande (5 o más)	Suavizado intenso (pierde detalles finos)
     - sigma: Desviación estándar de la gaussiana (mayor = más suavizado).
 
     Retorna:
     - df_suavizado: DataFrame con los espectros suavizados.
     """
+    sigma = int(input("\t\t\tIngrese sigma:")) #considerar usar sigma 2 o 3 
+    
     df_suavizado = df.copy()
     x_column = df.columns[0]
 
