@@ -12,12 +12,13 @@ import re  # Para manejo de expresiones regulares
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 import numpy as np
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, medfilt
 from sklearn.decomposition import PCA
 from numpy import trapz
 from scipy.ndimage import gaussian_filter1d
 import sys
 import time
+from scipy.interpolate import UnivariateSpline
 
 
 
@@ -324,6 +325,62 @@ def filtro_gaussiano(df):
     print("✅ Suavizado Gaussiano aplicado.")
     return df_suavizado
 
+
+def mediana(df):
+    """
+    Aplica suavizado por mediana a todas las columnas excepto la primera.
+
+    Parámetros:
+    - df: DataFrame con espectros. La primera columna es el eje X.
+
+    Retorna:
+    - df_suavizado: DataFrame suavizado por mediana.
+    """
+    ventana = int(input("\t\t\tIngrese tamaño de la ventana (impar recomendado): "))
+
+    # Asegurar que la ventana sea impar
+    if ventana % 2 == 0:
+        ventana += 1
+        print(f"\t\t\tVentana ajustada a {ventana} (impar obligatorio)")
+
+    df_suavizado = df.copy()
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        suavizado = medfilt(y, kernel_size=ventana)
+        df_suavizado.iloc[:, i] = suavizado
+
+    print("✅ Suavizado por mediana aplicado.")
+    return df_suavizado
+
+def spline(df):
+    """
+    Aplica una interpolación spline suave a todas las columnas excepto la primera.
+
+    Parámetros:
+    - df: DataFrame con espectros. La primera columna es el eje X.
+
+    Retorna:
+    - df_suavizado: DataFrame con curvas suavizadas por spline.
+    """
+    suavizado = float(input("\t\t\tIngrese factor de suavizado (s): "))  # Ej: 1.0 a 5.0
+
+    df_suavizado = df.copy()
+    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # eje X
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+        try:
+            spline = UnivariateSpline(x, y, s=suavizado)
+            df_suavizado.iloc[:, i] = spline(x)
+        except Exception as e:
+            print(f"❌ Error en columna {df.columns[i]}: {e}")
+            df_suavizado.iloc[:, i] = y  # dejar los datos originales si falla
+
+    print("✅ Suavizado por interpolación spline aplicado.")
+    return df_suavizado
+
+
 def suavizado(df):
     print("""
           1. Smoothing por Savitzky-Golay
@@ -343,7 +400,7 @@ def suavizado(df):
     elif opt == 4:
         df = mediana(df)
     elif opt == 5 :
-        df = interpolacion_suave(df)
+        df = spline(df)
     elif opt==0:
        print("""
              volviendo al menu...
