@@ -426,7 +426,7 @@ def suavizado(df):
     return df
           
           
-def derivada()      
+
 
 def menu():
     print("-" * 50) 
@@ -452,8 +452,8 @@ def derivada(df):
     Retorna:
     - df_derivada: DataFrame con derivadas aplicadas a los espectros.
     """
-    int orden = int(input("\t\t\tIngrese orden:"))
-    while orden != 1 or orden != 2:
+    orden = int(input("\t\t\tIngrese orden:"))
+    while orden != 1 and orden != 2:
         orden = int(input("""
               El orden de la derivada solo puede ser 1 o 2
               ->
