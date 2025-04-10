@@ -426,7 +426,7 @@ def suavizado(df):
     return df
           
           
-        
+def derivada()      
 
 def menu():
     print("-" * 50) 
@@ -436,11 +436,46 @@ def menu():
     print("1. Mostrar espectros ")
     print("2. Normalizar Espectro")
     print("3. Suavizar Espectro")
+    print("4. Derivar ")
     print("4. Aplicar PCA al espectro")
     print("0. Salir del programa")
     
-    
-    
+
+def derivada(df):
+    """
+    Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X (e.g., Raman shift).
+    - orden: 1 para primera derivada, 2 para segunda.
+
+    Retorna:
+    - df_derivada: DataFrame con derivadas aplicadas a los espectros.
+    """
+    int orden = int(input("\t\t\tIngrese orden:"))
+    while orden != 1 or orden != 2:
+        orden = int(input("""
+              El orden de la derivada solo puede ser 1 o 2
+              ->
+              """))
+    df_derivada = df.copy()
+    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # eje X
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+
+        if orden == 1:
+            derivada = np.gradient(y, x)
+        elif orden == 2:
+            derivada = np.gradient(np.gradient(y, x), x)
+        else:
+            raise ValueError("Solo se permite orden 1 o 2.")
+
+        df_derivada.iloc[:, i] = derivada
+
+    print(f"✅ Derivada de orden {orden} aplicada.")
+    return df_derivada
+   
     
     
     
@@ -473,6 +508,8 @@ def main():
             #print(df)
         elif opt == 3: 
             df = suavizado(df) 
+        elif opt == 4:
+            df = derivada(df)
         elif opt==0:
             print("""
                 saliendo del programa...
