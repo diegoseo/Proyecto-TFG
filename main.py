@@ -12,7 +12,7 @@ import sys  # Para usar sys.exit()
 #from funciones import * # NO SE RECOMIENDA IMPORTAR TODO DE UNA CON EL * 
 from funciones import mostrar_espectros, datos_sin_normalizar, mostrar_leyendas,guardar_archivo, espectro_acotado,grafico_tipo,grafico_acotado_tipo,descargar_csv,descargar_csv_acotado,descargar_csv_tipo,descargar_csv_acotado_tipo # SE LLAMA DE A UNO A LAS FUNCIONES PARA NO TENER QUE HACER CADA RATO funcion.raman_shift
 from funciones import normalizado_media , normalizado_area , suavizado_menu , suavizado_saviztky_golay , suavizado_filtroGausiano , suavizado_mediamovil , primera_derivada , segunda_derivada , suavizado_menu_derivadas , menu_correccion , correcion_LineaB , pca , hca , menu_correccion_pca
-from funciones import diccionario_nombre , diccionario_archivos , comparar_long_ondas , comparar_cant_filas , comparar_cant_col , low_level , mid_level
+from funciones import diccionario_nombre , diccionario_archivos , comparar_long_ondas , comparar_cant_filas , comparar_cant_col , low_level , mid_level, ordenar_muestras
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -75,23 +75,24 @@ def menu_principal():
                num = num + 1
              
                
-           print("\nPREGUNTAR COMO SE TIENE QUE IGUALAR LAS LONG DE ONDAS")
+           print("\nPREGUNTAR COMO SE TIENE QUE IGUALAR LAS LONG DE ONDAS") # RESPUESTA - INTERPOLANDO
         
            # TERCERO QUE LOS ARCHIVOS TENGAN LA MISMA LONGITUD DE ONDA (RAMAN_SHIFT)
            comparar_long_ondas(diccionario_archivos,diccionario_nombre,cant_archivos) 
            
-           print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS FILAS")
+           print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS FILAS") # RESPUESTA - NO SE IGUALA POR QUE SE GUARDA TODO DENTRO DE UN VECTOR
            
            # PRIMER PASO CORROBORAR QUE LOS ARCHIVOS TENGA LA MISMA CANTIDAD DE FILA 
            comparar_cant_filas(diccionario_archivos,diccionario_nombre, cant_archivos)
            
-           print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS COLUMNAS")
+           print("PREGUNTAR COMO SE TIENE QUE IGUALAR LAS COLUMNAS") # RESPUESTA - NO SE IGUALA POR QUE SE GUARDA TODO DENTRO DE UN VECTOR
            
            # SEGUNDO PASO CORROBORAR QUE LOS ARCHIVOS TENGA LA MISMA CANTDAD DE COLUMNAS
            comparar_cant_col(diccionario_archivos,diccionario_nombre, cant_archivos)
            
            
            if m_df == 1:
+               ordenar_muestras(diccionario_archivos)
                low_level(diccionario_archivos)   #VER QUE HACER SI NO TIENEN DIMENSIONES IGUALES O SIEMPRE VAN A SER DE IGUALES DIMENSIONES?
                df = cargar_archivo("lowfusion.csv") # en cargar_archivo tiene el header = none por eso funsiona
                main(df,"lowfusion.csv",0) # ahora te va a permitir ver todas las funciones del menu principal pero el mid-level solo la opcion 11 por el momento

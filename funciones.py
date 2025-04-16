@@ -2152,6 +2152,50 @@ def hca(dato,raman_shift):
                
 
 
+# ORDENAMOS LAS MUESTRAS PARA QUE EN CADA ARCHIVO LAS MUESTRAS TENGAN EL MISMO ORDEN, A A A B , A B A A RESULTADO A A A B 
+def ordenar_muestras(lista_df):
+    print("ENTRO EN ORDENAR MUESTRAS")
+
+    tipos_orden = lista_df[0].iloc[0, 1:].tolist()
+
+    for i in range(len(lista_df)):
+        df = lista_df[i]
+        fila_tipos = 0
+
+        col_0 = df.columns[0]
+        tipos_actuales = df.iloc[fila_tipos, 1:].copy() 
+        nuevas_cols = [col_0]
+
+        for tipo in tipos_orden:
+            coincidencias = tipos_actuales[tipos_actuales == tipo]
+
+            if len(coincidencias) == 0:
+                print(f"Tipo '{tipo}' no se encontro en el DataFrame {i}.")
+                continue  # saltamos al siguiente tipo
+
+            idx = coincidencias.index[0]
+            nuevas_cols.append(idx)
+            tipos_actuales.at[idx] = "USADO"
+
+        lista_df[i] = df[nuevas_cols]
+
+    return lista_df
+
+
+
+# AHORA QUE TENGO ORDENADO LA MUESTRA NECESITO ENCONTRAR SI TIENE EJE COMUN O NO PARA PODER DETERMINAR CUAL SERA EL PASO DE LA INTERPOLACION
+# def val_eje_comun():
+
+    
+
+
+
+
+# # TIENE QUE RECIBIR EL RAMAN SHIFT
+# def cal_pasos():
+    
+
+
 
 
 def low_level(df):
