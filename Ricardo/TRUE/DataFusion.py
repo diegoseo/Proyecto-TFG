@@ -436,7 +436,9 @@ def menu():
     print("2. Normalizar Espectro")
     print("3. Suavizar Espectro")
     print("4. Derivar ")
-    print("4. Aplicar PCA al espectro")
+    print("5. Correccion Linea Base")
+    #print("4. Aplicar PCA al espectro")
+    #print("5. aux validar_eje_x")
     print("0. Salir del programa")
     
 
@@ -475,8 +477,20 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
        
+   
     
-    
+def correccion_base(df):
+    print("""
+          1. Correccion Lineal  
+          2. Smoothing por Media Movil 
+          3. Smoothing por Filtro Gaussiano
+          4. Smoothing por Mediana
+          5. Smoothing por Interpolacion suave 
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 1:
+        correccion_lineal(df)
     
 
 ## Función principal
@@ -509,6 +523,8 @@ def main():
             df = suavizado(df) 
         elif opt == 4:
             df = derivada(df)
+        elif opt == 5:
+            df = correccion_base(df)
         elif opt==0:
             print("""
                 saliendo del programa...
