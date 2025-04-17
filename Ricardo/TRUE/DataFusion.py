@@ -477,12 +477,43 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
        
-   
-    
+def correccion_polinomial(df):
+    """Aplica corrección de línea base por ajuste polinomial a cada espectro (columna) del DataFrame.
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - grado: grado del polinomio para el ajuste (por defecto: 3)
+
+    Retorna:
+    - df_corregido: DataFrame con la línea base corregida.
+    """
+    grado = int(input("""
+          Ingrese el grado del polinomio
+          Grado del polinomio	Cuándo usarlo
+              2 o 3             Fondo ligeramente curvo
+              4 a 6	            Fondo más complejo
+              >6	           ⚠️ Riesgo de sobreajuste
+          ->     
+          """))
+    df_corregido = df.copy()
+    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+
+        # Ajustar un polinomio al espectro completo
+        coef = np.polyfit(x, y, deg=grado)
+        base = np.polyval(coef, x)
+
+        # Corregir el espectro
+        df_corregido.iloc[:, i] = y - base
+
+    print(f"✅ Corrección polinomial (grado {grado}) aplicada.")
+    return df_corregido
+     
 def correccion_base(df):
     print("""
           1. Correccion Lineal  
-          2. Smoothing por Media Movil 
+          2. Correccion Polinomial
           3. Smoothing por Filtro Gaussiano
           4. Smoothing por Mediana
           5. Smoothing por Interpolacion suave 
