@@ -425,7 +425,7 @@ def suavizado(df):
     return df
           
           
-
+def pca()
 
 def menu():
     print("-" * 50) 
@@ -468,13 +468,13 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
         elif orden == 2:
             derivada = np.gradient(np.gradient(y, x), x)
         else:
-            raise ValueError("Solo se permite orden 1 o 2.")
+            raise ValueError("Solo se permite orden 1 o 2.") #no entrara aqui
 
         df_derivada.iloc[:, i] = derivada
 
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
-   
+       
     
     
     
