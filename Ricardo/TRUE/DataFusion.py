@@ -243,7 +243,6 @@ def normalizar(df):
 def savitzky(df, window_length=11, polyorder=2):
     """
     Aplica suavizado Savitzky-Golay a todas las columnas del DataFrame excepto la primera.
-
     Parámetros:
     - df: DataFrame con la primera columna como eje X.
     - window_length: Tamaño de ventana (debe ser impar y >= polyorder + 2).
@@ -441,7 +440,7 @@ def menu():
     print("0. Salir del programa")
     
 
-def derivada(df):
+def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valores nulos
     """
     Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
 
