@@ -20,6 +20,7 @@ import sys
 import time
 from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
+from pybaselines import airpls
 
 
 
@@ -539,14 +540,44 @@ def correccion_asls(df, lam=1e5, p=0.01):
 
     print(f"✅ Corrección ASLS aplicada (λ={lam}, p={p})")
     return df_corregido
-     
+
+def correccion_airpls(df, lam=1e5, max_iter=50):
+    """
+    Aplica corrección de línea base con el método airPLS a cada espectro del DataFrame.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - lam: Parámetro de suavizado (lambda). Mayor = línea base más suave.
+    - max_iter: Número máximo de iteraciones.
+
+    Retorna:
+    - df_corregido: DataFrame con fondo corregido.
+    """
+    print("""
+          por defecto
+          LAMBDA = 1e5 
+          maximas iteraciones  = 50
+          """)
+    df_corregido = df.copy()
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        baseline, _ = airpls.airpls(y, lam=lam, max_iter=max_iter)
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print(f"✅ Corrección airPLS aplicada (λ={lam}, iter={max_iter})")
+    return df_corregido
+
+
+
 def correccion_base(df):
     print("""
           1. Correccion Lineal  
           2. Correccion Polinomial
           3. Correccion AsLS
-          4. Smoothing por Mediana
-          5. Smoothing por Interpolacion suave 
+          4. Correccion airPLS
+          5. Shirley
           0. Volver
           """)
     opt = int(input("ingrese opcion: "))
@@ -556,6 +587,8 @@ def correccion_base(df):
         df = correccion_polinomial(df)
     elif opt == 3:
         df = correccion_asls(df)
+    elif opt == 4:
+        df = correccion_airpls(df)
     elif opt == 0:
         return df
 
