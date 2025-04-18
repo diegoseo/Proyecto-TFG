@@ -20,7 +20,7 @@ import sys
 import time
 from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
-from baseline_correction import als, airPLS, modpoly
+#from baseline_correction import als, airPLS, modpoly
 #DEJARON DE TENER SOPORTE 
 # from pybaselines import  morphological
 # from pybaselines.airpls import airpls 
@@ -520,58 +520,67 @@ def correccion_polinomial(df):
     return df_corregido
 
 
-def correccion_asls(df, lam=1e5, p=0.01):
+def correccion_asls(df, lam=1e5, p=0.01, niter=10):
     """
-    Aplica corrección de línea base con el método ASLS a cada espectro del DataFrame.
-
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X.
-    - lam: Parámetro de suavizado (lambda). Mayor = línea base más suave.
-    - p: Asimetría. Más bajo = más sensible a picos.
-
-    Retorna:
-    - df_corregido: DataFrame con fondo corregido por ASLS.
+    Implementación manual del algoritmo ALS (Asymmetric Least Squares Smoothing)
+    basado en Eilers & Boelens (2005).
     """
-    print("""
-          por defecto
-          LAMBDA = 1e5 
-          Asimetria (p) = 0.01
-          """)
+    from scipy import sparse
+    from scipy.sparse.linalg import spsolve
+
+    def baseline_als(y, lam, p, niter):
+        L = len(y)
+        D = sparse.diags([1, -2, 1], [0, -1, -2], shape=(L, L - 2))
+        D = lam * D.dot(D.transpose())
+        w = np.ones(L)
+        for _ in range(niter):
+            W = sparse.spdiags(w, 0, L, L)
+            Z = W + D
+            z = spsolve(Z, w * y)
+            w = p * (y > z) + (1 - p) * (y < z)
+        return z
+
     df_corregido = df.copy()
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline = als(y, lam=lam, p=p)
+        baseline = baseline_als(y.values, lam=lam, p=p, niter=niter)
         df_corregido.iloc[:, i] = y - baseline
-    print(f"✅ Correcci\u00f3n AsLS aplicada (lam={lam}, p={p})")
+    print(f"✅ Corrección ALS aplicada (lam={lam}, p={p}, niter={niter})")
     return df_corregido
 
-def correccion_airpls(df, lam=1e5, max_iter=50):
-    """
-    Aplica corrección de línea base con el método airPLS a cada espectro del DataFrame.
 
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X.
-    - lam: Parámetro de suavizado (lambda). Mayor = línea base más suave.
-    - max_iter: Número máximo de iteraciones.
-
-    Retorna:
-    - df_corregido: DataFrame con fondo corregido.
+def correccion_airpls(df, lam=1e5, niter=10):
     """
-    print("""
-          por defecto
-          LAMBDA = 1e5 
-          maximas iteraciones  = 50
-          """)
+    Implementación simplificada de airPLS basada en Zhang et al. (2010).
+    """
+    def airpls_baseline(y, lam=1e5, niter=10):
+        from scipy import sparse
+        from scipy.sparse.linalg import spsolve
+
+        L = len(y)
+        D = sparse.diags([1, -2, 1], [0, -1, -2], shape=(L, L - 2))
+        D = D.dot(D.transpose())
+        H = lam * D
+        w = np.ones(L)
+        for i in range(niter):
+            W = sparse.spdiags(w, 0, L, L)
+            Z = W + H
+            z = spsolve(Z, w * y)
+            d = y - z
+            m = np.mean(d[d < 0]) if np.any(d < 0) else 0
+            s = np.std(d[d < 0]) if np.any(d < 0) else 0.01
+            w = np.exp(-(d - m)**2 / (2 * s**2))
+            w[d > z] = 1
+        return z
+
     df_corregido = df.copy()
-
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline, _ = airpls.airpls(y, lam=lam, max_iter=max_iter)
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print(f"✅ Corrección airPLS aplicada (λ={lam}, iter={max_iter})")
+        baseline = airpls_baseline(y.values, lam=lam, niter=niter)
+        df_corregido.iloc[:, i] = y - baseline
+    print(f"✅ Corrección airPLS aplicada (lam={lam}, iter={niter})")
     return df_corregido
+
 
 
 
@@ -597,29 +606,30 @@ def correccion_shirley(df, max_iter=100): #TODO: ver el tema de las impresiones 
     print(f"✅ Corrección Shirley aplicada (máx. {max_iter} iteraciones)")
     return df_corregido
 
-def correccion_modpoly(df, grado=3, max_iter=100): #TODO ver el tema de grado y max iter 
+def correccion_modpoly(df, grado=3):
     """
-    Aplica corrección de línea base usando el método ModPoly.
-
-    Parámetros:
-    - df: DataFrame con espectros. La primera columna es el eje X.
-    - grado: Grado del polinomio (típico: 2 a 6)
-    - max_iter: Número máximo de iteraciones.
-
-    Retorna:
-    - df_corregido: DataFrame con los espectros corregidos.
+    Implementación básica de ModPoly: ajuste polinomial iterativo ignorando picos.
     """
+    from numpy.polynomial import Polynomial
+
+    def modpoly_baseline(y, grado=3, max_iter=100, tol=1e-6):
+        mask = np.ones_like(y, dtype=bool)
+        for _ in range(max_iter):
+            p = Polynomial.fit(np.arange(len(y))[mask], y[mask], grado)
+            base = p(np.arange(len(y)))
+            nueva_mask = y < base
+            if np.all(mask == nueva_mask):
+                break
+            mask = nueva_mask
+        return base
+
     df_corregido = df.copy()
-
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline, _ = modpoly.modpoly(y, poly_order=grado, max_iter=max_iter)
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print(f"✅ Corrección ModPoly aplicada (grado {grado}, {max_iter} iteraciones).")
+        baseline = modpoly_baseline(y.values, grado=grado)
+        df_corregido.iloc[:, i] = y - baseline
+    print(f"✅ Corrección ModPoly aplicada (grado={grado})")
     return df_corregido
-
 def correccion_lineal(df):
     """
     Aplica corrección lineal de fondo a todos los espectros en el DataFrame,
