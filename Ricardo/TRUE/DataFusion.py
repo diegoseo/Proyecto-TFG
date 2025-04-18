@@ -19,6 +19,8 @@ from scipy.ndimage import gaussian_filter1d
 import sys
 import time
 from scipy.interpolate import UnivariateSpline
+from pybaselines.whittaker import asls
+
 
 
 
@@ -425,7 +427,7 @@ def suavizado(df):
     return df
           
           
-def pca()
+
 
 def menu():
     print("-" * 50) 
@@ -509,19 +511,55 @@ def correccion_polinomial(df):
 
     print(f"✅ Corrección polinomial (grado {grado}) aplicada.")
     return df_corregido
+
+
+def correccion_asls(df, lam=1e5, p=0.01):
+    """
+    Aplica corrección de línea base con el método ASLS a cada espectro del DataFrame.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - lam: Parámetro de suavizado (lambda). Mayor = línea base más suave.
+    - p: Asimetría. Más bajo = más sensible a picos.
+
+    Retorna:
+    - df_corregido: DataFrame con fondo corregido por ASLS.
+    """
+    print("""
+          por defecto
+          LAMBDA = 1e5 
+          Asimetria (p) = 0.01
+          """)
+    df_corregido = df.copy()
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        baseline, _ = als.asls(y, lam=lam, p=p)
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print(f"✅ Corrección ASLS aplicada (λ={lam}, p={p})")
+    return df_corregido
      
 def correccion_base(df):
     print("""
           1. Correccion Lineal  
           2. Correccion Polinomial
-          3. Smoothing por Filtro Gaussiano
+          3. Correccion AsLS
           4. Smoothing por Mediana
           5. Smoothing por Interpolacion suave 
           0. Volver
           """)
     opt = int(input("ingrese opcion: "))
     if opt == 1:
-        correccion_lineal(df)
+        df = correccion_lineal(df)
+    elif opt == 2:
+        df = correccion_polinomial(df)
+    elif opt == 3:
+        df = correccion_asls(df)
+    elif opt == 0:
+        return df
+
+        
     
 
 ## Función principal
