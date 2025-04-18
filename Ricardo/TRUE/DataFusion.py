@@ -20,7 +20,10 @@ import sys
 import time
 from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
-from pybaselines import airpls, shirley, morphological, modpoly
+from pybaselines import  morphological
+from pybaselines.airpls import airpls 
+from pybaselines.shirley import shirley
+from pybaselines.modpoly import modpoly
 
 
 
@@ -615,6 +618,58 @@ def correccion_modpoly(df, grado=3, max_iter=100): #TODO ver el tema de grado y 
         df_corregido.iloc[:, i] = corregido
 
     print(f"✅ Corrección ModPoly aplicada (grado {grado}, {max_iter} iteraciones).")
+    return df_corregido
+
+def correccion_lineal(df):
+    """
+    Aplica corrección lineal de fondo a todos los espectros en el DataFrame,
+    restando una línea recta entre los extremos de cada espectro.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+
+    Retorna:
+    - df_corregido: DataFrame con el fondo lineal corregido.
+    """
+    df_corregido = df.copy()
+    #x = df.iloc[:, 0]
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+
+        # Línea base entre los extremos
+        y0 = y.iloc[0]
+        y1 = y.iloc[-1]
+        baseline = np.linspace(y0, y1, len(y))
+
+        # Corregir
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print("✅ Corrección lineal aplicada.")
+    return df_corregido
+
+
+def correccion_rolling_ball(df, radius=50):
+    """
+    Aplica corrección de línea base usando el método Rolling Ball (morphological filter).
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - radius: Radio de la "pelota" (más grande = fondo más amplio, menos detalle).
+
+    Retorna:
+    - df_corregido: DataFrame con los espectros corregidos.
+    """
+    df_corregido = df.copy()
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        baseline, _ = morphological.rolling_ball(y, radius=radius)
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print(f"✅ Corrección Rolling Ball aplicada (radio = {radius})")
     return df_corregido
 
 def correccion_base(df):
