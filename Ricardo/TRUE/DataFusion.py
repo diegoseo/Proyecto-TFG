@@ -640,31 +640,16 @@ def correccion_modpoly(df, grado=3):
 
 def correccion_lineal(df):
     """
-    Aplica corrección lineal de fondo a todos los espectros en el DataFrame,
-    restando una línea recta entre los extremos de cada espectro.
-
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X.
-
-    Retorna:
-    - df_corregido: DataFrame con el fondo lineal corregido.
+    Corrección de fondo lineal: resta una recta entre los extremos del espectro.
     """
     df_corregido = df.copy()
-    #x = df.iloc[:, 0]
-
     for i in range(1, len(df.columns)):
-        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
-
-        # Línea base entre los extremos
-        y0 = y.iloc[0]
-        y1 = y.iloc[-1]
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        x = np.arange(len(y))
+        y0, y1 = y.iloc[0], y.iloc[-1]
         baseline = np.linspace(y0, y1, len(y))
-
-        # Corregir
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print("✅ Corrección lineal aplicada.")
+        df_corregido.iloc[:, i] = y - baseline
+    print("✅ Corrección Lineal aplicada")
     return df_corregido
 
 
