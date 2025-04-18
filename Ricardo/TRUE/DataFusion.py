@@ -22,7 +22,7 @@ from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
 #from baseline_correction import als, airPLS, modpoly
 #DEJARON DE TENER SOPORTE 
-# from pybaselines import  morphological
+from pybaselines import  morphological
 # from pybaselines.airpls import airpls 
 # from pybaselines.shirley import shirley
 # from pybaselines.modpoly import modpoly
@@ -584,26 +584,32 @@ def correccion_airpls(df, lam=1e5, niter=10):
 
 
 
-def correccion_shirley(df, max_iter=100): #TODO: ver el tema de las impresiones de max iter 
+def correccion_shirley(df, tol=1e-3, max_iter=100):
     """
-    Aplica corrección de línea base tipo Shirley a cada espectro del DataFrame.
-
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X.
-    - max_iter: Número máximo de iteraciones para convergencia.
-
-    Retorna:
-    - df_corregido: DataFrame con fondo corregido.
+    Corrección de fondo tipo Shirley basada en la formulación clásica.
     """
+    def shirley_baseline(y, tol=1e-3, max_iter=100):
+        y = np.asarray(y, dtype=float)
+        N = len(y)
+        b = np.zeros_like(y)
+        y0 = y[0]
+        yn = y[-1]
+        b_old = b.copy()
+        for _ in range(max_iter):
+            for i in range(N):
+                integral = np.trapz(y[i:] - b_old[i:], dx=1)
+                b[i] = y0 + (yn - y0) * (integral / np.trapz(y - b_old, dx=1))
+            if np.linalg.norm(b - b_old) < tol:
+                break
+            b_old = b.copy()
+        return b
+
     df_corregido = df.copy()
-
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline, _ = shirley.shirley(y, max_iter=max_iter)
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print(f"✅ Corrección Shirley aplicada (máx. {max_iter} iteraciones)")
+        baseline = shirley_baseline(y.values, tol=tol, max_iter=max_iter)
+        df_corregido.iloc[:, i] = y - baseline
+    print(f"✅ Corrección Shirley aplicada (tol={tol}, iter={max_iter})")
     return df_corregido
 
 def correccion_modpoly(df, grado=3):
@@ -630,6 +636,8 @@ def correccion_modpoly(df, grado=3):
         df_corregido.iloc[:, i] = y - baseline
     print(f"✅ Corrección ModPoly aplicada (grado={grado})")
     return df_corregido
+
+
 def correccion_lineal(df):
     """
     Aplica corrección lineal de fondo a todos los espectros en el DataFrame,
@@ -660,26 +668,21 @@ def correccion_lineal(df):
     return df_corregido
 
 
-def correccion_rolling_ball(df, radius=50):
-    """
-    Aplica corrección de línea base usando el método Rolling Ball (morphological filter).
+def correccion_rolling_ball(df, radio=50):
+    from scipy.ndimage import minimum_filter1d, maximum_filter1d
 
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X.
-    - radius: Radio de la "pelota" (más grande = fondo más amplio, menos detalle).
+    def rolling_ball_baseline(y, radius):
+        y = np.asarray(y, dtype=float)
+        y_smooth = maximum_filter1d(y, size=radius)
+        baseline = minimum_filter1d(y_smooth, size=radius)
+        return baseline
 
-    Retorna:
-    - df_corregido: DataFrame con los espectros corregidos.
-    """
     df_corregido = df.copy()
-
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline, _ = morphological.rolling_ball(y, radius=radius)
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print(f"✅ Corrección Rolling Ball aplicada (radio = {radius})")
+        baseline = rolling_ball_baseline(y.values, radio)
+        df_corregido.iloc[:, i] = y - baseline
+    print(f"✅ Corrección Rolling Ball aplicada (radio={radio})")
     return df_corregido
 
 def correccion_base(df):
