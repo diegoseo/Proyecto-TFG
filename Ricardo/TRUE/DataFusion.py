@@ -20,10 +20,12 @@ import sys
 import time
 from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
-from pybaselines import  morphological
-from pybaselines.airpls import airpls 
-from pybaselines.shirley import shirley
-from pybaselines.modpoly import modpoly
+from baseline_correction import als, airPLS, modpoly
+#DEJARON DE TENER SOPORTE 
+# from pybaselines import  morphological
+# from pybaselines.airpls import airpls 
+# from pybaselines.shirley import shirley
+# from pybaselines.modpoly import modpoly
 
 
 
@@ -538,11 +540,9 @@ def correccion_asls(df, lam=1e5, p=0.01):
     df_corregido = df.copy()
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        baseline, _ = als.asls(y, lam=lam, p=p)
-        corregido = y - baseline
-        df_corregido.iloc[:, i] = corregido
-
-    print(f"✅ Corrección ASLS aplicada (λ={lam}, p={p})")
+        baseline = als(y, lam=lam, p=p)
+        df_corregido.iloc[:, i] = y - baseline
+    print(f"✅ Correcci\u00f3n AsLS aplicada (lam={lam}, p={p})")
     return df_corregido
 
 def correccion_airpls(df, lam=1e5, max_iter=50):
