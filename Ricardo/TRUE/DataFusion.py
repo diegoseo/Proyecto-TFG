@@ -20,7 +20,8 @@ import sys
 import time
 from scipy.interpolate import UnivariateSpline
 from pybaselines.whittaker import asls
-from pybaselines import airpls
+from pybaselines import airpls, shirley, morphological, modpoly
+
 
 
 
@@ -571,13 +572,60 @@ def correccion_airpls(df, lam=1e5, max_iter=50):
 
 
 
+def correccion_shirley(df, max_iter=100): #TODO: ver el tema de las impresiones de max iter 
+    """
+    Aplica corrección de línea base tipo Shirley a cada espectro del DataFrame.
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X.
+    - max_iter: Número máximo de iteraciones para convergencia.
+
+    Retorna:
+    - df_corregido: DataFrame con fondo corregido.
+    """
+    df_corregido = df.copy()
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        baseline, _ = shirley.shirley(y, max_iter=max_iter)
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print(f"✅ Corrección Shirley aplicada (máx. {max_iter} iteraciones)")
+    return df_corregido
+
+def correccion_modpoly(df, grado=3, max_iter=100): #TODO ver el tema de grado y max iter 
+    """
+    Aplica corrección de línea base usando el método ModPoly.
+
+    Parámetros:
+    - df: DataFrame con espectros. La primera columna es el eje X.
+    - grado: Grado del polinomio (típico: 2 a 6)
+    - max_iter: Número máximo de iteraciones.
+
+    Retorna:
+    - df_corregido: DataFrame con los espectros corregidos.
+    """
+    df_corregido = df.copy()
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
+        baseline, _ = modpoly.modpoly(y, poly_order=grado, max_iter=max_iter)
+        corregido = y - baseline
+        df_corregido.iloc[:, i] = corregido
+
+    print(f"✅ Corrección ModPoly aplicada (grado {grado}, {max_iter} iteraciones).")
+    return df_corregido
+
 def correccion_base(df):
     print("""
           1. Correccion Lineal  
           2. Correccion Polinomial
           3. Correccion AsLS
           4. Correccion airPLS
-          5. Shirley
+          5. Correccion Shirley
+          6. Correccion Modpoly 
+          7. Correccion Rolling Ball
           0. Volver
           """)
     opt = int(input("ingrese opcion: "))
@@ -589,6 +637,12 @@ def correccion_base(df):
         df = correccion_asls(df)
     elif opt == 4:
         df = correccion_airpls(df)
+    elif opt == 5:
+        df = correccion_shirley(df)
+    elif opt == 6:
+        df = correccion_modpoly(df)
+    elif opt == 7:
+        df = correccion_rolling_ball(df)
     elif opt == 0:
         return df
 
