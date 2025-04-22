@@ -405,86 +405,6 @@ def spline(df):
     print("✅ Suavizado por interpolación spline aplicado.")
     return df_suavizado
 
-
-def suavizado(df):
-    print("""
-          1. Smoothing por Savitzky-Golay
-          2. Smoothing por Media Movil 
-          3. Smoothing por Filtro Gaussiano
-          4. Smoothing por Mediana
-          5. Smoothing por Interpolacion suave 
-          0. Volver
-          """)
-    opt = int(input("ingrese opcion: "))
-    if opt == 1:
-        df = savitzky(df)
-    elif opt == 2:
-        df = media_movil(df)
-    elif opt == 3: 
-        df = filtro_gaussiano(df)
-    elif opt == 4:
-        df = mediana(df)
-    elif opt == 5 :
-        df = spline(df)
-    elif opt==0:
-       print("""
-             volviendo al menu...
-             {}
-             """.format("-" * 32))
-    return df
-          
-          
-
-
-def menu():
-    print("-" * 50) 
-    #texto_desplazamiento("MENU", 10, 0.1)
-    print("****MENU****")
-    print("11. leer otro dataset")
-    print("1. Mostrar espectros ")
-    print("2. Normalizar Espectro")
-    print("3. Suavizar Espectro")
-    print("4. Derivar ")
-    print("5. Correccion Linea Base")
-    #print("4. Aplicar PCA al espectro")
-    #print("5. aux validar_eje_x")
-    print("0. Salir del programa")
-    
-
-def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valores nulos
-    """
-    Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
-
-    Parámetros:
-    - df: DataFrame con la primera columna como eje X (e.g., Raman shift).
-    - orden: 1 para primera derivada, 2 para segunda.
-
-    Retorna:
-    - df_derivada: DataFrame con derivadas aplicadas a los espectros.
-    """
-    orden = int(input("\t\t\tIngrese orden:"))
-    while orden != 1 and orden != 2:
-        orden = int(input("""
-              El orden de la derivada solo puede ser 1 o 2
-              ->
-              """))
-    df_derivada = df.copy()
-    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # eje X
-
-    for i in range(1, len(df.columns)):
-        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
-
-        if orden == 1:
-            derivada = np.gradient(y, x)
-        elif orden == 2:
-            derivada = np.gradient(np.gradient(y, x), x)
-        else:
-            raise ValueError("Solo se permite orden 1 o 2.") #no entrara aqui
-
-        df_derivada.iloc[:, i] = derivada
-
-    print(f"✅ Derivada de orden {orden} aplicada.")
-    return df_derivada
        
 def correccion_polinomial(df, grado=3):
     df_corregido = df.copy()
@@ -678,7 +598,82 @@ def correccion_base(df):
         return df
 
     return df
-    
+ 
+def suavizado(df):
+    print("""
+          1. Smoothing por Savitzky-Golay
+          2. Smoothing por Media Movil 
+          3. Smoothing por Filtro Gaussiano
+          4. Smoothing por Mediana
+          5. Smoothing por Interpolacion suave 
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 1:
+        df = savitzky(df)
+    elif opt == 2:
+        df = media_movil(df)
+    elif opt == 3: 
+        df = filtro_gaussiano(df)
+    elif opt == 4:
+        df = mediana(df)
+    elif opt == 5 :
+        df = spline(df)
+    elif opt==0:
+       print("""
+             volviendo al menu...
+             {}
+             """.format("-" * 32))
+    return df
+          
+def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valores nulos
+    """
+    Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
+
+    Parámetros:
+    - df: DataFrame con la primera columna como eje X (e.g., Raman shift).
+    - orden: 1 para primera derivada, 2 para segunda.
+
+    Retorna:
+    - df_derivada: DataFrame con derivadas aplicadas a los espectros.
+    """
+    orden = int(input("\t\t\tIngrese orden:"))
+    while orden != 1 and orden != 2:
+        orden = int(input("""
+              El orden de la derivada solo puede ser 1 o 2
+              ->
+              """))
+    df_derivada = df.copy()
+    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # eje X
+
+    for i in range(1, len(df.columns)):
+        y = pd.to_numeric(df.iloc[:, i], errors='coerce')
+
+        if orden == 1:
+            derivada = np.gradient(y, x)
+        elif orden == 2:
+            derivada = np.gradient(np.gradient(y, x), x)
+        else:
+            raise ValueError("Solo se permite orden 1 o 2.") #no entrara aqui
+
+        df_derivada.iloc[:, i] = derivada
+
+    print(f"✅ Derivada de orden {orden} aplicada.")
+    return df_derivada
+
+def menu():
+    print("-" * 50) 
+    #texto_desplazamiento("MENU", 10, 0.1)
+    print("****MENU****")
+    print("11. leer otro dataset")
+    print("1. Mostrar espectros ")
+    print("2. Normalizar Espectro")
+    print("3. Suavizar Espectro")
+    print("4. Derivar ")
+    print("5. Correccion Linea Base")
+    #print("4. Aplicar PCA al espectro")
+    #print("5. aux validar_eje_x")
+    print("0. Salir del programa")     
 
 ## Función principal
 def main():
@@ -720,7 +715,7 @@ def main():
             sys.exit()       
             
     
-    
+  
 
 if __name__ == "__main__":
     main()
