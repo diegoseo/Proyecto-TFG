@@ -23,10 +23,10 @@ from pybaselines.whittaker import asls
 #from baseline_correction import als, airPLS, modpoly
 #DEJARON DE TENER SOPORTE 
 from pybaselines import  morphological
-# from pybaselines.airpls import airpls 
-# from pybaselines.shirley import shirley
-# from pybaselines.modpoly import modpoly
-
+from sklearn.decomposition import PCA
+from bokeh.plotting import figure, show, output_file
+from bokeh.models import ColumnDataSource, LabelSet
+from bokeh.io import output_notebook
 
 
 
@@ -114,9 +114,7 @@ def mostrar_espectros(df):
     
     # Mostrar la gráfica
     plt.show()
-    
-
-    
+      
 def encabezados(df):
     # Obtener los encabezados únicos
     unique_headers = df.columns.unique()
@@ -174,6 +172,7 @@ def normalizar_area(df):
 
     print("✅ Normalización por área aplicada.")
     return df_norm
+
 def normalizar_zscore(df):
     """
     Normaliza cada columna (excepto la primera) usando Z-score:
@@ -318,7 +317,6 @@ def media_movil(df):
     print("✅ Suavizado por media móvil aplicado.")
     return df_suavizado
 
-
 def filtro_gaussiano(df):
     """
     Aplica suavizado gaussiano a todas las columnas del DataFrame excepto la primera.
@@ -344,7 +342,6 @@ def filtro_gaussiano(df):
 
     print("✅ Suavizado Gaussiano aplicado.")
     return df_suavizado
-
 
 def mediana(df):
     """
@@ -417,7 +414,6 @@ def correccion_polinomial(df, grado=3):
     print(f"✅ Corrección Polinomial aplicada (grado={grado})")
     return df_corregido
 
-
 def correccion_asls(df, lam=1e5, p=0.01, niter=10):
     """
     Implementación manual del algoritmo ALS (Asymmetric Least Squares Smoothing)
@@ -445,7 +441,6 @@ def correccion_asls(df, lam=1e5, p=0.01, niter=10):
         df_corregido.iloc[:, i] = y - baseline
     print(f"✅ Corrección ALS aplicada (lam={lam}, p={p}, niter={niter})")
     return df_corregido
-
 
 def correccion_airpls(df, lam=1e5, niter=10):
     """
@@ -478,9 +473,6 @@ def correccion_airpls(df, lam=1e5, niter=10):
         df_corregido.iloc[:, i] = y - baseline
     print(f"✅ Corrección airPLS aplicada (lam={lam}, iter={niter})")
     return df_corregido
-
-
-
 
 def correccion_shirley(df, tol=1e-3, max_iter=100):
     """
@@ -535,7 +527,6 @@ def correccion_modpoly(df, grado=3):
     print(f"✅ Corrección ModPoly aplicada (grado={grado})")
     return df_corregido
 
-
 def correccion_lineal(df):
     """
     Corrección de fondo lineal: resta una recta entre los extremos del espectro.
@@ -549,7 +540,6 @@ def correccion_lineal(df):
         df_corregido.iloc[:, i] = y - baseline
     print("✅ Corrección Lineal aplicada")
     return df_corregido
-
 
 def correccion_rolling_ball(df, radio=50):
     from scipy.ndimage import minimum_filter1d, maximum_filter1d
@@ -568,36 +558,7 @@ def correccion_rolling_ball(df, radio=50):
     print(f"✅ Corrección Rolling Ball aplicada (radio={radio})")
     return df_corregido
 
-def correccion_base(df):
-    print("""
-          1. Correccion Lineal  
-          2. Correccion Polinomial
-          3. Correccion AsLS
-          4. Correccion airPLS
-          5. Correccion Shirley
-          6. Correccion Modpoly 
-          7. Correccion Rolling Ball
-          0. Volver
-          """)
-    opt = int(input("ingrese opcion: "))
-    if opt == 1:
-        df = correccion_lineal(df)
-    elif opt == 2:
-        df = correccion_polinomial(df)
-    elif opt == 3:
-        df = correccion_asls(df)
-    elif opt == 4:
-        df = correccion_airpls(df)
-    elif opt == 5:
-        df = correccion_shirley(df)
-    elif opt == 6:
-        df = correccion_modpoly(df)
-    elif opt == 7:
-        df = correccion_rolling_ball(df)
-    elif opt == 0:
-        return df
 
-    return df
  
 def suavizado(df):
     print("""
@@ -661,6 +622,79 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
 
+def aplicar_pca(df, n_componentes=3, graficar=True):
+    """
+    Aplica PCA al DataFrame de espectros y opcionalmente grafica los componentes principales.
+
+    Parámetros:
+    - df: DataFrame donde la primera columna es el eje X y el resto espectros.
+    - n_componentes: Número de componentes principales a conservar.
+    - graficar: Si True, grafica en 2D con Bokeh si n_componentes==2.
+
+    Retorna:
+    - pca_df: DataFrame con los componentes principales.
+    - modelo_pca: Objeto PCA entrenado.
+    """
+    datos = df.iloc[:, 1:].T  # Transponemos: cada espectro es una muestra
+    pca = PCA(n_components=n_componentes)
+    componentes = pca.fit_transform(datos)
+
+    columnas = [f'PC{i+1}' for i in range(n_componentes)]
+    pca_df = pd.DataFrame(componentes, columns=columnas, index=df.columns[1:])
+
+    if graficar and n_componentes == 2:
+        output_file("pca_interactivo.html")
+        source = ColumnDataSource(data={
+            'PC1': pca_df['PC1'],
+            'PC2': pca_df['PC2'],
+            'labels': pca_df.index.astype(str)
+        })
+
+        p = figure(title="PCA Interactivo - 2 Componentes", x_axis_label='PC1', y_axis_label='PC2', width=800, height=600)
+        p.circle('PC1', 'PC2', size=8, source=source, fill_alpha=0.6)
+
+        labels = LabelSet(x='PC1', y='PC2', text='labels', level='glyph', x_offset=5, y_offset=5, source=source)
+        p.add_layout(labels)
+
+        show(p)
+
+    elif graficar:
+        print("✅ PCA aplicado. Para graficar interactivamente, usa n_componentes=2")
+
+    return pca_df, pca
+
+
+def correccion_base(df):
+    print("""
+          1. Correccion Lineal  
+          2. Correccion Polinomial
+          3. Correccion AsLS
+          4. Correccion airPLS
+          5. Correccion Shirley
+          6. Correccion Modpoly 
+          7. Correccion Rolling Ball
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 1:
+        df = correccion_lineal(df)
+    elif opt == 2:
+        df = correccion_polinomial(df)
+    elif opt == 3:
+        df = correccion_asls(df)
+    elif opt == 4:
+        df = correccion_airpls(df)
+    elif opt == 5:
+        df = correccion_shirley(df)
+    elif opt == 6:
+        df = correccion_modpoly(df)
+    elif opt == 7:
+        df = correccion_rolling_ball(df)
+    elif opt == 0:
+        return df
+
+    return df
+
 def menu():
     print("-" * 50) 
     #texto_desplazamiento("MENU", 10, 0.1)
@@ -671,7 +705,8 @@ def menu():
     print("3. Suavizar Espectro")
     print("4. Derivar ")
     print("5. Correccion Linea Base")
-    #print("4. Aplicar PCA al espectro")
+    print("6. PCA")
+    print("6. HCA")
     #print("5. aux validar_eje_x")
     print("0. Salir del programa")     
 
@@ -707,6 +742,8 @@ def main():
             df = derivada(df)
         elif opt == 5:
             df = correccion_base(df)
+        elif opt == 6: 
+            pca_df, pca = aplicar_pca(df)
         elif opt==0:
             print("""
                 saliendo del programa...
