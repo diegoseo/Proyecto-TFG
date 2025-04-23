@@ -629,7 +629,7 @@ def aplicar_pca(df, n_componentes=3, graficar=True):
     Parámetros:
     - df: DataFrame donde la primera columna es el eje X y el resto espectros.
     - n_componentes: Número de componentes principales a conservar.
-    - graficar: Si True, grafica en 2D con Bokeh si n_componentes==2.
+    - graficar: Si True, grafica en 2D o 3D con Bokeh según el número de componentes.
 
     Retorna:
     - pca_df: DataFrame con los componentes principales.
@@ -643,7 +643,7 @@ def aplicar_pca(df, n_componentes=3, graficar=True):
     pca_df = pd.DataFrame(componentes, columns=columnas, index=df.columns[1:])
 
     if graficar and n_componentes == 2:
-        output_file("pca_interactivo.html")
+        output_file("pca_interactivo_2d.html")
         source = ColumnDataSource(data={
             'PC1': pca_df['PC1'],
             'PC2': pca_df['PC2'],
@@ -658,10 +658,34 @@ def aplicar_pca(df, n_componentes=3, graficar=True):
 
         show(p)
 
+    elif graficar and n_componentes == 3:
+        from bokeh.plotting import figure, show, output_file
+        from bokeh.models import HoverTool
+        from bokeh.models import ColumnDataSource
+        from bokeh.layouts import layout
+
+        output_file("pca_interactivo_3d.html")
+
+        source = ColumnDataSource(data={
+            'x': pca_df['PC1'],
+            'y': pca_df['PC2'],
+            'z': pca_df['PC3'],
+            'labels': pca_df.index.astype(str)
+        })
+
+        p = figure(title="PCA - 3 Componentes (Proyección 2D)", x_axis_label='PC1', y_axis_label='PC2', width=800, height=600, tools="pan,wheel_zoom,box_zoom,reset,hover")
+        scatter = p.circle('x', 'y', size=8, source=source, fill_alpha=0.6)
+
+        hover = p.select(dict(type=HoverTool))
+        hover.tooltips = [("Muestra", "@labels"), ("PC1", "@x"), ("PC2", "@y"), ("PC3", "@z")]
+
+        show(p)
+
     elif graficar:
-        print("✅ PCA aplicado. Para graficar interactivamente, usa n_componentes=2")
+        print("✅ PCA aplicado. Visualización interactiva disponible para 2 o 3 componentes.")
 
     return pca_df, pca
+
 
 
 def correccion_base(df):
