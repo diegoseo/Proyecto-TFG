@@ -27,6 +27,12 @@ from sklearn.decomposition import PCA
 from bokeh.plotting import figure, show, output_file
 from bokeh.models import ColumnDataSource, LabelSet
 from bokeh.io import output_notebook
+from sklearn.decomposition import PCA
+from bokeh.plotting import figure, show, output_file
+from bokeh.models import ColumnDataSource, LabelSet
+from bokeh.io import output_notebook
+import plotly.graph_objects as go
+from scipy.stats import chi2
 
 
 
@@ -588,6 +594,8 @@ def suavizado(df):
     return df
           
 def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valores nulos
+
+
     """
     Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
 
@@ -621,70 +629,128 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
 
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
-
-def aplicar_pca(df, n_componentes=3, graficar=True):
+def obtener_types(df):
     """
-    Aplica PCA al DataFrame de espectros y opcionalmente grafica los componentes principales.
-
-    Parámetros:
-    - df: DataFrame donde la primera columna es el eje X y el resto espectros.
-    - n_componentes: Número de componentes principales a conservar.
-    - graficar: Si True, grafica en 2D o 3D con Bokeh según el número de componentes.
-
-    Retorna:
-    - pca_df: DataFrame con los componentes principales.
-    - modelo_pca: Objeto PCA entrenado.
+    Extrae el tipo base de cada espectro a partir del nombre de la columna.
+    Asume que los nombres son del tipo 'Ibuprofeno_1', 'Aspirina_2', etc.
     """
-    datos = df.iloc[:, 1:].T  # Transponemos: cada espectro es una muestra
+    return [col.split('_')[0] for col in df.columns[1:]]  # omite la primera columna (eje X)
+
+def aplicar_pca(df, types, n_componentes=2):
+    datos = df.iloc[:, 1:].T
     pca = PCA(n_components=n_componentes)
-    componentes = pca.fit_transform(datos)
+    dato_pca = pca.fit_transform(datos)
+    varianza = pca.explained_variance_ratio_ * 100
 
-    columnas = [f'PC{i+1}' for i in range(n_componentes)]
-    pca_df = pd.DataFrame(componentes, columns=columnas, index=df.columns[1:])
+    if n_componentes == 2:
+        plot_pca_2d_interactivo(types, dato_pca, varianza)
+    elif n_componentes == 3:
+        plot_pca_3d_interactivo(types, dato_pca, varianza)
+    else:
+        print(f"PCA aplicado con {n_componentes} componentes.")
+        print("⚠️ Visualización no disponible para más de 3 dimensiones. Puedes analizar la matriz resultante manualmente o reducir a 2-3 componentes para visualizar.")
 
-    if graficar and n_componentes == 2:
-        output_file("pca_interactivo_2d.html")
-        source = ColumnDataSource(data={
-            'PC1': pca_df['PC1'],
-            'PC2': pca_df['PC2'],
-            'labels': pca_df.index.astype(str)
-        })
+    return dato_pca, varianza, pca
 
-        p = figure(title="PCA Interactivo - 2 Componentes", x_axis_label='PC1', y_axis_label='PC2', width=800, height=600)
-        p.circle('PC1', 'PC2', size=8, source=source, fill_alpha=0.6)
 
-        labels = LabelSet(x='PC1', y='PC2', text='labels', level='glyph', x_offset=5, y_offset=5, source=source)
-        p.add_layout(labels)
+def generar_elipsoide(centro, cov, color='rgba(150,150,150,0.3)', intervalo_confianza=0.95):
+    U, S, _ = np.linalg.svd(cov)
+    radii = np.sqrt(chi2.ppf(intervalo_confianza, df=3) * S)
 
-        show(p)
+    u = np.linspace(0, 2 * np.pi, 30)
+    v = np.linspace(0, np.pi, 30)
+    x = np.outer(np.cos(u), np.sin(v))
+    y = np.outer(np.sin(u), np.sin(v))
+    z = np.outer(np.ones_like(u), np.cos(v))
 
-    elif graficar and n_componentes == 3:
-        from bokeh.plotting import figure, show, output_file
-        from bokeh.models import HoverTool
-        from bokeh.models import ColumnDataSource
-        from bokeh.layouts import layout
+    for i in range(len(x)):
+        for j in range(len(x)):
+            [x[i, j], y[i, j], z[i, j]] = centro + np.dot(U, np.multiply(radii, [x[i, j], y[i, j], z[i, j]]))
 
-        output_file("pca_interactivo_3d.html")
+    return go.Surface(x=x, y=y, z=z, opacity=0.3, colorscale=[[0, color], [1, color]], showscale=False)
 
-        source = ColumnDataSource(data={
-            'x': pca_df['PC1'],
-            'y': pca_df['PC2'],
-            'z': pca_df['PC3'],
-            'labels': pca_df.index.astype(str)
-        })
 
-        p = figure(title="PCA - 3 Componentes (Proyección 2D)", x_axis_label='PC1', y_axis_label='PC2', width=800, height=600, tools="pan,wheel_zoom,box_zoom,reset,hover")
-        scatter = p.circle('x', 'y', size=8, source=source, fill_alpha=0.6)
+def plot_pca_2d_interactivo(types, dato_pca, varianza):
+    df_pca = pd.DataFrame(dato_pca, columns=['PC1', 'PC2'])
+    df_pca['Tipo'] = types
 
-        hover = p.select(dict(type=HoverTool))
-        hover.tooltips = [("Muestra", "@labels"), ("PC1", "@x"), ("PC2", "@y"), ("PC3", "@z")]
+    colores_unicos = plt.cm.tab20.colors
+    tipos_unicos = sorted(df_pca['Tipo'].unique())
+    asignacion_colores = {tipo: f'rgba({int(r*255)},{int(g*255)},{int(b*255)},0.7)' for tipo, (r, g, b) in zip(tipos_unicos, colores_unicos)}
 
-        show(p)
+    fig = go.Figure()
 
-    elif graficar:
-        print("✅ PCA aplicado. Visualización interactiva disponible para 2 o 3 componentes.")
+    for tipo in tipos_unicos:
+        indices = df_pca['Tipo'] == tipo
+        fig.add_trace(go.Scatter(
+            x=df_pca.loc[indices, 'PC1'],
+            y=df_pca.loc[indices, 'PC2'],
+            mode='markers',
+            marker=dict(size=8, color=asignacion_colores[tipo], opacity=0.7),
+            name=f'Tipo {tipo}'
+        ))
 
-    return pca_df, pca
+    fig.update_layout(
+        title=f'<b><u>PCA 2D - Agrupamiento por Tipo</u></b>',
+        xaxis_title=f'PC1 ({varianza[0]:.2f}%)',
+        yaxis_title=f'PC2 ({varianza[1]:.2f}%)',
+        legend=dict(font=dict(size=14), bgcolor="rgba(255,255,255,0.7)", bordercolor="black", borderwidth=1),
+        margin=dict(l=0, r=0, b=0, t=40)
+    )
+    fig.show(renderer="browser")
+
+
+def plot_pca_3d_interactivo(types, dato_pca, varianza):
+    df_pca = pd.DataFrame(dato_pca, columns=['PC1', 'PC2', 'PC3'])
+    df_pca['Tipo'] = types
+
+    intervalo_confianza = float(input("Ingrese el intervalo de confianza (%): ")) / 100
+
+    colores_unicos = plt.cm.tab20.colors
+    tipos_unicos = sorted(df_pca['Tipo'].unique())
+    asignacion_colores = {tipo: f'rgba({int(r*255)},{int(g*255)},{int(b*255)},0.7)' for tipo, (r, g, b) in zip(tipos_unicos, colores_unicos)}
+
+    fig = go.Figure()
+
+    for tipo in tipos_unicos:
+        indices = df_pca['Tipo'] == tipo
+        fig.add_trace(go.Scatter3d(
+            x=df_pca.loc[indices, 'PC1'],
+            y=df_pca.loc[indices, 'PC2'],
+            z=df_pca.loc[indices, 'PC3'],
+            mode='markers',
+            marker=dict(size=5, color=asignacion_colores[tipo], opacity=0.7),
+            name=f'Tipo {tipo}'
+        ))
+
+        datos_tipo = df_pca.loc[indices, ['PC1', 'PC2', 'PC3']].to_numpy()
+        if datos_tipo.shape[0] > 3:
+            centro = np.mean(datos_tipo, axis=0)
+            cov = np.cov(datos_tipo.T)
+            elipsoide = generar_elipsoide(centro, cov, asignacion_colores[tipo], intervalo_confianza)
+            fig.add_trace(elipsoide)
+
+    fig.update_layout(
+        legend=dict(
+            font=dict(size=14),
+            bgcolor="rgba(255,255,255,0.7)",
+            bordercolor="black",
+            borderwidth=1
+        ),
+        title=dict(
+            text=f'<b><u>PCA 3D - Agrupamiento por Tipo</u></b>',
+            x=0.5,
+            xanchor="center",
+            font=dict(size=20)
+        ),
+        scene=dict(
+            xaxis_title=f'PC1 ({varianza[0]:.2f}%)',
+            yaxis_title=f'PC2 ({varianza[1]:.2f}%)',
+            zaxis_title=f'PC3 ({varianza[2]:.2f}%)'
+        ),
+        margin=dict(l=0, r=0, b=0, t=40)
+    )
+    fig.show(renderer="browser")
 
 
 
@@ -767,7 +833,8 @@ def main():
         elif opt == 5:
             df = correccion_base(df)
         elif opt == 6: 
-            pca_df, pca = aplicar_pca(df)
+            types = obtener_types(df)
+            dato_pca, varianza, pca = aplicar_pca(df, types)
         elif opt==0:
             print("""
                 saliendo del programa...
