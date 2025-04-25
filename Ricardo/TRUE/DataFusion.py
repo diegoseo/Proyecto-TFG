@@ -21,6 +21,7 @@ from scipy.stats import chi2
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import spearmanr
+import seaborn as sns
 
 
 
@@ -773,20 +774,19 @@ def correccion_base(df):
 
     return df
 
-def aplicar_hca(df, metodo_enlace='ward', cortar_en=3, usar_maxclust=True):
+def aplicar_hca(df, cortar_en=3, usar_maxclust=True):
     """
-    Aplica Análisis de Agrupamiento Jerárquico (HCA) y grafica el dendrograma y la matriz de distancias.
+    Aplica Análisis de Agrupamiento Jerárquico (HCA), muestra mapa de calor de distancia y dendrograma.
 
     Parámetros:
     - df: DataFrame con espectros. Primera columna = eje X.
-    - metodo_enlace: 'ward', 'single', 'complete', 'average', etc.
     - cortar_en: Número de grupos o distancia de corte
     - usar_maxclust: True para criterio por cantidad de clusters, False para distancia
     """
 
     opciones_distancia = {
         '1': 'euclidean',
-        '2': 'cityblock',  # Manhattan
+        '2': 'cityblock',
         '3': 'cosine',
         '4': 'chebyshev',
         '5': 'correlation',
@@ -794,10 +794,25 @@ def aplicar_hca(df, metodo_enlace='ward', cortar_en=3, usar_maxclust=True):
         '7': 'jaccard'
     }
 
+    opciones_enlace = {
+        '1': 'ward',
+        '2': 'single',
+        '3': 'complete',
+        '4': 'average',
+        '5': 'weighted',
+        '6': 'centroid',
+        '7': 'median'
+    }
+
     print("\nSeleccione el tipo de distancia:")
     print("1. Euclidiana\n2. Manhattan\n3. Coseno\n4. Chebyshev\n5. Correlación (Pearson)\n6. Correlación de Rangos (Spearman)\n7. Jaccard (solo binario)")
-    seleccion = input("Ingrese el número correspondiente: ").strip()
-    metodo_distancia = opciones_distancia.get(seleccion, 'euclidean')
+    seleccion_d = input("Ingrese el número correspondiente: ").strip()
+    metodo_distancia = opciones_distancia.get(seleccion_d, 'euclidean')
+
+    print("\nSeleccione el método de enlace:")
+    print("1. Ward\n2. Single\n3. Complete\n4. Average\n5. Weighted\n6. Centroid\n7. Median")
+    seleccion_e = input("Ingrese el número correspondiente: ").strip()
+    metodo_enlace = opciones_enlace.get(seleccion_e, 'ward')
 
     print(f"\n📌 Método de distancia: {metodo_distancia}")
     print(f"📌 Método de enlace: {metodo_enlace}")
@@ -811,9 +826,8 @@ def aplicar_hca(df, metodo_enlace='ward', cortar_en=3, usar_maxclust=True):
         distancia = squareform(distancia_matriz, checks=False)
     else:
         distancia = pdist(datos, metric=metodo_distancia)
-        distancia_matriz = squareform(distancia)  # para visualización
+        distancia_matriz = squareform(distancia)
 
-    # ➤ Mostrar matriz de distancia como mapa de calor
     plt.figure(figsize=(10, 8))
     sns.heatmap(distancia_matriz, xticklabels=nombres, yticklabels=nombres, cmap='viridis', annot=False)
     plt.title(f"🗺️ Matriz de Distancias ({metodo_distancia})")
@@ -821,7 +835,6 @@ def aplicar_hca(df, metodo_enlace='ward', cortar_en=3, usar_maxclust=True):
     plt.tight_layout()
     plt.show()
 
-    # ➤ Aplicar HCA
     Z = linkage(distancia, method=metodo_enlace)
 
     plt.figure(figsize=(12, 6))
@@ -860,7 +873,7 @@ def analisis_datos(df):
         types = obtener_types(df)
         dato_pca, varianza, pca = aplicar_pca(df, types)
     elif opt == 2:
-        grupos = aplica_hca(df)
+        grupos = aplicar_hca(df)
         
           
           
