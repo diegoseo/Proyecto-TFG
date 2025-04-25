@@ -10,29 +10,17 @@ import pandas as pd
 import csv
 import re  # Para manejo de expresiones regulares
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
 import numpy as np
 from scipy.signal import savgol_filter, medfilt
 from sklearn.decomposition import PCA
-from numpy import trapz
 from scipy.ndimage import gaussian_filter1d
 import sys
-import time
 from scipy.interpolate import UnivariateSpline
-from pybaselines.whittaker import asls
-#from baseline_correction import als, airPLS, modpoly
-#DEJARON DE TENER SOPORTE 
-from pybaselines import  morphological
-from sklearn.decomposition import PCA
-from bokeh.plotting import figure, show, output_file
-from bokeh.models import ColumnDataSource, LabelSet
-from bokeh.io import output_notebook
-from sklearn.decomposition import PCA
-from bokeh.plotting import figure, show, output_file
-from bokeh.models import ColumnDataSource, LabelSet
-from bokeh.io import output_notebook
 import plotly.graph_objects as go
 from scipy.stats import chi2
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from scipy.spatial.distance import pdist, squareform
+from scipy.stats import spearmanr
 
 
 
@@ -785,6 +773,78 @@ def correccion_base(df):
 
     return df
 
+def aplicar_hca(df, metodo_enlace='ward', cortar_en=3, usar_maxclust=True):
+    """
+    Aplica Análisis de Agrupamiento Jerárquico (HCA) y grafica el dendrograma y la matriz de distancias.
+
+    Parámetros:
+    - df: DataFrame con espectros. Primera columna = eje X.
+    - metodo_enlace: 'ward', 'single', 'complete', 'average', etc.
+    - cortar_en: Número de grupos o distancia de corte
+    - usar_maxclust: True para criterio por cantidad de clusters, False para distancia
+    """
+
+    opciones_distancia = {
+        '1': 'euclidean',
+        '2': 'cityblock',  # Manhattan
+        '3': 'cosine',
+        '4': 'chebyshev',
+        '5': 'correlation',
+        '6': 'spearman',
+        '7': 'jaccard'
+    }
+
+    print("\nSeleccione el tipo de distancia:")
+    print("1. Euclidiana\n2. Manhattan\n3. Coseno\n4. Chebyshev\n5. Correlación (Pearson)\n6. Correlación de Rangos (Spearman)\n7. Jaccard (solo binario)")
+    seleccion = input("Ingrese el número correspondiente: ").strip()
+    metodo_distancia = opciones_distancia.get(seleccion, 'euclidean')
+
+    print(f"\n📌 Método de distancia: {metodo_distancia}")
+    print(f"📌 Método de enlace: {metodo_enlace}")
+
+    nombres = df.columns[1:]
+    datos = df.iloc[:, 1:].T
+
+    if metodo_distancia == 'spearman':
+        rho, _ = spearmanr(datos)
+        distancia_matriz = 1 - rho
+        distancia = squareform(distancia_matriz, checks=False)
+    else:
+        distancia = pdist(datos, metric=metodo_distancia)
+        distancia_matriz = squareform(distancia)  # para visualización
+
+    # ➤ Mostrar matriz de distancia como mapa de calor
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(distancia_matriz, xticklabels=nombres, yticklabels=nombres, cmap='viridis', annot=False)
+    plt.title(f"🗺️ Matriz de Distancias ({metodo_distancia})")
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.show()
+
+    # ➤ Aplicar HCA
+    Z = linkage(distancia, method=metodo_enlace)
+
+    plt.figure(figsize=(12, 6))
+    dendrogram(Z, labels=nombres, leaf_rotation=90)
+    plt.title("📊 Dendrograma - HCA")
+    plt.xlabel("Espectros")
+    plt.ylabel("Distancia")
+    if not usar_maxclust:
+        plt.axhline(y=cortar_en, color='red', linestyle='--')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    if usar_maxclust:
+        grupos = fcluster(Z, t=cortar_en, criterion='maxclust')
+    else:
+        grupos = fcluster(Z, t=cortar_en, criterion='distance')
+
+    print("\n🔹 Grupos asignados:")
+    for nombre, grupo in zip(nombres, grupos):
+        print(f"{nombre}: Grupo {grupo}")
+
+    return grupos
 
 def analisis_datos(df): 
     #TODO: PCA INPUT DE DIMENSIONES
@@ -799,7 +859,8 @@ def analisis_datos(df):
     if opt == 1:
         types = obtener_types(df)
         dato_pca, varianza, pca = aplicar_pca(df, types)
-    
+    elif opt == 2:
+        grupos = aplica_hca(df)
         
           
           
