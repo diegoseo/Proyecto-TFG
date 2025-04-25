@@ -785,6 +785,25 @@ def correccion_base(df):
 
     return df
 
+
+def analisis_datos(df): 
+    #TODO: PCA INPUT DE DIMENSIONES
+    print("""
+          1. PCA   
+          2. HCA
+          3. K-Means Clustering
+          4. DBSCAN
+          0. Volver
+          """)
+    opt = int(input("ingrese opcion: "))
+    if opt == 1:
+        types = obtener_types(df)
+        dato_pca, varianza, pca = aplicar_pca(df, types)
+    
+        
+          
+          
+    
 def menu():
     print("-" * 50) 
     #texto_desplazamiento("MENU", 10, 0.1)
@@ -795,7 +814,7 @@ def menu():
     print("3. Suavizar Espectro")
     print("4. Derivar ")
     print("5. Correccion Linea Base")
-    print("6. PCA")
+    print("6. Analisis de Datos y Agrupamiento")
     print("6. HCA")
     #print("5. aux validar_eje_x")
     print("0. Salir del programa")     
@@ -833,8 +852,8 @@ def main():
         elif opt == 5:
             df = correccion_base(df)
         elif opt == 6: 
-            types = obtener_types(df)
-            dato_pca, varianza, pca = aplicar_pca(df, types)
+            analisis_datos(df)
+            
         elif opt==0:
             print("""
                 saliendo del programa...
