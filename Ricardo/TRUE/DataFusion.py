@@ -618,6 +618,7 @@ def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valo
 
     print(f"✅ Derivada de orden {orden} aplicada.")
     return df_derivada
+
 def obtener_types(df):
     """
     Extrae el tipo base de cada espectro a partir del nombre de la columna.
@@ -770,8 +771,7 @@ def correccion_base(df):
     elif opt == 7:
         df = correccion_rolling_ball(df)
     elif opt == 0:
-        return df
-
+        print("Volviendo ...")
     return df
 
 def aplicar_hca(df, cortar_en=3, usar_maxclust=True):
@@ -874,6 +874,27 @@ def analisis_datos(df):
         dato_pca, varianza, pca = aplicar_pca(df, types)
     elif opt == 2:
         grupos = aplicar_hca(df)
+    elif opt == 3:
+        print( """
+              NO RESUELTO 
+                1.	Elegís un número de clusters k.
+            	2.	El algoritmo selecciona k centroides iniciales aleatorios.
+            	3.	Cada espectro se asigna al centroide más cercano.
+            	4.	Los centroides se recalculan como el promedio de los espectros asignados a ellos.
+            	5.	Se repiten pasos 3-4 hasta que:
+            	•	Las asignaciones no cambian.
+            	•	O alcanza un número máximo de iteraciones.
+              
+              
+              """)
+    elif opt == 4: 
+        print("""
+              NO RESULETO DBSCAN 
+              
+              
+              """)
+    elif opt == 0: 
+        print("Volviendo ...")
         
           
           
@@ -889,7 +910,7 @@ def menu():
     print("4. Derivar ")
     print("5. Correccion Linea Base")
     print("6. Analisis de Datos y Agrupamiento")
-    print("6. HCA")
+    print("7. HCA")
     #print("5. aux validar_eje_x")
     print("0. Salir del programa")     
 
