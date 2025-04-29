@@ -8,6 +8,7 @@ Created on Sun Mar 16 11:55:37 2025
 
 import pandas as pd
 import csv
+import os
 import re  # Para manejo de expresiones regulares
 import matplotlib.pyplot as plt
 import numpy as np
@@ -869,7 +870,7 @@ def inspeccionar_archivo(df, nombre_dataset="Datos"):
     - df: DataFrame cargado.
     - nombre_dataset: nombre para impresión más clara.
     """
-    print(f"\n🔍 Inspección del archivo: {nombre_dataset}")
+    print(f"\n🔍 Inspección del archivo: {nombre_dataset}") 
     print("Dimensiones (filas, columnas):", df.shape)
     print("Primeras filas:")
     print(df.head())
@@ -925,7 +926,28 @@ def analisis_datos(df):
         print("Volviendo ...")
         
           
-          
+def exportar_dataset_csv(df, carpeta_destino='./csv_exportados'):
+    """
+    Exporta un DataFrame preprocesado a un archivo CSV.
+    
+    Parámetros:
+    - df: DataFrame a guardar.
+    - nombre_archivo: Nombre del archivo CSV (sin extensión).
+    - carpeta_destino: Carpeta donde guardar los CSVs. Se crea si no existe.
+    """
+    nombre_archivo = input("ingrese nombre del archivo: ")
+    if not os.path.exists(carpeta_destino):
+        os.makedirs(carpeta_destino)
+    
+    # Ruta completa
+    ruta_completa = os.path.join(carpeta_destino, f'{nombre_archivo}.csv')
+    
+    try:
+        df.to_csv(ruta_completa, index=False)
+        print(f"✅ Dataset exportado exitosamente a: {ruta_completa}")
+    except Exception as e:
+        print(f"❌ Error al exportar el dataset: {e}")
+         
     
 def menu():
     print("-" * 50) 
@@ -939,7 +961,8 @@ def menu():
     print("5. Correccion Linea Base")
     print("6. Analisis de Datos y Agrupamiento")
     print("7. Inspeccionar Archivo")
-    print("7. Exportar Dataframe")
+    print("8. Exportar Dataframe")
+    print("9. Data Fusion")
     print("0. Salir del programa")     
 
 ## Función principal
@@ -977,7 +1000,9 @@ def main():
         elif opt == 6: 
             analisis_datos(df)
         elif opt == 7:
-            df = inspeccionar_archivo(df)
+            inspeccionar_archivo(df)
+        elif opt == 8: 
+            exportar_dataset_csv(df)
             
         elif opt==0:
             print("""
