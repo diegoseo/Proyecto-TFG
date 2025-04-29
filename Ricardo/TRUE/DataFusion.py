@@ -910,8 +910,7 @@ def menu():
     print("4. Derivar ")
     print("5. Correccion Linea Base")
     print("6. Analisis de Datos y Agrupamiento")
-    print("7. ")
-    #print("5. aux validar_eje_x")
+    print("7. Exportar Dataframe")
     print("0. Salir del programa")     
 
 ## Función principal
