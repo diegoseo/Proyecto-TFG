@@ -859,6 +859,34 @@ def aplicar_hca(df, cortar_en=3, usar_maxclust=True):
 
     return grupos
 
+def inspeccionar_archivo(df, nombre_dataset="Datos"):
+    """
+    Inspecciona un DataFrame espectroscópico para saber si necesita ajuste de formato.
+    - Verifica si es necesario transponer.
+    - Verifica si es necesario interpolar.
+
+    Parámetros:
+    - df: DataFrame cargado.
+    - nombre_dataset: nombre para impresión más clara.
+    """
+    print(f"\n🔍 Inspección del archivo: {nombre_dataset}")
+    print("Dimensiones (filas, columnas):", df.shape)
+    print("Primeras filas:")
+    print(df.head())
+
+    if df.shape[0] < df.shape[1]:
+        print("\n✅ Las muestras están en columnas. NO se necesita transponer.")
+    else:
+        print("\n⚠️ Las muestras parecen estar en filas. Puede ser necesario transponer (.T).")
+
+    print("\nVerificando la primera columna:")
+    print(df.iloc[:, 0].head())
+
+    if np.all(np.diff(df.iloc[:, 0]) >= 0):
+        print("\n✅ El eje X (Raman Shift o Wavenumber) está en orden ascendente.")
+    else:
+        print("\n⚠️ El eje X NO está en orden ascendente. Puede ser necesario reordenar.")
+
 def analisis_datos(df): 
     #TODO: PCA INPUT DE DIMENSIONES
     print("""
@@ -910,6 +938,7 @@ def menu():
     print("4. Derivar ")
     print("5. Correccion Linea Base")
     print("6. Analisis de Datos y Agrupamiento")
+    print("7. Inspeccionar Archivo")
     print("7. Exportar Dataframe")
     print("0. Salir del programa")     
 
@@ -947,6 +976,8 @@ def main():
             df = correccion_base(df)
         elif opt == 6: 
             analisis_datos(df)
+        elif opt == 7:
+            df = inspeccionar_archivo(df)
             
         elif opt==0:
             print("""
