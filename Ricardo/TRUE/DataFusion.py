@@ -947,7 +947,49 @@ def exportar_dataset_csv(df, carpeta_destino='./csv_exportados'):
         print(f"✅ Dataset exportado exitosamente a: {ruta_completa}")
     except Exception as e:
         print(f"❌ Error al exportar el dataset: {e}")
-         
+        
+def listar_archivos_csv(directorio):
+    archivos = [f for f in os.listdir(directorio) if f.endswith('.csv')]
+    return archivos
+        
+def datafusion():
+    """
+    Solicita y carga archivos FTIR y Raman, inspecciona sus ejes X y sugiere si es necesaria la interpolación.
+    """
+    base_path = "./csv_exportados"
+    print("Archivos manipulados listo para Datafusion: ")
+    archivos_csv= listar_archivos_csv(base_path)
+    print("Archivos .csv encontrados:")
+    for archivo in archivos_csv:
+        print(archivo)
+    
+    
+    
+    archivo_ftir = input("Ingrese el nombre del archivo FTIR (con .csv): ").strip()
+    ruta_ftir = os.path.join(base_path, archivo_ftir)
+    archivo_raman = input("Ingrese el nombre del archivo RAMAN (con .csv): ").strip()
+    ruta_raman = os.path.join(base_path, archivo_raman)
+
+    try:
+        df_ftir = pd.read_csv(ruta_ftir)
+        df_raman = pd.read_csv(ruta_raman)
+    except Exception as e:
+        print(f"❌ Error al leer los archivos: {e}")
+        return
+
+    eje_ftir = df_ftir.iloc[:, 0]
+    eje_raman = df_raman.iloc[:, 0]
+
+    print("\n🔹 FTIR - eje X:")
+    print(f"Min: {eje_ftir.min()} cm⁻¹, Max: {eje_ftir.max()} cm⁻¹, Puntos: {len(eje_ftir)}")
+
+    print("🔹 Raman - eje X:")
+    print(f"Min: {eje_raman.min()} cm⁻¹, Max: {eje_raman.max()} cm⁻¹, Puntos: {len(eje_raman)}")
+
+    if not eje_ftir.equals(eje_raman):
+        print("\n⚠️ Los ejes X de FTIR y Raman NO coinciden. Es necesaria la interpolación antes de la fusión.")
+    else:
+        print("\n✅ Los ejes X coinciden. No es necesaria la interpolación. Se puede fusionar directamente.")
     
 def menu():
     print("-" * 50) 
@@ -1003,6 +1045,8 @@ def main():
             inspeccionar_archivo(df)
         elif opt == 8: 
             exportar_dataset_csv(df)
+        elif opt == 9:
+            datafusion()
             
         elif opt==0:
             print("""
