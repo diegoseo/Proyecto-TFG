@@ -298,7 +298,7 @@ def media_movil(df):
     """
     window_size = int(input("\t\t\tIngrese tamaño de ventana:"))
     while window_size % 2 == 0:
-        windows_size = int(input("""
+        window_size = int(input("""
                                  Por favor ingrese un numero impar, de preferencia 5, 7 o 9 
                                  para que el punto central esté bien definido.
                                  -> """))
@@ -974,11 +974,7 @@ def limpiar_etiquetas_columnas(df):
     return df
         
 
-
 def interpolar_dataframe(df, nuevo_eje_x):
-    """
-    Interpola todas las columnas de un DataFrame (excepto la primera) a un nuevo eje X.
-    """
     eje_original = df.iloc[:, 0]
     columnas = df.columns[1:]
     df_interp = pd.DataFrame({df.columns[0]: nuevo_eje_x})
@@ -999,7 +995,17 @@ def interpolar_dataframe(df, nuevo_eje_x):
         f = interp1d(x_valid, y_valid, kind='linear', bounds_error=False, fill_value='extrapolate')
         df_interp[col] = f(nuevo_eje_x)
 
+    if df_interp.shape[1] <= 1:
+        return None
+
     return df_interp
+
+def fusionar_interpolados(df_ftir, df_raman):
+    df_ftir_t = df_ftir.set_index(df_ftir.columns[0]).T
+    df_raman_t = df_raman.set_index(df_raman.columns[0]).T
+    df_fusionado = pd.concat([df_ftir_t, df_raman_t], axis=1)
+    df_fusionado.index.name = 'Muestra'
+    return df_fusionado
 
 def datafusion():
     base_path = './csv_exportados'
@@ -1018,7 +1024,6 @@ def datafusion():
     df_ftir = limpiar_etiquetas_columnas(df_ftir)
     df_raman = limpiar_etiquetas_columnas(df_raman)
 
-    # Eliminar columnas duplicadas si las hay
     df_ftir = df_ftir.loc[:, ~df_ftir.columns.duplicated()]
     df_raman = df_raman.loc[:, ~df_raman.columns.duplicated()]
 
@@ -1042,14 +1047,30 @@ def datafusion():
             puntos = int(input("Ingrese cantidad de puntos para interpolar (ej. 1500): "))
             nuevo_eje = np.linspace(min_comun, max_comun, puntos)
 
-            df_ftir = interpolar_dataframe(df_ftir, nuevo_eje)
-            df_raman = interpolar_dataframe(df_raman, nuevo_eje)
-            print("✅ Interpolación completada.")
+            df_ftir_interp = interpolar_dataframe(df_ftir, nuevo_eje)
+            df_raman_interp = interpolar_dataframe(df_raman, nuevo_eje)
+
+            if df_ftir_interp is None or df_raman_interp is None:
+                print("❌ Error: la interpolación no produjo columnas válidas.")
+                return
+
+            nombre_ftir = os.path.splitext(archivo_ftir)[0] + '_interpolado.csv'
+            ruta_ftir_guardado = os.path.join(base_path, nombre_ftir)
+            df_ftir_interp.to_csv(ruta_ftir_guardado, index=False)
+            print(f"✅ FTIR interpolado guardado como: {ruta_ftir_guardado}")
+
+            nombre_raman = os.path.splitext(archivo_raman)[0] + '_interpolado.csv'
+            ruta_raman_guardado = os.path.join(base_path, nombre_raman)
+            df_raman_interp.to_csv(ruta_raman_guardado, index=False)
+            print(f"✅ Raman interpolado guardado como: {ruta_raman_guardado}")
+
+            fusion = fusionar_interpolados(df_ftir_interp, df_raman_interp)
+            fusion.to_csv(os.path.join(base_path, "fusion_ftir_raman.csv"))
+            print("✅ Fusion guardada como fusion_ftir_raman.csv")
         else:
             print("⏭️ No se aplicó interpolación. Puede causar error en fusión.")
     else:
         print("\n✅ Los ejes X coinciden. No es necesaria la interpolación. Se puede fusionar directamente.")
-
     
 def menu():
     print("-" * 50) 
