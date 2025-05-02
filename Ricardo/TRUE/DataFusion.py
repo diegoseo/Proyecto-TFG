@@ -23,6 +23,7 @@ from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import spearmanr
 import seaborn as sns
+from scipy.interpolate import interp1d
 
 
 
@@ -951,20 +952,57 @@ def exportar_dataset_csv(df, carpeta_destino='./csv_exportados'):
 def listar_archivos_csv(directorio):
     archivos = [f for f in os.listdir(directorio) if f.endswith('.csv')]
     return archivos
+
+
+#ESTA FUNCION NOS SIRVE PARA ESE ARCHIVO QUE TENIAMOS DEL FTIR DONDE TENIAMOS LOS SUBDIJOS POR CADA COMPONENTE QUIMICO 
+def limpiar_etiquetas_columnas(df):
+    """
+    Limpia los nombres de las columnas eliminando sufijos como '10-B', '1L-E', etc.,
+    dejando solo el nombre base. También convierte los nombres a minúsculas
+    y elimina espacios extra.
+    """
+    nuevas_columnas = []
+    for col in df.columns:
+        if col == df.columns[0]:
+            nuevas_columnas.append(col)  # eje X
+        else:
+            base = re.sub(r'\s*\d+[a-zA-Z-]*$', '', str(col))  # elimina sufijo como '10-B'
+            base = re.sub(r'\s+', '', base)  # elimina espacios internos
+            base = base.lower().strip()  # minúsculas y sin espacios externos
+            nuevas_columnas.append(base)
+    df.columns = nuevas_columnas
+    return df
         
+
+
+def interpolar_dataframe(df, nuevo_eje_x):
+    """
+    Interpola todas las columnas de un DataFrame (excepto la primera) a un nuevo eje X.
+    """
+    eje_original = df.iloc[:, 0]
+    columnas = df.columns[1:]
+    df_interp = pd.DataFrame({df.columns[0]: nuevo_eje_x})
+
+    for col in columnas:
+        x = eje_original
+        y = df[col]
+
+        validos = ~(pd.isna(x) | pd.isna(y))
+        x_valid = x[validos]
+        y_valid = y[validos]
+
+        if len(x_valid) < 2:
+            print(f"⚠️ Columna {col} no tiene suficientes puntos válidos para interpolar.")
+            df_interp[col] = np.nan
+            continue
+
+        f = interp1d(x_valid, y_valid, kind='linear', bounds_error=False, fill_value='extrapolate')
+        df_interp[col] = f(nuevo_eje_x)
+
+    return df_interp
+
 def datafusion():
-    """
-    Solicita y carga archivos FTIR y Raman, inspecciona sus ejes X y sugiere si es necesaria la interpolación.
-    """
-    base_path = "./csv_exportados"
-    print("Archivos manipulados listo para Datafusion: ")
-    archivos_csv= listar_archivos_csv(base_path)
-    print("Archivos .csv encontrados:")
-    for archivo in archivos_csv:
-        print(archivo)
-    
-    
-    
+    base_path = './csv_exportados'
     archivo_ftir = input("Ingrese el nombre del archivo FTIR (con .csv): ").strip()
     ruta_ftir = os.path.join(base_path, archivo_ftir)
     archivo_raman = input("Ingrese el nombre del archivo RAMAN (con .csv): ").strip()
@@ -977,19 +1015,41 @@ def datafusion():
         print(f"❌ Error al leer los archivos: {e}")
         return
 
-    eje_ftir = df_ftir.iloc[:, 0]
-    eje_raman = df_raman.iloc[:, 0]
+    df_ftir = limpiar_etiquetas_columnas(df_ftir)
+    df_raman = limpiar_etiquetas_columnas(df_raman)
+
+    # Eliminar columnas duplicadas si las hay
+    df_ftir = df_ftir.loc[:, ~df_ftir.columns.duplicated()]
+    df_raman = df_raman.loc[:, ~df_raman.columns.duplicated()]
+
+    df_ftir.iloc[:, 0] = df_ftir.iloc[:, 0].astype(str).str.replace('.', '', regex=False).astype(float)
+    df_raman.iloc[:, 0] = df_raman.iloc[:, 0].astype(str).str.replace('.', '', regex=False).astype(float)
+
+    eje_ftir = pd.to_numeric(df_ftir.iloc[:, 0], errors='coerce')
+    eje_raman = pd.to_numeric(df_raman.iloc[:, 0], errors='coerce')
 
     print("\n🔹 FTIR - eje X:")
     print(f"Min: {eje_ftir.min()} cm⁻¹, Max: {eje_ftir.max()} cm⁻¹, Puntos: {len(eje_ftir)}")
-
     print("🔹 Raman - eje X:")
     print(f"Min: {eje_raman.min()} cm⁻¹, Max: {eje_raman.max()} cm⁻¹, Puntos: {len(eje_raman)}")
 
     if not eje_ftir.equals(eje_raman):
         print("\n⚠️ Los ejes X de FTIR y Raman NO coinciden. Es necesaria la interpolación antes de la fusión.")
+        opcion = input("¿Desea interpolar ambos datasets a un mismo eje común? (s/n): ").strip().lower()
+        if opcion == 's':
+            min_comun = max(eje_ftir.min(), eje_raman.min())
+            max_comun = min(eje_ftir.max(), eje_raman.max())
+            puntos = int(input("Ingrese cantidad de puntos para interpolar (ej. 1500): "))
+            nuevo_eje = np.linspace(min_comun, max_comun, puntos)
+
+            df_ftir = interpolar_dataframe(df_ftir, nuevo_eje)
+            df_raman = interpolar_dataframe(df_raman, nuevo_eje)
+            print("✅ Interpolación completada.")
+        else:
+            print("⏭️ No se aplicó interpolación. Puede causar error en fusión.")
     else:
         print("\n✅ Los ejes X coinciden. No es necesaria la interpolación. Se puede fusionar directamente.")
+
     
 def menu():
     print("-" * 50) 
