@@ -1001,11 +1001,26 @@ def interpolar_dataframe(df, nuevo_eje_x):
     return df_interp
 
 def fusionar_interpolados(df_ftir, df_raman):
+    """
+    Fusiona dos DataFrames interpolados (FTIR y Raman) y los exporta en formato tradicional.
+    """
     df_ftir_t = df_ftir.set_index(df_ftir.columns[0]).T
     df_raman_t = df_raman.set_index(df_raman.columns[0]).T
     df_fusionado = pd.concat([df_ftir_t, df_raman_t], axis=1)
     df_fusionado.index.name = 'Muestra'
-    return df_fusionado
+
+    # Convertir al formato tradicional: columnas = muestras, filas = eje X
+    df_fusionado_t = df_fusionado.T
+    df_fusionado_t.insert(0, 'eje_x', range(1, len(df_fusionado_t)+1))
+    columnas = ['eje_x'] + df_fusionado_t.columns[1:].tolist()
+    df_tradicional = df_fusionado_t[columnas]
+
+    # Guardar archivo en formato tradicional
+    ruta_salida = './csv_exportados/fusion_formato_tradicional.csv'
+    df_tradicional.to_csv(ruta_salida, index=False)
+    print(f"✅ Fusion exportada en formato tradicional como: {ruta_salida}")
+
+    return df_tradicional
 
 def datafusion():
     base_path = './csv_exportados'
