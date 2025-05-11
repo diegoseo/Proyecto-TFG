@@ -192,7 +192,7 @@ def normalizar_zscore(df):
     print("✅ Normalización Z-score aplicada.")
     return df_norm   
     
-def normalizar_media(df):
+def normalizar_media_limpiar(df):
     """
     Normaliza cada columna (excepto la primera) dividiendo por su media.
 
@@ -218,6 +218,18 @@ def normalizar_media(df):
     print("✅ Normalización por media aplicada.")
     return df_norm
 
+def normalizar_media(df):
+
+    eje_x = df.iloc[:, 0]
+
+    intensidades = df.iloc[:, 1:]
+
+    intensidades_centradas = intensidades - intensidades.mean()
+
+    df_normalizado = pd.concat([eje_x, intensidades_centradas], axis=1)
+    
+    return df_normalizado
+
 def normalizar(df):
     print("""
           1. Normalizar por Min-Max
@@ -242,6 +254,7 @@ def normalizar(df):
              volviendo al menu...
              {}
              """.format("-" * 32)) 
+    print(df.head())
     return df
 
 
@@ -281,11 +294,13 @@ def savitzky(df, window_length=11, polyorder=2):
             df_suavizado.iloc[:, i] = savgol_filter(y, window_length=win, polyorder=polyorder)
         else:
             print(f"⚠ Columna '{df.columns[i]}' no se suavizó (window_length <= polyorder)")
+            
 
     print("✅ Suavizado Savitzky-Golay aplicado.")
+    print(df.head())
     return df_suavizado
 
-def media_movil(df):
+def media_movil(df): #TODO: CORREGIR LOS PRIMEROS 
     """
     Aplica suavizado por media móvil a todas las columnas excepto la primera.
 
@@ -312,6 +327,7 @@ def media_movil(df):
         df_suavizado.iloc[:, i] = suavizado
 
     print("✅ Suavizado por media móvil aplicado.")
+    print(df.head())
     return df_suavizado
 
 def filtro_gaussiano(df):
@@ -338,6 +354,7 @@ def filtro_gaussiano(df):
         df_suavizado.iloc[:, i] = gaussian_filter1d(y, sigma=sigma)
 
     print("✅ Suavizado Gaussiano aplicado.")
+    print(df.head())
     return df_suavizado
 
 def mediana(df):
@@ -584,41 +601,47 @@ def suavizado(df):
              """.format("-" * 32))
     return df
           
-def derivada(df): # aca tenemos que tener en cuenta el tema del orden y los valores nulos
+import pandas as pd
+import numpy as np
 
-
+def derivada(df):
     """
     Aplica la primera o segunda derivada a todos los espectros (columnas) del DataFrame, excepto la primera (eje X).
 
     Parámetros:
     - df: DataFrame con la primera columna como eje X (e.g., Raman shift).
-    - orden: 1 para primera derivada, 2 para segunda.
-
     Retorna:
     - df_derivada: DataFrame con derivadas aplicadas a los espectros.
     """
-    orden = int(input("\t\t\tIngrese orden:"))
-    while orden != 1 and orden != 2:
-        orden = int(input("""
-              El orden de la derivada solo puede ser 1 o 2
-              ->
-              """))
-    df_derivada = df.copy()
-    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # eje X
 
-    for i in range(1, len(df.columns)):
+    try:
+        orden = int(input("\t\t\tIngrese orden (1 o 2): "))
+        while orden not in [1, 2]:
+            orden = int(input("\t⚠️ Orden inválido. Ingrese 1 o 2: "))
+    except Exception as e:
+        print("❌ Error en la entrada:", e)
+        return None
+
+    df_derivada = df.copy()
+    x = pd.to_numeric(df.iloc[:, 0], errors='coerce')
+
+    for i in range(1, df.shape[1]):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce')
 
+        # Verifica que no haya NaNs en x o y
+        if x.isnull().any() or y.isnull().any():
+            print(f"⚠️ Columna {df.columns[i]} contiene valores nulos. Se omite.")
+            continue
+
         if orden == 1:
-            derivada = np.gradient(y, x)
-        elif orden == 2:
-            derivada = np.gradient(np.gradient(y, x), x)
+            deriv = np.gradient(y.values, x.values)
         else:
-            raise ValueError("Solo se permite orden 1 o 2.") #no entrara aqui
+            deriv = np.gradient(np.gradient(y.values, x.values), x.values)
 
-        df_derivada.iloc[:, i] = derivada
+        df_derivada.iloc[:, i] = deriv
 
-    print(f"✅ Derivada de orden {orden} aplicada.")
+    print(f"\n✅ Derivada de orden {orden} aplicada correctamente.")
+    print(df_derivada.head())
     return df_derivada
 
 def obtener_types(df):
