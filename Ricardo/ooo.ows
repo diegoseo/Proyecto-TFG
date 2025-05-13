@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scheme version="2.0" title="" description="">
+	<nodes>
+		<node id="0" name="Datasets" qualified_name="Orange.widgets.data.owdatasets.OWDataSets" project_name="Orange3" version="" title="Datasets" position="(88.0, 231.0)" />
+		<node id="1" name="Preprocess Spectra" qualified_name="orangecontrib.spectroscopy.widgets.owpreprocess.OWPreprocess" project_name="Orange-Spectroscopy" version="" title="Preprocess Spectra" position="(276.0, 158.0)" />
+		<node id="2" name="Preprocess" qualified_name="Orange.widgets.data.owpreprocess.OWPreprocess" project_name="Orange3" version="" title="Preprocess" position="(306.0, 321.0)" />
+		<node id="3" name="Scatter Plot" qualified_name="Orange.widgets.visualize.owscatterplot.OWScatterPlot" project_name="Orange3" version="" title="Scatter Plot" position="(520.0, 165.0)" />
+		<node id="4" name="Save Data" qualified_name="Orange.widgets.data.owsave.OWSave" project_name="Orange3" version="" title="Save Data" position="(480.0, 266.0)" />
+	</nodes>
+	<links>
+		<link id="0" source_node_id="0" sink_node_id="1" source_channel="Data" sink_channel="Data" enabled="true" source_channel_id="data" sink_channel_id="data" />
+		<link id="1" source_node_id="0" sink_node_id="2" source_channel="Data" sink_channel="Data" enabled="true" source_channel_id="data" sink_channel_id="data" />
+		<link id="2" source_node_id="1" sink_node_id="3" source_channel="Preprocessed Data" sink_channel="Data" enabled="true" source_channel_id="preprocessed_data" sink_channel_id="data" />
+		<link id="3" source_node_id="1" sink_node_id="4" source_channel="Preprocessed Data" sink_channel="Data" enabled="true" source_channel_id="preprocessed_data" sink_channel_id="data" />
+	</links>
+	<annotations />
+	<thumbnail />
+	<node_properties>
+		<properties node_id="0" format="literal">{'controlAreaVisible': True, 'domain': None, 'filter_hint': None, 'header_state': b'\x00\x00\x00\xff\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04/\x00\x00\x00\x07\x01\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00d\xff\xff\xff\xff\x00\x00\x00\x81\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00(\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x01@\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00[\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00Z\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00J\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00d\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x01d\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x03\xe8\x00\x00\x00\x00d', 'language': 'English', 'savedWidgetGeometry': b'\x01\xd9\xd0\xcb\x00\x03\x00\x00\xff\xff\xff\xe8\xff\xff\xfc\xce\x00\x00\x043\xff\xff\xfe\xdd\xff\xff\xff\xe8\xff\xff\xfc\xea\x00\x00\x043\xff\xff\xfe\xdd\x00\x00\x00\x01\x00\x00\x00\x00\x07\x80\xff\xff\xff\xe8\xff\xff\xfc\xea\x00\x00\x043\xff\xff\xfe\xdd', 'selected_id': 'liver-spectroscopy.tab', 'splitter_state': b'\x00\x00\x00\xff\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x01,\x00\x00\x00\xc8\x01\xff\xff\xff\xff\x01\x00\x00\x00\x02\x00', '__version__': 2}</properties>
+		<properties node_id="1" format="literal">{'autocommit': False, 'controlAreaVisible': True, 'preview_curves': 25, 'preview_n': None, 'process_reference': True, 'savedWidgetGeometry': b'\x01\xd9\xd0\xcb\x00\x03\x00\x00\x00\x00\x02\x13\x00\x00\x00\xec\x00\x00\x05m\x00\x00\x03\x08\x00\x00\x02\x13\x00\x00\x01\x08\x00\x00\x05m\x00\x00\x03\x08\x00\x00\x00\x00\x00\x00\x00\x00\x07\x80\x00\x00\x02\x13\x00\x00\x01\x08\x00\x00\x05m\x00\x00\x03\x08', 'storedsettings': {'name': '', 'preprocessors': [('orangecontrib.infrared.pca_denoising', {})]}, 'curveplot': {'color_individual': False, 'invertX': False, 'peak_labels_saved': [], 'sample_seed': 0, 'selection_group_saved': None, 'show_grid': False, 'viewtype': 0, 'waterfall': False}, 'curveplot_after': {'color_individual': False, 'invertX': False, 'peak_labels_saved': [], 'sample_seed': 0, 'selection_group_saved': None, 'show_grid': False, 'viewtype': 0, 'waterfall': False}, '__version__': 9}</properties>
+		<properties node_id="2" format="literal">{'autocommit': True, 'controlAreaVisible': True, 'savedWidgetGeometry': b'\x01\xd9\xd0\xcb\x00\x03\x00\x00\x00\x00\x02\x1b\x00\x00\x00\xf2\x00\x00\x05d\x00\x00\x03\x01\x00\x00\x02\x1b\x00\x00\x01\x0e\x00\x00\x05d\x00\x00\x03\x01\x00\x00\x00\x00\x00\x00\x00\x00\x07\x80\x00\x00\x02\x1b\x00\x00\x01\x0e\x00\x00\x05d\x00\x00\x03\x01', 'storedsettings': {'name': '', 'preprocessors': [('orange.preprocess.scale', {'method': 2})]}, '__version__': 2}</properties>
+		<properties node_id="3" format="pickle">gASV2g4AAAAAAAB9lCiMDWF0dHJfeF9pc19hYnOUiYwNYXR0cl95X2lzX2Fic5SJjAthdXRvX2Nv
+bW1pdJSIjAthdXRvX3NhbXBsZZSIjBJjb250cm9sQXJlYVZpc2libGWUiIwTc2F2ZWRXaWRnZXRH
+ZW9tZXRyeZRDQgHZ0MsAAwAAAAACEwAAARUAAAV7AAADFAAAAhQAAAE0AAAFegAAAxMAAAAAAAAA
+AAeAAAACFAAAATQAAAV6AAADE5SMCXNlbGVjdGlvbpROjBF0b29sdGlwX3Nob3dzX2FsbJSIjA92
+aXN1YWxfc2V0dGluZ3OUfZSMBWdyYXBolH2UKIwLYWxwaGFfdmFsdWWUS/+MDWNsYXNzX2RlbnNp
+dHmUiYwRaml0dGVyX2NvbnRpbnVvdXOUiYwLaml0dGVyX3NpemWUSwCME2xhYmVsX29ubHlfc2Vs
+ZWN0ZWSUiYwWb3J0aG9ub3JtYWxfcmVncmVzc2lvbpSJjAtwb2ludF93aWR0aJRLAYwMc2hvd19l
+bGxpcHNllImMCXNob3dfZ3JpZJSJjAtzaG93X2xlZ2VuZJSIjA1zaG93X3JlZ19saW5llIl1jAtf
+X3ZlcnNpb25fX5RLBYwQY29udGV4dF9zZXR0aW5nc5RdlIwVb3Jhbmdld2lkZ2V0LnNldHRpbmdz
+lIwHQ29udGV4dJSTlCmBlH2UKIwGdmFsdWVzlH2UKIwKYXR0cl9jb2xvcpSMBHR5cGWUS2WGlIwK
+YXR0cl9sYWJlbJROSv7///+GlIwKYXR0cl9zaGFwZZROSv7///+GlIwJYXR0cl9zaXpllE5K/v//
+/4aUjAZhdHRyX3iUjAgxODAxLjI2NJRLZoaUjAxhdHRyX3hfbG93ZXKUTkr+////hpSMDGF0dHJf
+eF91cHBlcpROSv7///+GlIwGYXR0cl95lIwIOTAyLjU2MDaUS2aGlIwMYXR0cl95X2xvd2VylE5K
+/v///4aUjAxhdHRyX3lfdXBwZXKUTkr+////hpRoDH2UaBlLBXWMCmF0dHJpYnV0ZXOUfZQoaC1L
+AowIMTc5Ny40MDeUSwKMBzE3OTMuNTWUSwKMCDE3ODkuNjkzlEsCjAgxNzg1LjgzNpRLAowIMTc4
+MS45NzmUSwKMCDE3NzguMTIxlEsCjAgxNzc0LjI2NJRLAowIMTc3MC40MDeUSwKMBzE3NjYuNTWU
+SwKMCDE3NjIuNjkzlEsCjAgxNzU4LjgzNpRLAowIMTc1NC45NzmUSwKMCDE3NTEuMTIylEsCjAgx
+NzQ3LjI2NZRLAowIMTc0My40MDiUSwKMBzE3MzkuNTWUSwKMCDE3MzUuNjkzlEsCjAgxNzMxLjgz
+NpRLAowIMTcyNy45NzmUSwKMCDE3MjQuMTIylEsCjAgxNzIwLjI2NZRLAowIMTcxNi40MDiUSwKM
+CDE3MTIuNTUxlEsCjAgxNzA4LjY5NJRLAowIMTcwNC44MzeUSwKMCDE3MDAuOTc5lEsCjAgxNjk3
+LjEyMpRLAowIMTY5My4yNjWUSwKMCDE2ODkuNDA4lEsCjAgxNjg1LjU1MZRLAowIMTY4MS42OTSU
+SwKMCDE2NzcuODM3lEsCjAcxNjczLjk4lEsCjAgxNjcwLjEyM5RLAowIMTY2Ni4yNjaUSwKMCDE2
+NjIuNDA5lEsCjAgxNjU4LjU1MZRLAowIMTY1NC42OTSUSwKMCDE2NTAuODM3lEsCjAcxNjQ2Ljk4
+lEsCjAgxNjQzLjEyM5RLAowIMTYzOS4yNjaUSwKMCDE2MzUuNDA5lEsCjAgxNjMxLjU1MpRLAowI
+MTYyNy42OTWUSwKMCDE2MjMuODM4lEsCjAcxNjE5Ljk4lEsCjAgxNjE2LjEyM5RLAowIMTYxMi4y
+NjaUSwKMCDE2MDguNDA5lEsCjAgxNjA0LjU1MpRLAowIMTYwMC42OTWUSwKMCDE1OTYuODM4lEsC
+jAgxNTkyLjk4MZRLAowIMTU4OS4xMjSUSwKMCDE1ODUuMjY3lEsCjAcxNTgxLjQxlEsCjAgxNTc3
+LjU1MpRLAowIMTU3My42OTWUSwKMCDE1NjkuODM4lEsCjAgxNTY1Ljk4MZRLAowIMTU2Mi4xMjSU
+SwKMCDE1NTguMjY3lEsCjAcxNTU0LjQxlEsCjAgxNTUwLjU1M5RLAowIMTU0Ni42OTaUSwKMCDE1
+NDIuODM5lEsCjAgxNTM4Ljk4MZRLAowIMTUzNS4xMjSUSwKMCDE1MzEuMjY3lEsCjAcxNTI3LjQx
+lEsCjAgxNTIzLjU1M5RLAowIMTUxOS42OTaUSwKMCDE1MTUuODM5lEsCjAgxNTExLjk4MpRLAowI
+MTUwOC4xMjWUSwKMCDE1MDQuMjY4lEsCjAgxNTAwLjQxMZRLAowIMTQ5Ni41NTOUSwKMCDE0OTIu
+Njk2lEsCjAgxNDg4LjgzOZRLAowIMTQ4NC45ODKUSwKMCDE0ODEuMTI1lEsCjAgxNDc3LjI2OJRL
+AowIMTQ3My40MTGUSwKMCDE0NjkuNTU0lEsCjAgxNDY1LjY5N5RLAowHMTQ2MS44NJRLAowIMTQ1
+Ny45ODKUSwKMCDE0NTQuMTI1lEsCjAgxNDUwLjI2OJRLAowIMTQ0Ni40MTGUSwKMCDE0NDIuNTU0
+lEsCjAgxNDM4LjY5N5RLAowHMTQzNC44NJRLAowIMTQzMC45ODOUSwKMCDE0MjcuMTI2lEsCjAgx
+NDIzLjI2OZRLAowIMTQxOS40MTGUSwKMCDE0MTUuNTU0lEsCjAgxNDExLjY5N5RLAowHMTQwNy44
+NJRLAowIMTQwMy45ODOUSwKMCDE0MDAuMTI2lEsCjAgxMzk2LjI2OZRLAowIMTM5Mi40MTKUSwKM
+CDEzODguNTU1lEsCjAgxMzg0LjY5OJRLAowIMTM4MC44NDGUSwKMCDEzNzYuOTgzlEsCjAgxMzcz
+LjEyNpRLAowIMTM2OS4yNjmUSwKMCDEzNjUuNDEylEsCjAgxMzYxLjU1NZRLAowIMTM1Ny42OTiU
+SwKMCDEzNTMuODQxlEsCjAgxMzQ5Ljk4NJRLAowIMTM0Ni4xMjeUSwKMBzEzNDIuMjeUSwKMCDEz
+MzguNDEylEsCjAgxMzM0LjU1NZRLAowIMTMzMC42OTiUSwKMCDEzMjYuODQxlEsCjAgxMzIyLjk4
+NJRLAowIMTMxOS4xMjeUSwKMBzEzMTUuMjeUSwKMCDEzMTEuNDEzlEsCjAgxMzA3LjU1NpRLAowI
+MTMwMy42OTmUSwKMCDEyOTkuODQylEsCjAgxMjk1Ljk4NJRLAowIMTI5Mi4xMjeUSwKMBzEyODgu
+MjeUSwKMCDEyODQuNDEzlEsCjAgxMjgwLjU1NpRLAowIMTI3Ni42OTmUSwKMCDEyNzIuODQylEsC
+jAgxMjY4Ljk4NZRLAowIMTI2NS4xMjiUSwKMCDEyNjEuMjcxlEsCjAgxMjU3LjQxM5RLAowIMTI1
+My41NTaUSwKMCDEyNDkuNjk5lEsCjAgxMjQ1Ljg0MpRLAowIMTI0MS45ODWUSwKMCDEyMzguMTI4
+lEsCjAgxMjM0LjI3MZRLAowIMTIzMC40MTSUSwKMCDEyMjYuNTU3lEsCjAYxMjIyLjeUSwKMCDEy
+MTguODQzlEsCjAgxMjE0Ljk4NZRLAowIMTIxMS4xMjiUSwKMCDEyMDcuMjcxlEsCjAgxMjAzLjQx
+NJRLAowIMTE5OS41NTeUSwKMBjExOTUuN5RLAowIMTE5MS44NDOUSwKMCDExODcuOTg2lEsCjAgx
+MTg0LjEyOZRLAowIMTE4MC4yNzGUSwKMCDExNzYuNDE0lEsCjAgxMTcyLjU1N5RLAowGMTE2OC43
+lEsCjAgxMTY0Ljg0M5RLAowIMTE2MC45ODaUSwKMCDExNTcuMTI5lEsCjAgxMTUzLjI3MpRLAowI
+MTE0OS40MTWUSwKMCDExNDUuNTU4lEsCjAgxMTQxLjcwMZRLAowIMTEzNy44NDSUSwKMCDExMzMu
+OTg2lEsCjAgxMTMwLjEyOZRLAowIMTEyNi4yNzKUSwKMCDExMjIuNDE1lEsCjAgxMTE4LjU1OJRL
+AowIMTExNC43MDGUSwKMCDExMTAuODQ0lEsCjAgxMTA2Ljk4N5RLAowHMTEwMy4xM5RLAowIMTA5
+OS4yNzKUSwKMCDEwOTUuNDE1lEsCjAgxMDkxLjU1OJRLAowIMTA4Ny43MDGUSwKMCDEwODMuODQ0
+lEsCjAgxMDc5Ljk4N5RLAowHMTA3Ni4xM5RLAowIMTA3Mi4yNzOUSwKMCDEwNjguNDE2lEsCjAgx
+MDY0LjU1OZRLAowIMTA2MC43MDKUSwKMCDEwNTYuODQ0lEsCjAgxMDUyLjk4N5RLAowHMTA0OS4x
+M5RLAowIMTA0NS4yNzOUSwKMCDEwNDEuNDE2lEsCjAgxMDM3LjU1OZRLAowIMTAzMy43MDKUSwKM
+CDEwMjkuODQ1lEsCjAgxMDI1Ljk4OJRLAowIMTAyMi4xMzGUSwKMCDEwMTguMjczlEsCjAgxMDE0
+LjQxNpRLAowIMTAxMC41NTmUSwKMCDEwMDYuNzAylEsCjAgxMDAyLjg0NZRLAowHOTk4Ljk4OJRL
+AowIOTk1LjEzMDmUSwKMCDk5MS4yNzM4lEsCjAg5ODcuNDE2N5RLAowIOTgzLjU1OTaUSwKMCDk3
+OS43MDI1lEsCjAg5NzUuODQ1NJRLAowIOTcxLjk4ODOUSwKMCDk2OC4xMzEylEsCjAg5NjQuMjc0
+MZRLAowIOTYwLjQxNzGUSwKMCDk1Ni41NTk5lEsCjAg5NTIuNzAyOJRLAowIOTQ4Ljg0NTiUSwKM
+CDk0NC45ODg2lEsCjAg5NDEuMTMxNZRLAowIOTM3LjI3NDWUSwKMCDkzMy40MTc0lEsCjAg5Mjku
+NTYwMpRLAowIOTI1LjcwMzKUSwKMCDkyMS44NDYxlEsCjAc5MTcuOTg5lEsCjAg5MTQuMTMxOZRL
+AowIOTEwLjI3NDiUSwKMCDkwNi40MTc3lEsCaDRLAmgkSwF1jAVtZXRhc5R9lHViYXUu
+</properties>
+		<properties node_id="4" format="literal">{'add_type_annotations': True, 'auto_save': False, 'controlAreaVisible': True, 'filter': 'Compressed Comma-separated values (*.csv.gz)', 'savedWidgetGeometry': b'\x01\xd9\xd0\xcb\x00\x03\x00\x00\x00\x00\x036\x00\x00\x01\x98\x00\x00\x04\xb9\x00\x00\x02:\x00\x00\x036\x00\x00\x01\xb4\x00\x00\x04\xb9\x00\x00\x02:\x00\x00\x00\x00\x00\x00\x00\x00\x07\x80\x00\x00\x036\x00\x00\x01\xb4\x00\x00\x04\xb9\x00\x00\x02:', 'stored_name': 'liver-spectroscopy.csv.gz', 'stored_path': 'TRUE', '__version__': 3}</properties>
+	</node_properties>
+	<session_state>
+		<window_groups />
+	</session_state>
+</scheme>
