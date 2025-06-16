@@ -1045,6 +1045,9 @@ def fusionar_interpolados(df_ftir, df_raman):
 
     return df_tradicional
 
+
+
+
 def datafusion():
     base_path = './csv_exportados'
     archivo_ftir = input("Ingrese el nombre del archivo FTIR (con .csv): ").strip()
@@ -1068,16 +1071,28 @@ def datafusion():
     df_ftir.iloc[:, 0] = df_ftir.iloc[:, 0].astype(str).str.replace('.', '', regex=False).astype(float)
     df_raman.iloc[:, 0] = df_raman.iloc[:, 0].astype(str).str.replace('.', '', regex=False).astype(float)
 
-    eje_ftir = pd.to_numeric(df_ftir.iloc[:, 0], errors='coerce')
-    eje_raman = pd.to_numeric(df_raman.iloc[:, 0], errors='coerce')
+    print("\n📌 Elija el tipo de fusión de datos:")
+    print("1. Nivel bajo (Low-Level Fusion)")
+    print("2. Nivel medio (Feature-Level Fusion) [pendiente]")
+    print("3. Nivel alto (Decision-Level Fusion) [pendiente]")
+    opcion_fusion = input("Ingrese una opción (1/2/3): ").strip()
 
-    print("\n🔹 FTIR - eje X:")
-    print(f"Min: {eje_ftir.min()} cm⁻¹, Max: {eje_ftir.max()} cm⁻¹, Puntos: {len(eje_ftir)}")
-    print("🔹 Raman - eje X:")
-    print(f"Min: {eje_raman.min()} cm⁻¹, Max: {eje_raman.max()} cm⁻¹, Puntos: {len(eje_raman)}")
+    if opcion_fusion == '1':
+        fusion_low_level(df_ftir, df_raman, archivo_ftir, archivo_raman, base_path)
+    elif opcion_fusion == '2':
+        fusion_feature_level(df_ftir, df_raman)
+    elif opcion_fusion == '3':
+        fusion_decision_level(df_ftir, df_raman)
+    else:
+        print("❌ Opción inválida.")
+
+
+def fusion_low_level(df_ftir, df_raman, archivo_ftir, archivo_raman, base_path):
+    eje_ftir = df_ftir.iloc[:, 0]
+    eje_raman = df_raman.iloc[:, 0]
 
     if not eje_ftir.equals(eje_raman):
-        print("\n⚠️ Los ejes X de FTIR y Raman NO coinciden. Es necesaria la interpolación antes de la fusión.")
+        print("\n⚠️ Los ejes X no coinciden. Se necesita interpolación.")
         opcion = input("¿Desea interpolar ambos datasets a un mismo eje común? (s/n): ").strip().lower()
         if opcion == 's':
             min_comun = max(eje_ftir.min(), eje_raman.min())
@@ -1093,23 +1108,30 @@ def datafusion():
                 return
 
             nombre_ftir = os.path.splitext(archivo_ftir)[0] + '_interpolado.csv'
-            ruta_ftir_guardado = os.path.join(base_path, nombre_ftir)
-            df_ftir_interp.to_csv(ruta_ftir_guardado, index=False)
-            print(f"✅ FTIR interpolado guardado como: {ruta_ftir_guardado}")
+            df_ftir_interp.to_csv(os.path.join(base_path, nombre_ftir), index=False)
 
             nombre_raman = os.path.splitext(archivo_raman)[0] + '_interpolado.csv'
-            ruta_raman_guardado = os.path.join(base_path, nombre_raman)
-            df_raman_interp.to_csv(ruta_raman_guardado, index=False)
-            print(f"✅ Raman interpolado guardado como: {ruta_raman_guardado}")
+            df_raman_interp.to_csv(os.path.join(base_path, nombre_raman), index=False)
 
             fusion = fusionar_interpolados(df_ftir_interp, df_raman_interp)
-            fusion.to_csv(os.path.join(base_path, "fusion_ftir_raman.csv"))
-            print("✅ Fusion guardada como fusion_ftir_raman.csv")
         else:
-            print("⏭️ No se aplicó interpolación. Puede causar error en fusión.")
+            print("⏭️ No se aplicó interpolación. No es posible continuar con la fusión de bajo nivel.")
+            return
     else:
-        print("\n✅ Los ejes X coinciden. No es necesaria la interpolación. Se puede fusionar directamente.")
-    
+        print("\n✅ Ejes X coinciden. Se puede fusionar directamente.")
+        fusion = fusionar_interpolados(df_ftir, df_raman)
+
+    fusion.to_csv(os.path.join(base_path, "fusion_ftir_raman_lowlevel.csv"), index=False)
+    print("✅ Fusion (Low-Level) guardada como fusion_ftir_raman_lowlevel.csv")
+
+
+def fusion_feature_level(df_ftir, df_raman):
+    print("🛠️ Funcionalidad para Feature-Level Fusion en desarrollo...")
+
+
+def fusion_decision_level(df_ftir, df_raman):
+    print("🛠️ Funcionalidad para Decision-Level Fusion en desarrollo...")
+
 def menu():
     print("-" * 50) 
     #texto_desplazamiento("MENU", 10, 0.1)
