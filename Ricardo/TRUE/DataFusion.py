@@ -1047,7 +1047,6 @@ def fusionar_interpolados(df_ftir, df_raman):
 
 
 
-
 def datafusion():
     base_path = './csv_exportados'
     archivo_ftir = input("Ingrese el nombre del archivo FTIR (con .csv): ").strip()
