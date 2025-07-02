@@ -652,7 +652,9 @@ def obtener_types(df):
     return [col.split('_')[0] for col in df.columns[1:]]  # omite la primera columna (eje X)
 
 def aplicar_pca(df, types, n_componentes=2):
+    n_componentes = int(input("ingrese xdlol"))
     datos = df.iloc[:, 1:].T
+    
     pca = PCA(n_components=n_componentes)
     dato_pca = pca.fit_transform(datos)
     varianza = pca.explained_variance_ratio_ * 100
@@ -664,7 +666,7 @@ def aplicar_pca(df, types, n_componentes=2):
     else:
         print(f"PCA aplicado con {n_componentes} componentes.")
         print("⚠️ Visualización no disponible para más de 3 dimensiones. Puedes analizar la matriz resultante manualmente o reducir a 2-3 componentes para visualizar.")
-
+    print(dato_pca)
     return dato_pca, varianza, pca
 
 
@@ -963,6 +965,7 @@ def exportar_dataset_csv(df, carpeta_destino='./csv_exportados'):
     if not os.path.exists(carpeta_destino):
         os.makedirs(carpeta_destino)
     
+    
     # Ruta completa
     ruta_completa = os.path.join(carpeta_destino, f'{nombre_archivo}.csv')
     
@@ -971,6 +974,7 @@ def exportar_dataset_csv(df, carpeta_destino='./csv_exportados'):
         print(f"✅ Dataset exportado exitosamente a: {ruta_completa}")
     except Exception as e:
         print(f"❌ Error al exportar el dataset: {e}")
+    
         
 def listar_archivos_csv(directorio):
     archivos = [f for f in os.listdir(directorio) if f.endswith('.csv')]
@@ -1063,7 +1067,7 @@ def datafusion():
 
     df_ftir = limpiar_etiquetas_columnas(df_ftir)
     df_raman = limpiar_etiquetas_columnas(df_raman)
-
+    
     df_ftir = df_ftir.loc[:, ~df_ftir.columns.duplicated()]
     df_raman = df_raman.loc[:, ~df_raman.columns.duplicated()]
 
