@@ -1,0 +1,38 @@
+INFORME DE REDUCCIÓN DE DIMENSIONALIDAD
+========================================
+
+>> Parámetros Generales
+Nombre del informe: informe6
+Componentes seleccionados para visualización: [1, 2, 5]
+Intervalo de confianza: 90
+Componentes para PCA en t-SNE(PCA(X)): None
+Componentes para t-SNE en t-SNE(PCA(X)): None
+Componentes Principales: 20
+Varianza porcentaje: [6.40241047e+01 2.02651064e+01 6.35302828e+00 4.17449594e+00
+ 2.45862089e+00 1.02364890e+00 5.35031614e-01 3.82814779e-01
+ 1.88951447e-01 1.35357996e-01 1.05177316e-01 8.92305420e-02
+ 5.79625480e-02 4.91449697e-02 3.46489836e-02 2.75557350e-02
+ 1.61297015e-02 1.28748693e-02 1.12978105e-02 7.98547364e-03]
+Opciones activadas: {'PCA': True, 'GRAFICO 3D': True, 'GENERAR INFORME': True}
+
+>> Colores asignados por tipo:
+collagen: #9e0142
+glycogen: #fdbf6f
+lipids: #bfe5a0
+DNA: #5e4fa2
+
+>> Resultado de PCA:
+[[ 0.42555068 -0.19425265  0.30520772 ... -0.00329786  0.00255781
+  -0.00155017]
+ [ 0.85871392 -0.39592518 -0.25333967 ... -0.00803853  0.01585529
+  -0.00850341]
+ [ 0.34269329 -0.25893147  0.16366082 ...  0.01229723  0.00546151
+  -0.00123386]
+ ...
+ [ 0.28301944 -0.00885856  0.18631214 ...  0.00126362 -0.00470566
+  -0.00542591]
+ [ 0.10722908  0.04892642  0.19973781 ... -0.01270782 -0.01031522
+  -0.0033634 ]
+ [ 0.59798331  0.00839457  0.04219745 ... -0.00109204 -0.006748
+  -0.00215729]]
+

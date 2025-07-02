@@ -1,0 +1,32 @@
+INFORME DE REDUCCIÓN DE DIMENSIONALIDAD
+========================================
+
+>> Parámetros Generales
+Nombre del informe: informe2
+Componentes seleccionados para visualización: [1, 25, 50]
+Intervalo de confianza: 90
+Componentes para PCA: None
+Componentes para t-SNE: None
+Opciones activadas: {'PCA': True, 'GRAFICO 3D': True, 'GENERAR INFORME': True}
+
+>> Colores asignados por tipo:
+collagen: #9e0142
+glycogen: #fdbf6f
+lipids: #bfe5a0
+DNA: #5e4fa2
+
+>> Resultado de PCA:
+[[ 4.25550684e-01 -1.94252653e-01  3.05207719e-01 ...  5.82425738e-05
+   4.46561451e-04 -3.59658583e-04]
+ [ 8.58713915e-01 -3.95925181e-01 -2.53339670e-01 ...  3.70426510e-04
+  -1.04408613e-04 -1.95618844e-03]
+ [ 3.42693289e-01 -2.58931465e-01  1.63660821e-01 ... -2.52253676e-03
+   1.44356874e-03  5.36823422e-04]
+ ...
+ [ 2.83019443e-01 -8.85856086e-03  1.86312135e-01 ... -5.96692358e-04
+  -1.40705308e-03  1.13693811e-03]
+ [ 1.07229077e-01  4.89264213e-02  1.99737808e-01 ... -7.79535310e-04
+   1.25302899e-04 -3.71604249e-04]
+ [ 5.97983305e-01  8.39456746e-03  4.21974530e-02 ... -3.72363708e-04
+   1.32868365e-03  3.23592724e-04]]
+

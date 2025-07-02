@@ -1,0 +1,28 @@
+INFORME DE REDUCCIÓN DE DIMENSIONALIDAD
+========================================
+
+>> Parámetros Generales
+Nombre del informe: informe5
+Componentes seleccionados para visualización: []
+Intervalo de confianza: 90
+Componentes para PCA en t-SNE(PCA(X)): 20
+Componentes para t-SNE en t-SNE(PCA(X)): 2
+Componentes Principales: 
+Varianza porcentaje: None
+Opciones activadas: {'t-SNE(PCA(X))': True, 'GENERAR INFORME': True}
+
+>> Colores asignados por tipo:
+collagen: #9e0142
+glycogen: #fdbf6f
+lipids: #bfe5a0
+DNA: #5e4fa2
+
+>> Resultado de t-SNE(PCA(X)):
+[[ 13.511612  -21.546814 ]
+ [ 32.047962  -13.818275 ]
+ [ 16.333437  -21.900738 ]
+ ...
+ [  7.7336025   3.5651183]
+ [  3.733711    4.7347035]
+ [ 15.024697    1.3657476]]
+
