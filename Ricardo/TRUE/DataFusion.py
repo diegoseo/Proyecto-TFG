@@ -203,7 +203,7 @@ def normalizar_media_limpiar(df):
     - df_norm: DataFrame normalizado por media.
     """
     df_norm = df.copy()
-    x_column = df.columns[0]
+    #x_column = df.columns[0]
 
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce')
@@ -347,7 +347,7 @@ def filtro_gaussiano(df):
     sigma = int(input("\t\t\tIngrese sigma:")) #considerar usar sigma 2 o 3 
     
     df_suavizado = df.copy()
-    x_column = df.columns[0]
+    #x_column = df.columns[0]
 
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce')
@@ -548,7 +548,7 @@ def correccion_lineal(df):
     df_corregido = df.copy()
     for i in range(1, len(df.columns)):
         y = pd.to_numeric(df.iloc[:, i], errors='coerce').fillna(0)
-        x = np.arange(len(y))
+        #x = np.arange(len(y))
         y0, y1 = y.iloc[0], y.iloc[-1]
         baseline = np.linspace(y0, y1, len(y))
         df_corregido.iloc[:, i] = y - baseline
@@ -601,8 +601,6 @@ def suavizado(df):
              """.format("-" * 32))
     return df
           
-import pandas as pd
-import numpy as np
 
 def derivada(df):
     """
@@ -916,6 +914,7 @@ def inspeccionar_archivo(df, nombre_dataset="Datos"):
 
 def analisis_datos(df): 
     #TODO: PCA INPUT DE DIMENSIONES
+    #TODO: HCA VER QUE HACER CON GRUPOS
     print("""
           1. PCA   
           2. HCA
