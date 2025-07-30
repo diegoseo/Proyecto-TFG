@@ -141,7 +141,7 @@ def minmax(df):
         except Exception as e:
             print(f"❌ Error al normalizar columna #{i}: {e}")
 
-    print("✅ Min-Max aplicado")
+    print("✅ Min-Max")
     print(df_norm)
     return df_norm
 
