@@ -1149,7 +1149,7 @@ def menu():
     print("8. Exportar Dataframe")
     print("9. Data Fusion")
     print("0. Salir del programa")     
-
+  
 ## Función principal
 def main():
     df = lectura_archivo()
