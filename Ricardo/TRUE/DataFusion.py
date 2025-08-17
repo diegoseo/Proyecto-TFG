@@ -999,7 +999,163 @@ def limpiar_etiquetas_columnas(df):
     df.columns = nuevas_columnas
     return df
         
+def interpolar_dataframe(df, eje_comun, metodo='linear'):
+    """
+    Interpola TODAS las columnas de intensidad de un DataFrame espectroscópico al eje común.
+    - Primera columna = eje X (Wavenumber/Raman shift)
+    - Resto de columnas = intensidades (una o varias muestras)
+    """
+    x = df.iloc[:, 0].values
+    out = pd.DataFrame({df.columns[0]: eje_comun})
+    for col in df.columns[1:]:
+        y = pd.to_numeric(df[col], errors="coerce").values
+        valid = ~(np.isnan(x) | np.isnan(y))
+        if valid.sum() < 2:
+            out[col] = np.nan
+            continue
+        f = interp1d(x[valid], y[valid], kind=metodo, bounds_error=False, fill_value="extrapolate")
+        out[col] = f(eje_comun)
+    return out
 
+def fusionar_lowlevel(ftir_interp, raman_interp):
+    """
+    Fusión low-level CORRECTA sin transponer:
+    - Une por la primera columna (eje X)
+    - Mantiene todas las columnas de cada técnica con prefijos para claridad
+    """
+    xcol = ftir_interp.columns[0]
+    A = ftir_interp.copy()
+    B = raman_interp.copy()
+
+    # renombrar intensidades para distinguir FTIR / RAMAN
+    A = A.rename(columns={c: f"FTIR__{c}" for c in A.columns[1:]})
+    B = B.rename(columns={c: f"RAMAN__{c}" for c in B.columns[1:]})
+
+    # Asegurar que la columna X conserven el mismo nombre
+    if f"FTIR__{xcol}" in A.columns:
+        A = A.rename(columns={f"FTIR__{xcol}": xcol})
+    if f"RAMAN__{xcol}" in B.columns:
+        B = B.rename(columns={f"RAMAN__{xcol}": xcol})
+
+    fusion = pd.merge(A, B, on=xcol, how="inner")
+    # orden: X primero
+    return fusion[[xcol] + [c for c in fusion.columns if c != xcol]]
+
+def fusion_low_level(df_ftir, df_raman, base_path="./csv_exportados"):
+    """
+    Low-level fusion:
+    - Encuentra rango común
+    - Pregunta método de interpolación y #puntos
+    - Interpola ambos datasets al mismo eje
+    - Fusiona y guarda CSV
+    - Genera gráfico de superposición
+    """
+    x_ftir = df_ftir.iloc[:, 0].values
+    x_raman = df_raman.iloc[:, 0].values
+
+    xmin = max(np.nanmin(x_ftir), np.nanmin(x_raman))
+    xmax = min(np.nanmax(x_ftir), np.nanmax(x_raman))
+    if not np.isfinite(xmin) or not np.isfinite(xmax) or xmin >= xmax:
+        print("❌ No hay intersección válida entre ejes X de FTIR y Raman.")
+        return
+
+    print("\n🧮 Tipo de interpolación:")
+    print("1) linear   2) cubic   3) nearest")
+    mapa = {"1": "linear", "2": "cubic", "3": "nearest"}
+    metodo = mapa.get(input("Elige (1/2/3) [1]: ").strip() or "1", "linear")
+
+    try:
+        puntos = int(input("Cantidad de puntos del eje común [1500]: ").strip() or "1500")
+    except ValueError:
+        puntos = 1500
+
+    eje_comun = np.linspace(xmin, xmax, puntos)
+
+    ftir_i = interpolar_dataframe(df_ftir, eje_comun, metodo=metodo)
+    raman_i = interpolar_dataframe(df_raman, eje_comun, metodo=metodo)
+
+    fusion = fusionar_lowlevel(ftir_i, raman_i)
+
+    os.makedirs(base_path, exist_ok=True)
+    out_csv = os.path.join(base_path, f"fusion_lowlevel_{metodo}_{puntos}.csv")
+    fusion.to_csv(out_csv, index=False)
+    print(f"✅ Fusión low-level guardada en: {out_csv}")
+
+    # gráfico (toma la primera curva de cada técnica si existen)
+    xcol = fusion.columns[0]
+    col_ftir = next((c for c in fusion.columns[1:] if c.startswith("FTIR__")), None)
+    col_raman = next((c for c in fusion.columns[1:] if c.startswith("RAMAN__")), None)
+
+    if col_ftir and col_raman:
+        plt.figure(figsize=(10, 5))
+        plt.plot(fusion[xcol], fusion[col_ftir], label=col_ftir.replace("FTIR__", "FTIR "), linewidth=1.6)
+        plt.plot(fusion[xcol], fusion[col_raman], label=col_raman.replace("RAMAN__", "Raman "), linewidth=1.3)
+        plt.xlabel("Wavenumber (cm⁻¹)")
+        plt.ylabel("Intensidad")
+        plt.title("Superposición FTIR vs Raman (interpolados)")
+        plt.grid(True); plt.legend()
+        fig_path = os.path.join(base_path, f"fusion_lowlevel_plot_{metodo}_{puntos}.png")
+        plt.tight_layout(); plt.savefig(fig_path, dpi=150); plt.close()
+        print(f"🖼️ Gráfico guardado en: {fig_path}")
+    else:
+        print("⚠️ No se encontraron columnas de intensidad para graficar (FTIR__* / RAMAN__*).")
+def cargar_csv_detectando_separador(ruta_base, nombre_archivo):
+    """
+    Lee un CSV detectando automáticamente el separador usando tu función detectar_separador().
+    Requiere que 'nombre_archivo' exista dentro de 'ruta_base'.
+    """
+    ruta = os.path.join(ruta_base, nombre_archivo)
+    sep = detectar_separador(ruta)
+    if sep is None:
+        raise ValueError(f"No se pudo detectar separador para: {ruta}")
+    df = pd.read_csv(ruta, sep=sep)
+    # Limpia encabezados con tu función ya definida
+    df = limpiar_etiquetas_columnas(df)
+    # Garantiza que la primera col sea numérica (eje X)
+    df.iloc[:, 0] = pd.to_numeric(df.iloc[:, 0], errors="coerce")
+    df = df.dropna(subset=[df.columns[0]])
+    # Elimina duplicados de columnas si los hubiera
+    df = df.loc[:, ~df.columns.duplicated()]
+    return df
+
+def datafusion():
+    """
+    CLI: pide dos CSV (FTIR y Raman) desde ./csv_exportados y ofrece:
+    1) Low-level  2) Feature-level (pendiente)  3) Decision-level (pendiente)
+    """
+    base = "./csv_exportados"
+    os.makedirs(base, exist_ok=True)
+
+    print("\n📁 Archivos disponibles en ./csv_exportados:")
+    try:
+        print([f for f in os.listdir(base) if f.endswith(".csv")])
+    except Exception:
+        pass
+
+    f_ftir = input("🧪 Archivo FTIR (.csv) dentro de ./csv_exportados: ").strip()
+    f_raman = input("💡 Archivo Raman (.csv) dentro de ./csv_exportados: ").strip()
+
+    try:
+        df_ftir = cargar_csv_detectando_separador(base, f_ftir)
+        df_raman = cargar_csv_detectando_separador(base, f_raman)
+    except Exception as e:
+        print(f"❌ Error al cargar archivos: {e}")
+        return
+
+    print("\n📌 Tipo de fusión:")
+    print("1) Low-Level (interpolación + unión por eje)")
+    print("2) Feature-Level (pendiente)")
+    print("3) Decision-Level (pendiente)")
+    op = (input("Elige 1/2/3 [1]: ").strip() or "1")
+
+    if op == "1":
+        fusion_low_level(df_ftir, df_raman, base_path=base)
+    elif op == "2":
+        print("🛠️ Feature-Level aún no implementado en este archivo.")
+    elif op == "3":
+        print("🛠️ Decision-Level aún no implementado en este archivo.")
+    else:
+        print("❌ Opción inválida.")
 
 def menu():
     print("-" * 50) 
