@@ -24,6 +24,7 @@ from scipy.spatial.distance import pdist, squareform
 from scipy.stats import spearmanr
 import seaborn as sns
 from scipy.interpolate import interp1d
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler, Normalizer
 
 
 
@@ -1143,19 +1144,165 @@ def datafusion():
         return
 
     print("\n📌 Tipo de fusión:")
-    print("1) Low-Level (interpolación + unión por eje)")
-    print("2) Feature-Level (pendiente)")
-    print("3) Decision-Level (pendiente)")
-    op = (input("Elige 1/2/3 [1]: ").strip() or "1")
+    print("1) Interpolación + unión por eje LL")
+    print("2) Feature-Level ML")
+    print("3) Decision-Level HL")
+    op = (input("Elige 1/2/3: ").strip() or "1")
 
     if op == "1":
         fusion_low_level(df_ftir, df_raman, base_path=base)
-    elif op == "2":
-        print("🛠️ Feature-Level aún no implementado en este archivo.")
+    elif op == '2': #TODO: PODER CAMBIAR ESOS PARAMETROS POR ELEGIBLES POR EL USUARIO 
+        fusion_feature_level(
+            df_ftir, 
+            df_raman, 
+            base_path="./csv_exportados",
+            scale_kind="standard",        # o "minmax"
+            var_threshold_ftir=0.95,
+            var_threshold_raman=0.95,
+            max_components_ftir=None,     # o un entero si querés tope duro
+            max_components_raman=None,
+            save_plots=True
+        )
     elif op == "3":
         print("🛠️ Decision-Level aún no implementado en este archivo.")
     else:
         print("❌ Opción inválida.")
+
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+def _get_scaler(kind="standard"):
+    kind = (kind or "standard").lower()
+    if kind == "minmax":
+        return MinMaxScaler()
+    elif kind == "maxabs":
+        return MaxAbsScaler()
+    elif kind == "robust":
+        return RobustScaler()
+    elif kind == "normalizer":
+        return Normalizer(norm="l2")  # opciones: "l1", "l2", "max"
+    else:
+        return StandardScaler()
+def _to_samples_by_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convierte un DF espectroscópico (col0 = eje X, col1..N = intensidades por muestra)
+    a una matriz (muestras x variables) para PCA.
+    - Entradas: columnas = muestras; filas = posiciones del eje X (variables)
+    - Salida:   filas    = muestras; columnas = variables (eje X)
+    """
+    # df.iloc[:,1:] => (n_variables x n_samples)
+    # transponemos para obtener (n_samples x n_variables)
+    X = df.iloc[:, 1:].T
+    # Relleno de NaN si existieran
+    return X.fillna(0.0)
+
+def _pca_by_variance(X, var_threshold=0.95, max_components=None):
+    """
+    Aplica PCA escogiendo el número de componentes por umbral de varianza explicada
+    o por límite máximo si se indica max_components.
+    Devuelve: (X_pca, pca, n_comp_efectivos)
+    """
+    # límite superior por forma (no podemos pedir más comp. que min(n_samples, n_vars))
+    hard_cap = min(X.shape[0], X.shape[1])
+    if max_components is not None:
+        hard_cap = min(hard_cap, int(max_components))
+
+    # PCA con todos para decidir cuántos quedarse
+    pca_full = PCA(n_components=hard_cap, svd_solver="full")
+    pca_full.fit(X)
+    cumsum = np.cumsum(pca_full.explained_variance_ratio_)
+    n_comp = int(np.searchsorted(cumsum, var_threshold) + 1)
+    n_comp = min(hard_cap, max(1, n_comp))
+
+    # PCA final con n_comp efectivos
+    pca = PCA(n_components=n_comp, svd_solver="full")
+    X_pca = pca.fit_transform(X)
+    return X_pca, pca, n_comp
+
+def fusion_feature_level(
+    df_ftir: pd.DataFrame,
+    df_raman: pd.DataFrame,
+    base_path: str = "./csv_exportados",
+    scale_kind: str = "standard",         # "standard" o "minmax"
+    var_threshold_ftir: float = 0.95,     # % de varianza acumulada deseada en FTIR
+    var_threshold_raman: float = 0.95,    # % de varianza acumulada deseada en Raman
+    max_components_ftir: int | None = None,
+    max_components_raman: int | None = None,
+    save_plots: bool = True
+) -> str:
+    """
+    Mid/Feature-Level Fusion:
+      1) Convierte cada técnica a (muestras x variables)
+      2) Escala (por técnica) -> PCA por separado
+      3) Concatena componentes FTIR + Raman y guarda CSV
+
+    Retorna la ruta del CSV fusionado.
+    """
+    os.makedirs(base_path, exist_ok=True)
+
+    # 1) Convertir a (muestras x variables)
+    Xf = _to_samples_by_features(df_ftir).values
+    Xr = _to_samples_by_features(df_raman).values
+
+    # Asegurar que tengan mismo nº de muestras (mismas columnas en origen)
+    if Xf.shape[0] != Xr.shape[0]:
+        raise ValueError(
+            f"Número de muestras no coincide entre FTIR ({Xf.shape[0]}) y Raman ({Xr.shape[0]}). "
+            "Asegúrate de que las columnas de ambos CSV representen las mismas muestras."
+        )
+
+    # 2) Escalar por técnica (independientemente)
+    scaler_f = _get_scaler(scale_kind)
+    scaler_r = _get_scaler(scale_kind)
+    Xf_sc = scaler_f.fit_transform(Xf)
+    Xr_sc = scaler_r.fit_transform(Xr)
+
+    # 3) PCA por separado (elige componentes por umbral de varianza)
+    Xf_pca, pca_f, n_f = _pca_by_variance(Xf_sc, var_threshold=var_threshold_ftir, max_components=max_components_ftir)
+    Xr_pca, pca_r, n_r = _pca_by_variance(Xr_sc, var_threshold=var_threshold_raman, max_components=max_components_raman)
+
+    # 4) Concatenar features
+    X_fused = np.concatenate([Xf_pca, Xr_pca], axis=1)
+    cols_f = [f"FTIR_PC{i+1}" for i in range(n_f)]
+    cols_r = [f"RAMAN_PC{i+1}" for i in range(n_r)]
+    df_fused = pd.DataFrame(X_fused, columns=cols_f + cols_r)
+
+    # (Opcional) etiqueta de muestras si querés arrastrar nombres de columnas originales
+    # Suponiendo que las columnas 1..N en ambos DF comparten los mismos nombres
+    sample_names = df_ftir.columns[1:].tolist()
+    if len(sample_names) == df_fused.shape[0]:
+        df_fused.insert(0, "Sample", sample_names)
+
+    # 5) Guardar CSV
+    out_csv = os.path.join(base_path, f"fusion_featurelevel_PCA_{scale_kind}.csv")
+    df_fused.to_csv(out_csv, index=False)
+
+    # 6) (Opcional) Gráficos de varianza explicada
+    if save_plots:
+        # FTIR
+        plt.figure(figsize=(6,4))
+        plt.plot(np.cumsum(pca_f.explained_variance_ratio_), marker="o")
+        plt.xlabel("N° componentes")
+        plt.ylabel("Varianza explicada acumulada")
+        plt.title(f"FTIR PCA (n={n_f}) - escala: {scale_kind}")
+        plt.grid(True); plt.tight_layout()
+        ftir_png = os.path.join(base_path, f"featurelevel_FTIR_pca_{scale_kind}.png")
+        plt.savefig(ftir_png, dpi=140); plt.close()
+
+        # Raman
+        plt.figure(figsize=(6,4))
+        plt.plot(np.cumsum(pca_r.explained_variance_ratio_), marker="o")
+        plt.xlabel("N° componentes")
+        plt.ylabel("Varianza explicada acumulada")
+        plt.title(f"Raman PCA (n={n_r}) - escala: {scale_kind}")
+        plt.grid(True); plt.tight_layout()
+        raman_png = os.path.join(base_path, f"featurelevel_RAMAN_pca_{scale_kind}.png")
+        plt.savefig(raman_png, dpi=140); plt.close()
+
+        print(f"🖼️ Guardados gráficos PCA:\n  - {ftir_png}\n  - {raman_png}")
+
+    print(f"✅ Feature-level fusion guardado en: {out_csv}")
+    return out_csv
+
 
 def menu():
     print("-" * 50) 
