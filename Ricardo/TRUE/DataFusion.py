@@ -1156,7 +1156,7 @@ def datafusion():
             df_ftir, 
             df_raman, 
             base_path="./csv_exportados",
-            scale_kind="standard",        # o "minmax"
+            scale_kind="minmax",        # o "minmax"
             var_threshold_ftir=0.95,
             var_threshold_raman=0.95,
             max_components_ftir=None,     # o un entero si querés tope duro
@@ -1222,7 +1222,7 @@ def fusion_feature_level(
     df_ftir: pd.DataFrame,
     df_raman: pd.DataFrame,
     base_path: str = "./csv_exportados",
-    scale_kind: str = "standard",         # "standard" o "minmax"
+    scale_kind: str = "minmax",         # "standard" o "minmax"
     var_threshold_ftir: float = 0.95,     # % de varianza acumulada deseada en FTIR
     var_threshold_raman: float = 0.95,    # % de varianza acumulada deseada en Raman
     max_components_ftir: int | None = None,
