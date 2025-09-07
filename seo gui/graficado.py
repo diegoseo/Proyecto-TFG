@@ -13,22 +13,16 @@ class GraficarEspectros(QWidget):
     
     def __init__(self, datos, raman_shift, asignacion_colores):
         super().__init__()
-        print("ENTRO EN GRAFICAR ESPECTRO 1")
         self.setWindowTitle("Gráfico de Espectros")
         self.resize(800, 600)
-        print("ENTRO EN GRAFICAR ESPECTRO 2")
         layout = QVBoxLayout()
         self.setLayout(layout)
-        print("ENTRO EN GRAFICAR ESPECTRO 3")
         self.plot_widget = pg.PlotWidget()
-        print("ENTRO EN GRAFICAR ESPECTRO 4")
         self.plot_widget.addLegend()
         self.plot_widget.setLabel('left', 'Intensidad')
         self.plot_widget.setLabel('bottom', 'Raman Shift')
         layout.addWidget(self.plot_widget)
 
-        print("ENTRO EN GRAFICAR ESPECTRO 5")
-        
         leyendas_tipos = set()  # almacenamos los tipos que enocontramos y la funcion set() nos ayuda a quer no se repitan
 
         datos = datos.iloc[:,1:] # APARTAMOS LA PRIMERA COLUMNA DE LONGITUDES DE ONDAS
@@ -41,10 +35,6 @@ class GraficarEspectros(QWidget):
         intensidades = intensidades.astype(float) # Convertimos a valores numéricos
 
         datos = intensidades
-
-        print("DATOS NUEVO")
-        print(datos)
-
 
         leyendas_tipos = set() # ACA GUARDAMOS LOS NOMBRES DE LOS TIPOS SIN QUE SE REPITAN
         tipos_unicos = datos.columns.unique()
@@ -93,10 +83,6 @@ class GraficarEspectrosAcotados(QWidget):
         print("min val = ", val_min)
         print("max val = ", val_max)
 
-        # raman = datos.iloc[1:,0] # SELECIONAMOS LA LONG DE ONDAS
-        # print("RAMAN")
-        # print(raman)
-
         datos = datos.iloc[:,1:] # APARTAMOS LA PRIMERA COLUMNA DE LONGITUDES DE ONDAS
         print("Datos:")
         print(datos)
@@ -111,14 +97,8 @@ class GraficarEspectrosAcotados(QWidget):
 
         intensidades = intensidades.astype(float) # Convertimos a valores numéricos
 
-        print("INTENSIDADES")
-        print(intensidades)
-
         datos = intensidades
-
-        print("DATOS NUEVO")
-        print(datos)
-                
+    
         leyendas_tipos = set()  # Guardamos los tipos sin repetir
         tipos_unicos = datos.columns.unique()
         x_total = np.array(raman_shift, dtype=float)  # Eje X completo
@@ -128,8 +108,7 @@ class GraficarEspectrosAcotados(QWidget):
 
         for tipo in tipos_unicos:
             indices = [i for i, col in enumerate(datos.columns) if col == tipo] # separa el indice cuando el nombre de columna es igual al tipo actual
-            # print("INDICES")
-            # print(indices)
+
             for x in indices:
                 y_fila = datos.iloc[:, x]
 
@@ -185,9 +164,6 @@ class GraficarEspectrosTipos(QWidget):
 
         datos = intensidades
 
-        print("DATOS NUEVO")
-        print(datos)
-
 
         leyendas_tipos = set() # ACA GUARDAMOS LOS NOMBRES DE LOS TIPOS SIN QUE SE REPITAN
         tipos_unicos = datos.columns.unique()
@@ -231,20 +207,9 @@ class GraficarEspectrosAcotadoTipos(QWidget):
         self.plot_widget.setLabel('bottom', 'Raman Shift')
         layout.addWidget(self.plot_widget)
 
-        print("min val = ", val_min)
-        print("max val = ", val_max)
-
-        # raman = datos.iloc[1:,0] # SELECIONAMOS LA LONG DE ONDAS
-        # print("RAMAN")
-        # print(raman)
-
         datos = datos.iloc[:,1:] # APARTAMOS LA PRIMERA COLUMNA DE LONGITUDES DE ONDAS
-        print("Datos:")
-        print(datos)
 
         tipos = datos.iloc[0, :]    # Fila 0 tiene los tipos (collagen, DNA, etc.)
-        print("TIPOS:")
-        print(tipos)
         
         intensidades = datos.iloc[1:, :].copy()  # Desde la fila 1 en adelante son datos
 
@@ -252,14 +217,8 @@ class GraficarEspectrosAcotadoTipos(QWidget):
 
         intensidades = intensidades.astype(float) # Convertimos a valores numéricos
 
-        print("INTENSIDADES")
-        print(intensidades)
-
         datos = intensidades
 
-        print("DATOS NUEVO")
-        print(datos)
-                
         leyendas_tipos = set()  # Guardamos los tipos sin repetir
         tipos_unicos = datos.columns.unique()
         x_total = np.array(raman_shift, dtype=float)  # Eje X completo
@@ -268,8 +227,7 @@ class GraficarEspectrosAcotadoTipos(QWidget):
         x_filtrado = x_total[mascara]
 
         indices = [i for i, col in enumerate(datos.columns) if col == tipo_deseado] # separa el indice cuando el nombre de columna es igual al tipo actual
-            # print("INDICES")
-            # print(indices)
+ 
         for x in indices:
             y_fila = datos.iloc[:, x]
 
@@ -296,30 +254,6 @@ class GraficarEspectrosAcotadoTipos(QWidget):
 
 
 
-    # def aplicar_transformaciones(self):
-    #     df = self.df.copy()
-
-    #     if self.chk_normalizar.isChecked():
-    #         df = (df - df.mean()) / df.std()
-
-    #     if self.chk_suavizar.isChecked():
-    #         df = df.rolling(window=3, min_periods=1).mean()
-
-    #     if self.chk_derivada.isChecked():
-    #         df = df.diff().fillna(0)
-
-    #     # Guardar CSV con opciones aplicadas
-    #     nombre_archivo, _ = QFileDialog.getSaveFileName(self, "Guardar archivo CSV", "", "CSV (*.csv)")
-    #     if nombre_archivo:
-    #         try:
-    #             df.to_csv(nombre_archivo, index=False, header=True)
-    #             QMessageBox.information(self, "Éxito", f"Archivo guardado como: {nombre_archivo}")
-    #         except Exception as e:
-    #             QMessageBox.critical(self, "Error", f"No se pudo guardar el archivo: {e}")
-
-
-
-
 
 """
 Metodo = K-Nearest Neighbors (KNN)
@@ -333,30 +267,6 @@ LOS 5 PUNTOS MAS CERCANOS A ESE PUNTO Y CONTARA CUANTOS ROJOS Y AZULES HAY PARA 
 EL MAYOR 
 YOUTUBE: https://www.youtube.com/watch?v=gs9E7E0qOIc
 """
-
-# def calcular_accuracy(dataframe_pca, etiquetas):
-
-#     #Recibe el DataFrame PCA reducido y las etiquetas de clase.
-#     #Devuelve el porcentaje de aciertos usando KNN.
-    
-#     # Asegura que solo se usen columnas numéricas para el modelo
-#     columnas_numericas = [col for col in dataframe_pca.columns if dataframe_pca[col].dtype in [np.float64, np.float32, np.int64]]
-    
-#     X = dataframe_pca[columnas_numericas].values
-#     y = etiquetas.values
-
-#     scaler = StandardScaler()
-#     X_scaled = scaler.fit_transform(X)
-
-#     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
-
-#     clf = KNeighborsClassifier(n_neighbors=3) # BUSCAMOS LOS 3 VECINOS MAS CERCANOS
-#     clf.fit(X_train, y_train)
-
-#     y_pred = clf.predict(X_test)
-#     accuracy = accuracy_score(y_test, y_pred)
-
-#     return round(accuracy * 100, 2)
 
 def calcular_accuracy(dataframe_pca, etiquetas):
     #Recibe el DataFrame PCA reducido y las etiquetas de clase.Devuelve el porcentaje de aciertos usando KNN.

@@ -36,10 +36,8 @@ def identificar_delimitador(archivo):
     
     
 def cargar_archivo(ruta_archivo):
-    #print("ENTRO 3")
     if not os.path.isfile(ruta_archivo):
         raise FileNotFoundError("Archivo no encontrado")
-    
     delimitador = identificar_delimitador(ruta_archivo)
     print("El deliminatador es: ",delimitador)
     df = pd.read_csv(ruta_archivo, delimiter=delimitador, header=None)
