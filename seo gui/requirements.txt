@@ -5,14 +5,19 @@ joblib==1.5.1
 kiwisolver==1.4.8
 matplotlib==3.10.3
 narwhals==1.46.0
-numpy==1.26.4
+# Para Python < 3.12 (tiene wheel 1.26.x)
+numpy==1.26.4; python_version < "3.12"
+# Para Python >= 3.12 (requiere NumPy 2.x)
+numpy==2.1.3; python_version >= "3.12"
 packaging==25.0
 pandas==2.3.1
 pillow==11.3.0
 plotly==6.2.0
 pyparsing==3.2.3
+# PySide6 con wheel para Python moderno
+PySide6==6.9.2
+# pyqtgraph 0.13.3 funciona bien con Qt6/PySide6
 pyqtgraph==0.13.3
-PySide6==6.5.2
 PySide6-Addons==6.5.2
 PySide6-Essentials==6.5.2
 python-dateutil==2.9.0.post0
