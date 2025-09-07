@@ -1,9 +1,22 @@
-build/
-dist/
-*.pkg
-<<<<<<< HEAD
+# SO / IDE
 .DS_Store
-=======
-.DStore
->>>>>>> dev-Ricardo
-.DS_Store
+*/.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Entornos
+venv/
+.venv/
+
+# Builds/outputs
+__pycache__/
+*.pyc
+*.pyo
+
+# Datos generados
+*.csv
+*.gz
+*.xlsx
+*.png
+*.tab
